@@ -76,6 +76,194 @@ export async function handleKeyRoutes(
       });
     }
 
+    // GET /api/keys/:namespaceId/:keyName - Get a key's value
+    const getMatch = url.pathname.match(/^\/api\/keys\/([^/]+)\/([^/]+)$/);
+    if (getMatch && request.method === 'GET' && !url.pathname.endsWith('/list')) {
+      const namespaceId = getMatch[1];
+      const keyName = decodeURIComponent(getMatch[2]);
+
+      console.log('[Keys] Getting key:', keyName, 'from namespace:', namespaceId);
+
+      if (isLocalDev) {
+        // Return mock key data
+        const mockValue = JSON.stringify({ example: 'data', timestamp: Date.now() });
+        const response: APIResponse = {
+          success: true,
+          result: {
+            name: keyName,
+            value: mockValue,
+            size: mockValue.length,
+            metadata: { mock: true }
+          }
+        };
+
+        return new Response(JSON.stringify(response), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      const cfRequest = createCfApiRequest(
+        `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(keyName)}`,
+        env
+      );
+
+      const cfResponse = await fetch(cfRequest);
+
+      if (!cfResponse.ok) {
+        const errorText = await cfResponse.text();
+        console.error('[Keys] Cloudflare API error:', errorText);
+        throw new Error(`Cloudflare API error: ${cfResponse.status} - ${errorText}`);
+      }
+
+      const value = await cfResponse.text();
+      
+      // Get metadata separately
+      const metadataRequest = createCfApiRequest(
+        `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/metadata/${encodeURIComponent(keyName)}`,
+        env
+      );
+      
+      const metadataResponse = await fetch(metadataRequest);
+      let metadata = {};
+      
+      if (metadataResponse.ok) {
+        const metadataData = await metadataResponse.json() as { result?: Record<string, unknown> };
+        metadata = metadataData.result || {};
+      }
+
+      const response: APIResponse = {
+        success: true,
+        result: {
+          name: keyName,
+          value: value,
+          size: new Blob([value]).size,
+          metadata: metadata
+        }
+      };
+
+      return new Response(JSON.stringify(response), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // PUT /api/keys/:namespaceId/:keyName - Create or update a key
+    const putMatch = url.pathname.match(/^\/api\/keys\/([^/]+)\/([^/]+)$/);
+    if (putMatch && request.method === 'PUT') {
+      const namespaceId = putMatch[1];
+      const keyName = decodeURIComponent(putMatch[2]);
+      const body = await request.json() as { 
+        value: string; 
+        metadata?: unknown; 
+        expiration_ttl?: number;
+        create_backup?: boolean;
+      };
+
+      if (body.value === undefined) {
+        return new Response(JSON.stringify({ error: 'Missing value' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      console.log('[Keys] Putting key:', keyName, 'to namespace:', namespaceId);
+
+      if (isLocalDev) {
+        const response: APIResponse = {
+          success: true
+        };
+
+        return new Response(JSON.stringify(response), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      // If create_backup is true, backup existing value first
+      if (body.create_backup) {
+        try {
+          const existingRequest = createCfApiRequest(
+            `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(keyName)}`,
+            env
+          );
+          const existingResponse = await fetch(existingRequest);
+          
+          if (existingResponse.ok) {
+            const existingValue = await existingResponse.text();
+            const backupKey = `__backup__:${keyName}`;
+            
+            // Store backup with 24 hour TTL
+            const backupRequest = createCfApiRequest(
+              `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(backupKey)}?expiration_ttl=86400`,
+              env,
+              {
+                method: 'PUT',
+                body: existingValue
+              }
+            );
+            await fetch(backupRequest);
+            console.log('[Keys] Created backup for key:', keyName);
+          }
+        } catch (err) {
+          console.error('[Keys] Failed to create backup:', err);
+          // Continue with put operation even if backup fails
+        }
+      }
+
+      // Build query params for expiration
+      const params = new URLSearchParams();
+      if (body.expiration_ttl) {
+        params.set('expiration_ttl', body.expiration_ttl.toString());
+      }
+
+      const queryString = params.toString() ? `?${params.toString()}` : '';
+
+      // Prepare headers for metadata
+      const headers: HeadersInit = {
+        'Content-Type': 'text/plain'
+      };
+
+      // Add metadata if provided (as JSON string in header or body)
+      const requestBody = body.value;
+      if (body.metadata) {
+        // For KV API, metadata goes in the request as form data or separate field
+        // We'll use the simpler text PUT for now
+      }
+
+      const cfRequest = createCfApiRequest(
+        `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(keyName)}${queryString}`,
+        env,
+        {
+          method: 'PUT',
+          body: requestBody,
+          headers: headers
+        }
+      );
+
+      const cfResponse = await fetch(cfRequest);
+
+      if (!cfResponse.ok) {
+        const errorText = await cfResponse.text();
+        console.error('[Keys] Cloudflare API error:', errorText);
+        throw new Error(`Cloudflare API error: ${cfResponse.status} - ${errorText}`);
+      }
+
+      // Log audit entry
+      const operation = body.create_backup ? 'update' : 'create';
+      await auditLog(db, {
+        namespace_id: namespaceId,
+        key_name: keyName,
+        operation: operation,
+        user_email: userEmail
+      });
+
+      const response: APIResponse = {
+        success: true
+      };
+
+      return new Response(JSON.stringify(response), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
     // DELETE /api/keys/:namespaceId/:keyName - Delete a key
     const deleteMatch = url.pathname.match(/^\/api\/keys\/([^/]+)\/(.+)$/);
     if (deleteMatch && request.method === 'DELETE') {

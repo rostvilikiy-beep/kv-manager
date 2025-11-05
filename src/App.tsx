@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { api, type KVNamespace, type KVKey } from './services/api'
 import { auth } from './services/auth'
 import { useTheme } from './hooks/useTheme'
@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { KeyEditorDialog } from './components/KeyEditorDialog'
 
 type View = 
   | { type: 'list' }
@@ -37,6 +39,12 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>({ type: 'list' })
   const { theme, setTheme } = useTheme()
   
+  // Rename namespace state
+  const [showRenameDialog, setShowRenameDialog] = useState(false)
+  const [renameNamespaceId, setRenameNamespaceId] = useState('')
+  const [renameTitle, setRenameTitle] = useState('')
+  const [renaming, setRenaming] = useState(false)
+  
   // Bulk operations state
   const [selectedNamespaces, setSelectedNamespaces] = useState<string[]>([])
   
@@ -46,6 +54,19 @@ export default function App() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([])
   const [keyPrefix, setKeyPrefix] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [keysCursor, setKeysCursor] = useState<string | undefined>()
+  const [keysListComplete, setKeysListComplete] = useState(true)
+  
+  // Create key state
+  const [showCreateKeyDialog, setShowCreateKeyDialog] = useState(false)
+  const [newKeyName, setNewKeyName] = useState('')
+  const [newKeyValue, setNewKeyValue] = useState('')
+  const [newKeyTTL, setNewKeyTTL] = useState('')
+  const [newKeyMetadata, setNewKeyMetadata] = useState('')
+  const [creatingKey, setCreatingKey] = useState(false)
+  
+  // Edit key state
+  const [selectedKeyForEdit, setSelectedKeyForEdit] = useState<string | null>(null)
 
   // Load namespaces on mount
   useEffect(() => {
@@ -92,6 +113,29 @@ export default function App() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete namespace')
     }
+  }
+
+  const handleRenameNamespace = async () => {
+    if (!renameTitle.trim()) return
+
+    try {
+      setRenaming(true)
+      await api.renameNamespace(renameNamespaceId, renameTitle.trim())
+      setShowRenameDialog(false)
+      setRenameNamespaceId('')
+      setRenameTitle('')
+      await loadNamespaces()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to rename namespace')
+    } finally {
+      setRenaming(false)
+    }
+  }
+
+  const openRenameDialog = (namespaceId: string, currentTitle: string) => {
+    setRenameNamespaceId(namespaceId)
+    setRenameTitle(currentTitle)
+    setShowRenameDialog(true)
   }
 
   const cycleTheme = () => {
@@ -145,16 +189,82 @@ export default function App() {
     }
   }
 
-  const loadKeys = async (namespaceId: string) => {
+  const loadKeys = useCallback(async (namespaceId: string, append = false) => {
     try {
       setKeysLoading(true)
       setError('')
-      const response = await api.listKeys(namespaceId, { prefix: keyPrefix || undefined })
-      setKeys(response.keys)
+      const response = await api.listKeys(namespaceId, { 
+        prefix: keyPrefix || undefined,
+        cursor: append ? keysCursor : undefined
+      })
+      setKeys(prev => append ? [...prev, ...response.keys] : response.keys)
+      setKeysCursor(response.cursor)
+      setKeysListComplete(response.list_complete)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load keys')
     } finally {
       setKeysLoading(false)
+    }
+  }, [keyPrefix, keysCursor])
+
+  const loadMoreKeys = async (namespaceId: string) => {
+    await loadKeys(namespaceId, true)
+  }
+
+  const handleCreateKey = async () => {
+    if (!newKeyName.trim() || currentView.type !== 'namespace') return
+
+    // Validate metadata if provided
+    if (newKeyMetadata.trim()) {
+      try {
+        JSON.parse(newKeyMetadata)
+      } catch {
+        setError('Invalid JSON in metadata field')
+        return
+      }
+    }
+
+    try {
+      setCreatingKey(true)
+      setError('')
+      
+      const options: {
+        expiration_ttl?: number
+        metadata?: unknown
+      } = {}
+      if (newKeyTTL.trim()) {
+        const ttl = parseInt(newKeyTTL)
+        if (isNaN(ttl) || ttl <= 0) {
+          setError('TTL must be a positive number')
+          return
+        }
+        options.expiration_ttl = ttl
+      }
+      if (newKeyMetadata.trim()) {
+        options.metadata = JSON.parse(newKeyMetadata)
+      }
+
+      await api.putKey(
+        currentView.namespaceId,
+        newKeyName.trim(),
+        newKeyValue,
+        options
+      )
+
+      setShowCreateKeyDialog(false)
+      setNewKeyName('')
+      setNewKeyValue('')
+      setNewKeyTTL('')
+      setNewKeyMetadata('')
+      
+      // Reset pagination and reload keys
+      setKeysCursor(undefined)
+      setKeysListComplete(true)
+      await loadKeys(currentView.namespaceId)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create key')
+    } finally {
+      setCreatingKey(false)
     }
   }
 
@@ -190,13 +300,17 @@ export default function App() {
   // Load keys when viewing a namespace
   useEffect(() => {
     if (currentView.type === 'namespace') {
+      setKeysCursor(undefined)
+      setKeysListComplete(true)
       loadKeys(currentView.namespaceId)
     } else {
       setKeys([])
       setSelectedKeys([])
       setKeyPrefix('')
+      setKeysCursor(undefined)
+      setKeysListComplete(true)
     }
-  }, [currentView, keyPrefix])
+  }, [currentView, keyPrefix, loadKeys])
 
   return (
     <div className="min-h-screen bg-background">
@@ -365,6 +479,13 @@ export default function App() {
                             Browse Keys
                           </Button>
                           <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openRenameDialog(ns.id, ns.title)}
+                          >
+                            Rename
+                          </Button>
+                          <Button 
                             variant="destructive" 
                             size="sm"
                             onClick={() => handleDeleteNamespace(ns.id)}
@@ -399,6 +520,10 @@ export default function App() {
                   <span className="font-mono">{currentView.namespaceTitle}</span> • {keys.length} {keys.length === 1 ? 'key' : 'keys'}
                 </p>
               </div>
+              <Button onClick={() => setShowCreateKeyDialog(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Key
+              </Button>
             </div>
 
             {/* Search/Filter Bar */}
@@ -476,71 +601,97 @@ export default function App() {
 
             {/* Keys Table */}
             {!keysLoading && keys.length > 0 && (
-              <div className="border rounded-lg">
-                <table className="w-full">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      <th className="w-12 p-4">
-                        <Checkbox
-                          checked={selectedKeys.length === keys.length}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedKeys(keys.map(k => k.name))
-                            } else {
-                              setSelectedKeys([])
-                            }
-                          }}
-                        />
-                      </th>
-                      <th className="text-left p-4 font-semibold">Key Name</th>
-                      <th className="text-left p-4 font-semibold">Expiration</th>
-                      <th className="w-24 p-4"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {keys.map((key) => {
-                      const isSelected = selectedKeys.includes(key.name)
-                      return (
-                        <tr 
-                          key={key.name} 
-                          className={`border-t hover:bg-muted/50 ${isSelected ? 'bg-primary/5' : ''}`}
-                        >
-                          <td className="p-4">
-                            <Checkbox
-                              checked={isSelected}
-                              onCheckedChange={() => toggleKeySelection(key.name)}
-                            />
-                          </td>
-                          <td className="p-4">
-                            <div className="font-mono text-sm">{key.name}</div>
-                          </td>
-                          <td className="p-4 text-sm text-muted-foreground">
-                            {key.expiration ? new Date(key.expiration * 1000).toLocaleString() : 'Never'}
-                          </td>
-                          <td className="p-4">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={async () => {
-                                if (confirm(`Delete key "${key.name}"?`)) {
-                                  try {
-                                    await api.deleteKey(currentView.namespaceId, key.name)
-                                    await loadKeys(currentView.namespaceId)
-                                  } catch (err) {
-                                    setError(err instanceof Error ? err.message : 'Failed to delete key')
+              <>
+                <div className="border rounded-lg">
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="w-12 p-4">
+                          <Checkbox
+                            checked={selectedKeys.length === keys.length}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedKeys(keys.map(k => k.name))
+                              } else {
+                                setSelectedKeys([])
+                              }
+                            }}
+                          />
+                        </th>
+                        <th className="text-left p-4 font-semibold">Key Name</th>
+                        <th className="text-left p-4 font-semibold">Expiration</th>
+                        <th className="w-24 p-4"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {keys.map((key) => {
+                        const isSelected = selectedKeys.includes(key.name)
+                        return (
+                          <tr 
+                            key={key.name} 
+                            className={`border-t hover:bg-muted/50 ${isSelected ? 'bg-primary/5' : ''}`}
+                          >
+                            <td className="p-4">
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={() => toggleKeySelection(key.name)}
+                              />
+                            </td>
+                            <td className="p-4">
+                              <div 
+                                className="font-mono text-sm cursor-pointer hover:text-primary hover:underline"
+                                onClick={() => setSelectedKeyForEdit(key.name)}
+                              >
+                                {key.name}
+                              </div>
+                            </td>
+                            <td className="p-4 text-sm text-muted-foreground">
+                              {key.expiration ? new Date(key.expiration * 1000).toLocaleString() : 'Never'}
+                            </td>
+                            <td className="p-4">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={async () => {
+                                  if (confirm(`Delete key "${key.name}"?`)) {
+                                    try {
+                                      await api.deleteKey(currentView.namespaceId, key.name)
+                                      setKeysCursor(undefined)
+                                      setKeysListComplete(true)
+                                      await loadKeys(currentView.namespaceId)
+                                    } catch (err) {
+                                      setError(err instanceof Error ? err.message : 'Failed to delete key')
+                                    }
                                   }
-                                }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Load More Button */}
+                {!keysListComplete && (
+                  <div className="flex justify-center mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => loadMoreKeys(currentView.namespaceId)}
+                      disabled={keysLoading}
+                    >
+                      {keysLoading ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading...</>
+                      ) : (
+                        'Load More'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -586,6 +737,139 @@ export default function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Rename Namespace Dialog */}
+      <Dialog open={showRenameDialog} onOpenChange={setShowRenameDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Namespace</DialogTitle>
+            <DialogDescription>
+              Enter a new title for this namespace.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="rename-title">Namespace Title</Label>
+              <Input
+                id="rename-title"
+                placeholder="my-kv-namespace"
+                value={renameTitle}
+                onChange={(e) => setRenameTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !renaming) {
+                    handleRenameNamespace()
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowRenameDialog(false)}
+              disabled={renaming}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleRenameNamespace} disabled={renaming || !renameTitle.trim()}>
+              {renaming && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Rename
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Key Dialog */}
+      <Dialog open={showCreateKeyDialog} onOpenChange={setShowCreateKeyDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create New Key</DialogTitle>
+            <DialogDescription>
+              Add a new key-value pair to this namespace.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="key-name">Key Name *</Label>
+              <Input
+                id="key-name"
+                placeholder="my-key"
+                value={newKeyName}
+                onChange={(e) => setNewKeyName(e.target.value)}
+                className="font-mono"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="key-value">Value *</Label>
+              <Textarea
+                id="key-value"
+                placeholder="Enter the value..."
+                value={newKeyValue}
+                onChange={(e) => setNewKeyValue(e.target.value)}
+                className="font-mono min-h-[200px]"
+                rows={10}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="key-ttl">TTL (seconds)</Label>
+              <Input
+                id="key-ttl"
+                type="number"
+                placeholder="Leave empty for no expiration"
+                value={newKeyTTL}
+                onChange={(e) => setNewKeyTTL(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="key-metadata">Metadata (JSON)</Label>
+              <Textarea
+                id="key-metadata"
+                placeholder='{"key": "value"}'
+                value={newKeyMetadata}
+                onChange={(e) => setNewKeyMetadata(e.target.value)}
+                className="font-mono"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateKeyDialog(false)
+                setNewKeyName('')
+                setNewKeyValue('')
+                setNewKeyTTL('')
+                setNewKeyMetadata('')
+              }}
+              disabled={creatingKey}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateKey} disabled={creatingKey || !newKeyName.trim()}>
+              {creatingKey && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Key Editor Dialog */}
+      {currentView.type === 'namespace' && selectedKeyForEdit && (
+        <KeyEditorDialog
+          open={!!selectedKeyForEdit}
+          onOpenChange={(open) => {
+            if (!open) setSelectedKeyForEdit(null)
+          }}
+          namespaceId={currentView.namespaceId}
+          keyName={selectedKeyForEdit}
+          onSaved={() => {
+            setKeysCursor(undefined)
+            setKeysListComplete(true)
+            loadKeys(currentView.namespaceId)
+          }}
+        />
+      )}
     </div>
   )
 }

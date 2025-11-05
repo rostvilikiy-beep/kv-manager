@@ -110,6 +110,74 @@ export async function handleNamespaceRoutes(
       });
     }
 
+    // PATCH /api/namespaces/:namespaceId/rename - Rename namespace
+    const renameMatch = url.pathname.match(/^\/api\/namespaces\/([^/]+)\/rename$/);
+    if (renameMatch && request.method === 'PATCH') {
+      const namespaceId = renameMatch[1];
+      const body = await request.json() as { title: string };
+
+      if (!body.title) {
+        return new Response(JSON.stringify({ error: 'Missing title' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      console.log('[Namespaces] Renaming namespace:', namespaceId, 'to:', body.title);
+
+      if (isLocalDev) {
+        const response: APIResponse<KVNamespaceInfo> = {
+          success: true,
+          result: {
+            id: namespaceId,
+            title: body.title,
+            first_accessed: new Date().toISOString(),
+            last_accessed: new Date().toISOString()
+          }
+        };
+
+        return new Response(JSON.stringify(response), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      const cfRequest = createCfApiRequest(
+        `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}`,
+        env,
+        {
+          method: 'PUT',
+          body: JSON.stringify({ title: body.title })
+        }
+      );
+
+      const cfResponse = await fetch(cfRequest);
+
+      if (!cfResponse.ok) {
+        const errorText = await cfResponse.text();
+        console.error('[Namespaces] Cloudflare API error:', errorText);
+        throw new Error(`Cloudflare API error: ${cfResponse.status} - ${errorText}`);
+      }
+
+      const data = await cfResponse.json() as { result: KVNamespaceInfo };
+
+      // Log audit entry
+      await auditLog(db, {
+        namespace_id: namespaceId,
+        operation: 'rename_namespace',
+        user_email: userEmail,
+        details: JSON.stringify({ new_title: body.title })
+      });
+
+      const response: APIResponse<KVNamespaceInfo> = {
+        success: true,
+        result: data.result
+      };
+
+      return new Response(JSON.stringify(response), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
     // DELETE /api/namespaces/:namespaceId - Delete namespace
     const deleteMatch = url.pathname.match(/^\/api\/namespaces\/([^/]+)$/);
     if (deleteMatch && request.method === 'DELETE') {
