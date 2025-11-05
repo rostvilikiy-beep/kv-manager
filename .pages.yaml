@@ -1,0 +1,9 @@
+# Cloudflare Pages Build Configuration
+build:
+  command: npm run build
+  cwd: ./
+  watch_paths:
+    - src/**
+    - worker/**
+    - package.json
+
