@@ -1,5 +1,7 @@
 # Cloudflare KV Manager
 
+* Last Updated November 4, 2025 *
+
 A modern web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
 ## Features
