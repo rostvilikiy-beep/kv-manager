@@ -33,6 +33,3 @@ dist-ssr
 
 # D1 local database
 .mf/
-
-# Secrets
-wrangler.toml

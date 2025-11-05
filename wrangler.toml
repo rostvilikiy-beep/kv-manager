@@ -1,0 +1,67 @@
+# KV Manager - Production Configuration
+
+name = "kv-manager"
+main = "worker/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Assets configuration - serve static files from dist/
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Production D1 database
+[[d1_databases]]
+binding = "METADATA"
+database_name = "kv-manager-metadata"
+database_id = "36b36024-2890-43fd-a867-88279c765cf7"
+
+# Durable Objects bindings
+[[durable_objects.bindings]]
+name = "BULK_OPERATION_DO"
+class_name = "BulkOperationDO"
+script_name = "kv-manager"
+
+[[durable_objects.bindings]]
+name = "IMPORT_EXPORT_DO"
+class_name = "ImportExportDO"
+script_name = "kv-manager"
+
+# Durable Object migrations
+[[migrations]]
+tag = "v1"
+new_classes = ["BulkOperationDO", "ImportExportDO"]
+
+# Production environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# ACCOUNT_ID - Your Cloudflare account ID
+# API_KEY - Your Cloudflare API token
+# TEAM_DOMAIN - Your Cloudflare Access team domain (e.g., https://myteam.cloudflareaccess.com)
+# POLICY_AUD - Your Cloudflare Access policy AUD tag
+
+# Example KV namespace bindings (add as needed)
+# [[kv_namespaces]]
+# binding = "KV_your_namespace_id"
+# id = "your_namespace_id"
+
+# Custom domain configuration
+# Production: kv.adamic.tech
+[[routes]]
+pattern = "kv.adamic.tech"
+custom_domain = true
+zone_name = "adamic.tech"
+
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
