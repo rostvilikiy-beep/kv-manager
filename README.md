@@ -4,6 +4,8 @@
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
+**🎯 [Try the Live Demo](https://kv.adamic.tech/)** - See KV Manager in action
+
 ## Features
 
 ### Namespace Management
