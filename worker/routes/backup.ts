@@ -13,7 +13,7 @@ export async function handleBackupRoutes(
 
   try {
     // GET /api/backup/:namespaceId/:keyName/check - Check if backup exists
-    const checkMatch = url.pathname.match(/^\/api\/backup\/([^/]+)\/([^/]+)\/check$/);
+    const checkMatch = url.pathname.match(/^\/api\/backup\/([^/]+)\/(.+)\/check$/);
     if (checkMatch && request.method === 'GET') {
       const namespaceId = checkMatch[1];
       const keyName = decodeURIComponent(checkMatch[2]);
@@ -55,7 +55,7 @@ export async function handleBackupRoutes(
     }
 
     // POST /api/backup/:namespaceId/:keyName/undo - Restore from backup
-    const undoMatch = url.pathname.match(/^\/api\/backup\/([^/]+)\/([^/]+)\/undo$/);
+    const undoMatch = url.pathname.match(/^\/api\/backup\/([^/]+)\/(.+)\/undo$/);
     if (undoMatch && request.method === 'POST') {
       const namespaceId = undoMatch[1];
       const keyName = decodeURIComponent(undoMatch[2]);
