@@ -35,9 +35,12 @@ export function BulkProgressDialog({
   const [autoCloseTimer, setAutoCloseTimer] = useState<number | null>(null);
   const [canClose, setCanClose] = useState(false);
 
+  // Only use the hook when dialog is open and we have valid params
+  const shouldConnect = open && jobId && wsUrl;
+  
   const { progress, isConnected, error: connectionError } = useBulkJobProgress({
-    jobId,
-    wsUrl,
+    jobId: shouldConnect ? jobId : '',
+    wsUrl: shouldConnect ? wsUrl : '',
     onComplete: (result) => {
       setCanClose(true);
       

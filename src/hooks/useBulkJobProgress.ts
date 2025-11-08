@@ -42,6 +42,12 @@ export function useBulkJobProgress({
 
   // Polling fallback
   const startPolling = useCallback(() => {
+    // Don't start polling if jobId is empty
+    if (!jobId) {
+      console.log('[useBulkJobProgress] Skipping polling - missing jobId');
+      return;
+    }
+    
     console.log('[useBulkJobProgress] Starting polling fallback for job:', jobId);
     
     if (pollingIntervalRef.current) {
@@ -121,6 +127,12 @@ export function useBulkJobProgress({
   // Connect to WebSocket
   const connect = useCallback(() => {
     if (wsRef.current || hasCompletedRef.current) {
+      return;
+    }
+
+    // Don't attempt to connect if wsUrl or jobId is empty
+    if (!wsUrl || !jobId) {
+      console.log('[useBulkJobProgress] Skipping connection - missing wsUrl or jobId');
       return;
     }
 
@@ -226,7 +238,7 @@ export function useBulkJobProgress({
       setError('Failed to establish WebSocket connection');
       startPolling(); // Fall back to polling immediately
     }
-  }, [wsUrl, onComplete, onError, startPolling, stopPolling]);
+  }, [jobId, wsUrl, onComplete, onError, startPolling, stopPolling]);
 
   // Store connect in ref to avoid circular dependency
   useEffect(() => {

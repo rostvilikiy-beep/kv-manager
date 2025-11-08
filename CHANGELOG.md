@@ -59,6 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed all ESLint and TypeScript linting errors related to React hooks and Workers types
 
 ### Fixed
+- **CRITICAL**: WebSocket connection loop causing 429 rate limit errors
+  - Added parameter validation in `useBulkJobProgress` hook to prevent connection attempts with empty jobId or wsUrl
+  - Added conditional guard in `BulkProgressDialog` to only invoke hook when dialog is open and has valid parameters
+  - Prevents infinite reconnection loops and API request floods
+  - See `HOTFIX-websocket-connection-loop.md` for detailed analysis
 - React hooks immutability issues in `useBulkJobProgress` hook
 - Circular dependency in WebSocket connection callback
 - TypeScript type compatibility issues between DOM and Cloudflare Workers WebSocket types
