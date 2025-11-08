@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 5, 2025*
+*Last Updated: November 8, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -72,7 +72,18 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 
 - **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.1.12 + Tailwind CSS 3.4.18 + shadcn/ui
 - **Backend**: Cloudflare Workers + KV + D1 (metadata) + Durable Objects (orchestration)
+- **Real-time Progress**: WebSocket connections via Durable Objects with polling fallback
 - **Auth**: Cloudflare Access (Zero Trust)
+
+### WebSocket-Based Progress Tracking
+
+All bulk operations (copy, delete, TTL updates, tag operations, import, export) now use **WebSocket connections** for real-time progress updates:
+
+- **Async Processing**: Operations start immediately and process in background via Durable Objects
+- **Real-Time Updates**: Progress, current key, percentage, and errors stream via WebSocket
+- **Graceful Fallback**: Automatic fallback to HTTP polling if WebSocket connection fails
+- **Reconnection**: Exponential backoff reconnection strategy for dropped connections
+- **Progress Details**: See total keys, processed count, errors, current key being processed, and percentage completion
 
 ## Docker Deployment
 
@@ -263,11 +274,15 @@ wrangler deploy
 - `GET /api/backup/:namespaceId/:keyName/check` - Check if backup exists
 
 ### Import/Export
-- `GET /api/export/:namespaceId` - Export namespace keys and values
+- `GET /api/export/:namespaceId` - Start async export of namespace keys and values
   - Query params: `format` (json|ndjson)
-- `POST /api/import/:namespaceId` - Import keys into namespace
+  - Returns: `job_id`, `status`, `ws_url`
+- `POST /api/import/:namespaceId` - Start async import of keys into namespace
   - Query params: `collision` (skip|overwrite|fail)
-- `GET /api/jobs/:jobId` - Get status of import/export job
+  - Returns: `job_id`, `status`, `ws_url`
+- `GET /api/jobs/:jobId` - Get status of bulk job (polling endpoint)
+- `GET /api/jobs/:jobId/ws` - WebSocket endpoint for real-time progress updates
+- `GET /api/jobs/:jobId/download` - Download completed export file
 
 ### Audit Logs
 - `GET /api/audit/:namespaceId` - Get audit log for a namespace
@@ -427,13 +442,21 @@ npx wrangler d1 list
 - Verify D1 database is properly initialized
 - Try searching without filters first
 
+### WebSocket connection issues
+- Progress tracking automatically falls back to HTTP polling if WebSocket fails
+- Check browser console for connection errors
+- Verify firewall/proxy settings allow WebSocket connections
+- WebSocket connections use same origin as API (ws:// for http://, wss:// for https://)
+- For development, ensure worker is running on expected port (default: 8787)
+
 ## Next Steps:
 
 ### Immediate Priorities:
-1. Add WebSocket support for real-time progress
-2. Implement Durable Objects for large operations
+1. ✅ ~~Add WebSocket support for real-time progress~~ - **Completed!**
+2. ✅ ~~Implement Durable Objects for large operations~~ - **Completed!**
 3. Add advanced search filters
 4. Create analytics dashboard
+5. Add operation cancellation support
 
 ### Future Enhancements:
 1. R2 backup integration
@@ -442,6 +465,8 @@ npx wrangler d1 list
 4. Key expiration alerts
 5. Namespace templates
 6. Batch operations to R2
+7. Real-time notifications for completed operations
+8. Progress history and job logs
 
 ## License
 

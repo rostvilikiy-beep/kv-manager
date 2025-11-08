@@ -1,4 +1,5 @@
 import type { Env } from './types';
+import type { DurableObjectNamespace } from '@cloudflare/workers-types';
 import { validateAccessJWT } from './utils/auth';
 import { getCorsHeaders, handleCorsPreflightRequest, isLocalDevelopment } from './utils/cors';
 import { handleNamespaceRoutes } from './routes/namespaces';
@@ -64,6 +65,49 @@ async function handleApiRequest(request: Request, env: Env): Promise<Response> {
 
   if (url.pathname.startsWith('/api/backup')) {
     return await handleBackupRoutes(request, env, url, corsHeaders, isLocalDev, userEmail);
+  }
+
+  // WebSocket endpoint for job progress
+  const wsJobMatch = url.pathname.match(/^\/api\/jobs\/([^/]+)\/ws$/);
+  if (wsJobMatch && request.headers.get('Upgrade') === 'websocket') {
+    const jobId = wsJobMatch[1];
+    console.log('[Worker] WebSocket upgrade request for job:', jobId);
+    
+    // Determine which DO to use based on job type
+    const jobType = jobId.split('-')[0]; // e.g., "copy", "import", "export", etc.
+    
+    let doNamespace: DurableObjectNamespace;
+    if (jobType === 'import' || jobType === 'export') {
+      doNamespace = env.IMPORT_EXPORT_DO;
+    } else {
+      doNamespace = env.BULK_OPERATION_DO;
+    }
+    
+    // Get Durable Object stub using job ID
+    const id = doNamespace.idFromName(jobId);
+    const stub = doNamespace.get(id);
+    
+    // Forward the WebSocket upgrade request to the DO
+    // @ts-expect-error - Request types are compatible at runtime
+    return await stub.fetch(request);
+  }
+
+  // Download endpoint for export results
+  const downloadMatch = url.pathname.match(/^\/api\/jobs\/([^/]+)\/download$/);
+  if (downloadMatch && request.method === 'GET') {
+    const jobId = downloadMatch[1];
+    console.log('[Worker] Download request for job:', jobId);
+    
+    const id = env.IMPORT_EXPORT_DO.idFromName(jobId);
+    const stub = env.IMPORT_EXPORT_DO.get(id);
+    
+    // Forward to DO's download endpoint
+    const doUrl = new URL(request.url);
+    doUrl.pathname = `/download/${jobId}`;
+    const doRequest = new Request(doUrl.toString(), request);
+    
+    // @ts-expect-error - Request types are compatible at runtime
+    return await stub.fetch(doRequest);
   }
 
   if (url.pathname.startsWith('/api/export') || url.pathname.startsWith('/api/import') || url.pathname.startsWith('/api/jobs')) {

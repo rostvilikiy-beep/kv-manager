@@ -46,6 +46,34 @@ export interface SearchResult {
   value_preview?: string
 }
 
+// Job Progress types
+export interface JobProgress {
+  jobId: string
+  status: 'queued' | 'running' | 'completed' | 'failed'
+  progress: {
+    total: number
+    processed: number
+    errors: number
+    currentKey?: string
+    percentage: number
+  }
+  result?: {
+    processed?: number
+    errors?: number
+    skipped?: number
+    downloadUrl?: string
+    format?: string
+  }
+  error?: string
+}
+
+export interface BulkJobResponse {
+  job_id: string
+  status: string
+  ws_url: string
+  total_keys?: number
+}
+
 class APIService {
   /**
    * Get fetch options with credentials
@@ -232,9 +260,9 @@ class APIService {
   }
 
   /**
-   * Bulk delete keys
+   * Bulk delete keys (async with job tracking)
    */
-  async bulkDeleteKeys(namespaceId: string, keys: string[]): Promise<{ status: string; total_keys: number; processed_keys: number }> {
+  async bulkDeleteKeys(namespaceId: string, keys: string[]): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/keys/${namespaceId}/bulk-delete`,
       {
@@ -346,13 +374,13 @@ class APIService {
   }
 
   /**
-   * Bulk copy keys to another namespace
+   * Bulk copy keys to another namespace (async with job tracking)
    */
   async bulkCopyKeys(
     namespaceId: string, 
     keys: string[], 
     targetNamespaceId: string
-  ): Promise<{ job_id: string; status: string; total_keys: number; processed_keys: number; error_count: number }> {
+  ): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/keys/${namespaceId}/bulk-copy`,
       {
@@ -372,13 +400,13 @@ class APIService {
   }
 
   /**
-   * Bulk update TTL for keys
+   * Bulk update TTL for keys (async with job tracking)
    */
   async bulkUpdateTTL(
     namespaceId: string, 
     keys: string[], 
     expirationTtl: number
-  ): Promise<{ job_id: string; status: string; total_keys: number; processed_keys: number; error_count: number }> {
+  ): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/keys/${namespaceId}/bulk-ttl`,
       {
@@ -398,14 +426,14 @@ class APIService {
   }
 
   /**
-   * Bulk tag keys
+   * Bulk tag keys (async with job tracking)
    */
   async bulkTagKeys(
     namespaceId: string,
     keys: string[],
     tags: string[],
     operation: 'add' | 'remove' | 'replace' = 'replace'
-  ): Promise<{ processed_keys: number }> {
+  ): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/metadata/${namespaceId}/bulk-tag`,
       {
@@ -425,9 +453,9 @@ class APIService {
   }
 
   /**
-   * Export namespace
+   * Export namespace (async with job tracking)
    */
-  async exportNamespace(namespaceId: string, format: 'json' | 'ndjson' = 'json'): Promise<Blob> {
+  async exportNamespace(namespaceId: string, format: 'json' | 'ndjson' = 'json'): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/export/${namespaceId}?format=${format}`,
       { credentials: 'include' }
@@ -435,17 +463,18 @@ class APIService {
     
     await this.handleResponse(response);
     
-    return await response.blob()
+    const data = await response.json()
+    return data.result
   }
 
   /**
-   * Import keys to namespace
+   * Import keys to namespace (async with job tracking)
    */
   async importKeys(
     namespaceId: string,
     data: string,
     collision: 'skip' | 'overwrite' | 'fail' = 'overwrite'
-  ): Promise<{ job_id: string; status: string; total_keys: number; processed_keys: number; error_count: number }> {
+  ): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/import/${namespaceId}?collision=${collision}`,
       {
@@ -523,6 +552,26 @@ class APIService {
     
     const data = await response.json()
     return data.result
+  }
+
+  /**
+   * Download export file from completed export job
+   */
+  async downloadExport(jobId: string, filename: string): Promise<void> {
+    const response = await fetch(
+      `${WORKER_API}/api/jobs/${jobId}/download`,
+      { credentials: 'include' }
+    )
+    
+    await this.handleResponse(response);
+    
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
   }
 }
 

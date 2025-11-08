@@ -38,15 +38,18 @@
 - **Bulk Copy**: Copy keys between namespaces
 - **Bulk TTL Update**: Set expiration on multiple keys
 - **Bulk Tag**: Apply tags to multiple keys
-- Progress tracking with job IDs
+- **Real-time Progress Tracking**: WebSocket-based live updates with automatic polling fallback
+- **Async Processing**: Operations execute in background via Durable Objects
+- **Detailed Progress**: View current key, processed count, errors, and percentage completion
 - Batch processing (10,000 keys per operation)
 
 ### Import/Export
 - Export namespaces in JSON or NDJSON format
 - Auto-detect format on import
 - Collision handling (skip/overwrite/fail)
-- Progress tracking for large operations
-- Download exported data as files
+- **Real-time Progress Tracking**: WebSocket-based live updates during import/export
+- **Async Processing**: Large imports/exports process in background
+- Download exported data as files with automatic download trigger
 
 ### Audit Logging
 - Track all operations with user attribution
@@ -66,6 +69,7 @@
 
 - **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.1.12 + Tailwind CSS 3.4.18 + shadcn/ui
 - **Backend**: Cloudflare Workers + KV + D1 (metadata) + Durable Objects (orchestration)
+- **Real-time Communication**: WebSocket connections via Durable Objects with HTTP polling fallback
 - **Auth**: Cloudflare Access (Zero Trust)
 
 ## 📦 Getting Started

@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/status-Production%2FStable-brightgreen)
 [![Security](https://img.shields.io/badge/Security-Enhanced-green.svg)](https://github.com/neverinfamous/kv-manager/blob/main/SECURITY.md)
 
-**Version:** 1.0.0 | **Last Updated:** November 5, 2025 
+**Version:** 1.0.0 | **Last Updated:** November 8, 2025 
 **Base Image:** Node.js 22-alpine | **Architecture:** linux/amd64, linux/arm64
 
 A fully containerized version of the KV Manager for Cloudflare. This Docker image provides a modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys with enterprise-grade authentication via Cloudflare Access (Zero Trust).
@@ -98,8 +98,9 @@ This Docker image packages the complete KV Manager with:
 - **Key Operations** - Full CRUD operations with cursor-based pagination and TTL management
 - **Metadata & Tags (D1-Backed)** - Unlimited tags and custom JSON metadata (no size limit)
 - **Search & Discovery** - Cross-namespace search by key name with tag filtering
-- **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with progress tracking
-- **Import/Export** - JSON/NDJSON format support with collision handling
+- **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with real-time WebSocket progress tracking
+- **Import/Export** - JSON/NDJSON format support with collision handling and live progress updates
+- **Async Processing** - Background job execution via Durable Objects for large operations
 - **Backup & Restore** - Single-version backup and restore for keys
 - **Audit Logging** - Track all operations with user attribution and CSV export
 - **Dark/Light Themes** - System-aware theme switching with persistence
@@ -116,7 +117,8 @@ This Docker image packages the complete KV Manager with:
 - Tailwind CSS + shadcn/ui for modern UI
 - Cloudflare Workers runtime for serverless API
 - D1 database for metadata and audit logs
-- Durable Objects for orchestration
+- Durable Objects for orchestration and WebSocket management
+- WebSocket connections for real-time progress updates with HTTP polling fallback
 
 ---
 

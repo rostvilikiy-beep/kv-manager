@@ -44,6 +44,8 @@ CREATE TABLE bulk_jobs (
   total_keys INTEGER,
   processed_keys INTEGER,
   error_count INTEGER,
+  current_key TEXT, -- Currently processing key name
+  percentage REAL DEFAULT 0, -- Progress percentage (0-100)
   started_at DATETIME,
   completed_at DATETIME,
   user_email TEXT

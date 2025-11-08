@@ -79,9 +79,67 @@ export interface BulkJob {
   total_keys?: number
   processed_keys?: number
   error_count?: number
+  current_key?: string
+  percentage?: number
   started_at?: string
   completed_at?: string
   user_email?: string
+}
+
+// WebSocket Progress Message Types
+export interface JobProgress {
+  jobId: string
+  status: 'queued' | 'running' | 'completed' | 'failed'
+  progress: {
+    total: number
+    processed: number
+    errors: number
+    currentKey?: string
+    percentage: number
+  }
+  result?: unknown
+  error?: string
+}
+
+export interface BulkCopyParams {
+  sourceNamespaceId: string
+  targetNamespaceId: string
+  keys: string[]
+  userEmail: string
+}
+
+export interface BulkTTLParams {
+  namespaceId: string
+  keys: string[]
+  ttl: number
+  userEmail: string
+}
+
+export interface BulkTagParams {
+  namespaceId: string
+  keys: string[]
+  tags: string[]
+  operation: 'add' | 'remove' | 'replace'
+  userEmail: string
+}
+
+export interface BulkDeleteParams {
+  namespaceId: string
+  keys: string[]
+  userEmail: string
+}
+
+export interface ImportParams {
+  namespaceId: string
+  importData: Array<{ name: string; value: string; metadata?: Record<string, unknown>; expiration_ttl?: number }>
+  collision: 'skip' | 'overwrite' | 'fail'
+  userEmail: string
+}
+
+export interface ExportParams {
+  namespaceId: string
+  format: 'json' | 'ndjson'
+  userEmail: string
 }
 
 // API Response Wrapper

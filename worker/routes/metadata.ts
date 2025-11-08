@@ -7,7 +7,7 @@ export async function handleMetadataRoutes(
   url: URL,
   corsHeaders: HeadersInit,
   isLocalDev: boolean,
-  _userEmail: string // eslint-disable-line @typescript-eslint/no-unused-vars
+  userEmail: string
 ): Promise<Response> {
   const db = getD1Binding(env);
 
@@ -144,11 +144,14 @@ export async function handleMetadataRoutes(
       const operation = body.operation || 'replace';
       console.log('[Metadata] Bulk tag operation:', operation, 'for', body.keys.length, 'keys');
 
-      if (isLocalDev || !db) {
+      if (isLocalDev) {
+        const jobId = `tag-${Date.now()}`;
         const response: APIResponse = {
           success: true,
           result: {
-            processed_keys: body.keys.length
+            job_id: jobId,
+            status: 'queued',
+            ws_url: `/api/jobs/${jobId}/ws`
           }
         };
 
@@ -157,49 +160,48 @@ export async function handleMetadataRoutes(
         });
       }
 
-      // Process each key
-      for (const keyName of body.keys) {
-        if (operation === 'replace') {
-          // Replace tags entirely
-          await db.prepare(`
-            INSERT INTO key_metadata (namespace_id, key_name, tags, updated_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(namespace_id, key_name) 
-            DO UPDATE SET tags = excluded.tags, updated_at = CURRENT_TIMESTAMP
-          `).bind(namespaceId, keyName, JSON.stringify(body.tags)).run();
-        } else {
-          // Get existing tags
-          const existing = await db.prepare(
-            'SELECT tags FROM key_metadata WHERE namespace_id = ? AND key_name = ?'
-          ).bind(namespaceId, keyName).first();
+      // Generate job ID and create job entry in D1
+      const jobId = `tag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-          let existingTags: string[] = [];
-          if (existing && existing.tags) {
-            existingTags = JSON.parse(existing.tags as string);
-          }
-
-          let newTags: string[];
-          if (operation === 'add') {
-            // Add tags (unique)
-            newTags = Array.from(new Set([...existingTags, ...body.tags]));
-          } else {
-            // Remove tags
-            newTags = existingTags.filter(tag => !body.tags.includes(tag));
-          }
-
-          await db.prepare(`
-            INSERT INTO key_metadata (namespace_id, key_name, tags, updated_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(namespace_id, key_name) 
-            DO UPDATE SET tags = excluded.tags, updated_at = CURRENT_TIMESTAMP
-          `).bind(namespaceId, keyName, JSON.stringify(newTags)).run();
-        }
+      if (db) {
+        await db.prepare(`
+          INSERT INTO bulk_jobs (job_id, namespace_id, operation_type, status, total_keys, started_at, user_email)
+          VALUES (?, ?, 'bulk_tag', 'queued', ?, CURRENT_TIMESTAMP, ?)
+        `).bind(jobId, namespaceId, body.keys.length, userEmail).run();
       }
 
+      // Get Durable Object stub and start async processing
+      const id = env.BULK_OPERATION_DO.idFromName(jobId);
+      const stub = env.BULK_OPERATION_DO.get(id);
+
+      // Fire and forget - start processing in DO
+      const doRequest = new Request(`https://do/process/bulk-tag`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          namespaceId,
+          keys: body.keys,
+          tags: body.tags,
+          operation,
+          userEmail
+        })
+      });
+
+      // Don't await - let it process in background
+      // @ts-expect-error - Request types are compatible at runtime
+      stub.fetch(doRequest).catch(err => {
+        console.error('[Metadata] DO processing error:', err);
+      });
+
+      // Return immediately with job info
       const response: APIResponse = {
         success: true,
         result: {
-          processed_keys: body.keys.length
+          job_id: jobId,
+          status: 'queued',
+          ws_url: `/api/jobs/${jobId}/ws`,
+          total_keys: body.keys.length
         }
       };
 

@@ -313,7 +313,7 @@ export async function handleKeyRoutes(
       });
     }
 
-    // POST /api/keys/:namespaceId/bulk-delete - Bulk delete keys
+    // POST /api/keys/:namespaceId/bulk-delete - Bulk delete keys (async with DO)
     const bulkDeleteMatch = url.pathname.match(/^\/api\/keys\/([^/]+)\/bulk-delete$/);
     if (bulkDeleteMatch && request.method === 'POST') {
       const namespaceId = bulkDeleteMatch[1];
@@ -329,12 +329,13 @@ export async function handleKeyRoutes(
       console.log('[Keys] Bulk deleting', body.keys.length, 'keys from namespace:', namespaceId);
 
       if (isLocalDev) {
+        const jobId = `delete-${Date.now()}`;
         const response: APIResponse = {
           success: true,
           result: {
-            status: 'completed',
-            total_keys: body.keys.length,
-            processed_keys: body.keys.length
+            job_id: jobId,
+            status: 'queued',
+            ws_url: `/api/jobs/${jobId}/ws`
           }
         };
 
@@ -343,38 +344,46 @@ export async function handleKeyRoutes(
         });
       }
 
-      // Use Cloudflare KV bulk delete API
-      const cfRequest = createCfApiRequest(
-        `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/bulk`,
-        env,
-        {
-          method: 'DELETE',
-          body: JSON.stringify(body.keys)
-        }
-      );
+      // Generate job ID and create job entry in D1
+      const jobId = `delete-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      const cfResponse = await fetch(cfRequest);
-
-      if (!cfResponse.ok) {
-        const errorText = await cfResponse.text();
-        console.error('[Keys] Cloudflare API error:', errorText);
-        throw new Error(`Cloudflare API error: ${cfResponse.status} - ${errorText}`);
+      if (db) {
+        await db.prepare(`
+          INSERT INTO bulk_jobs (job_id, namespace_id, operation_type, status, total_keys, started_at, user_email)
+          VALUES (?, ?, 'bulk_delete', 'queued', ?, CURRENT_TIMESTAMP, ?)
+        `).bind(jobId, namespaceId, body.keys.length, userEmail).run();
       }
 
-      // Log audit entry
-      await auditLog(db, {
-        namespace_id: namespaceId,
-        operation: 'bulk_delete',
-        user_email: userEmail,
-        details: JSON.stringify({ key_count: body.keys.length })
+      // Get Durable Object stub and start async processing
+      const id = env.BULK_OPERATION_DO.idFromName(jobId);
+      const stub = env.BULK_OPERATION_DO.get(id);
+
+      // Fire and forget - start processing in DO
+      const doRequest = new Request(`https://do/process/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          namespaceId,
+          keys: body.keys,
+          userEmail
+        })
       });
 
+      // Don't await - let it process in background
+      // @ts-expect-error - Request types are compatible at runtime
+      stub.fetch(doRequest).catch(err => {
+        console.error('[Keys] DO processing error:', err);
+      });
+
+      // Return immediately with job info
       const response: APIResponse = {
         success: true,
         result: {
-          status: 'completed',
-          total_keys: body.keys.length,
-          processed_keys: body.keys.length
+          job_id: jobId,
+          status: 'queued',
+          ws_url: `/api/jobs/${jobId}/ws`,
+          total_keys: body.keys.length
         }
       };
 
@@ -399,14 +408,13 @@ export async function handleKeyRoutes(
       console.log('[Keys] Bulk copying', body.keys.length, 'keys from', sourceNamespaceId, 'to', body.target_namespace_id);
 
       if (isLocalDev) {
+        const jobId = `copy-${Date.now()}`;
         const response: APIResponse = {
           success: true,
           result: {
-            job_id: `copy-${Date.now()}`,
-            status: 'completed',
-            total_keys: body.keys.length,
-            processed_keys: body.keys.length,
-            error_count: 0
+            job_id: jobId,
+            status: 'queued',
+            ws_url: `/api/jobs/${jobId}/ws`
           }
         };
 
@@ -417,97 +425,45 @@ export async function handleKeyRoutes(
 
       const jobId = `copy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Create job entry
+      // Create job entry in D1
       if (db) {
         await db.prepare(`
           INSERT INTO bulk_jobs (job_id, namespace_id, operation_type, status, total_keys, started_at, user_email)
-          VALUES (?, ?, 'bulk_copy', 'running', ?, CURRENT_TIMESTAMP, ?)
+          VALUES (?, ?, 'bulk_copy', 'queued', ?, CURRENT_TIMESTAMP, ?)
         `).bind(jobId, sourceNamespaceId, body.keys.length, userEmail).run();
       }
 
-      // Fetch all key values from source
-      const copyData: Array<{ key: string; value: string }> = [];
-      for (const keyName of body.keys) {
-        try {
-          const valueRequest = createCfApiRequest(
-            `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${sourceNamespaceId}/values/${encodeURIComponent(keyName)}`,
-            env
-          );
-          const valueResponse = await fetch(valueRequest);
+      // Get Durable Object stub and start async processing
+      const id = env.BULK_OPERATION_DO.idFromName(jobId);
+      const stub = env.BULK_OPERATION_DO.get(id);
 
-          if (valueResponse.ok) {
-            const value = await valueResponse.text();
-            copyData.push({ key: keyName, value: value });
-          }
-        } catch (err) {
-          console.error('[Keys] Failed to fetch key for copy:', keyName, err);
-        }
-      }
-
-      // Write to target namespace using bulk API
-      let processedCount = 0;
-      let errorCount = 0;
-      const batchSize = 10000;
-
-      for (let i = 0; i < copyData.length; i += batchSize) {
-        const batch = copyData.slice(i, i + batchSize);
-
-        try {
-          const bulkRequest = createCfApiRequest(
-            `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${body.target_namespace_id}/bulk`,
-            env,
-            {
-              method: 'PUT',
-              body: JSON.stringify(batch),
-              headers: { 'Content-Type': 'application/json' }
-            }
-          );
-
-          const bulkResponse = await fetch(bulkRequest);
-
-          if (bulkResponse.ok) {
-            processedCount += batch.length;
-          } else {
-            console.error('[Keys] Bulk copy failed:', await bulkResponse.text());
-            errorCount += batch.length;
-          }
-        } catch (err) {
-          console.error('[Keys] Batch copy error:', err);
-          errorCount += batch.length;
-        }
-      }
-
-      // Update job status
-      if (db) {
-        await db.prepare(`
-          UPDATE bulk_jobs 
-          SET status = 'completed', completed_at = CURRENT_TIMESTAMP, processed_keys = ?, error_count = ?
-          WHERE job_id = ?
-        `).bind(processedCount, errorCount, jobId).run();
-      }
-
-      // Log audit entry
-      await auditLog(db, {
-        namespace_id: sourceNamespaceId,
-        operation: 'bulk_copy',
-        user_email: userEmail,
-        details: JSON.stringify({ 
-          target_namespace_id: body.target_namespace_id,
-          total: body.keys.length,
-          processed: processedCount,
-          errors: errorCount,
-          job_id: jobId
+      // Fire and forget - start processing in DO
+      const doRequest = new Request(`https://do/process/bulk-copy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          sourceNamespaceId,
+          targetNamespaceId: body.target_namespace_id,
+          keys: body.keys,
+          userEmail
         })
       });
 
+      // Don't await - let it process in background
+      // @ts-expect-error - Request types are compatible at runtime
+      stub.fetch(doRequest).catch(err => {
+        console.error('[Keys] DO processing error:', err);
+      });
+
+      // Return immediately with job info
       const response: APIResponse = {
         success: true,
         result: {
           job_id: jobId,
-          status: 'completed',
-          total_keys: body.keys.length,
-          processed_keys: processedCount,
-          error_count: errorCount
+          status: 'queued',
+          ws_url: `/api/jobs/${jobId}/ws`,
+          total_keys: body.keys.length
         }
       };
 
@@ -532,14 +488,13 @@ export async function handleKeyRoutes(
       console.log('[Keys] Bulk updating TTL for', body.keys.length, 'keys in namespace:', namespaceId);
 
       if (isLocalDev) {
+        const jobId = `ttl-${Date.now()}`;
         const response: APIResponse = {
           success: true,
           result: {
-            job_id: `ttl-${Date.now()}`,
-            status: 'completed',
-            total_keys: body.keys.length,
-            processed_keys: body.keys.length,
-            error_count: 0
+            job_id: jobId,
+            status: 'queued',
+            ws_url: `/api/jobs/${jobId}/ws`
           }
         };
 
@@ -550,101 +505,45 @@ export async function handleKeyRoutes(
 
       const jobId = `ttl-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Create job entry
+      // Create job entry in D1
       if (db) {
         await db.prepare(`
           INSERT INTO bulk_jobs (job_id, namespace_id, operation_type, status, total_keys, started_at, user_email)
-          VALUES (?, ?, 'bulk_ttl', 'running', ?, CURRENT_TIMESTAMP, ?)
+          VALUES (?, ?, 'bulk_ttl', 'queued', ?, CURRENT_TIMESTAMP, ?)
         `).bind(jobId, namespaceId, body.keys.length, userEmail).run();
       }
 
-      // Fetch current values and re-write with new TTL
-      const updateData: Array<{ key: string; value: string; expiration_ttl: number }> = [];
-      for (const keyName of body.keys) {
-        try {
-          const valueRequest = createCfApiRequest(
-            `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(keyName)}`,
-            env
-          );
-          const valueResponse = await fetch(valueRequest);
+      // Get Durable Object stub and start async processing
+      const id = env.BULK_OPERATION_DO.idFromName(jobId);
+      const stub = env.BULK_OPERATION_DO.get(id);
 
-          if (valueResponse.ok) {
-            const value = await valueResponse.text();
-            updateData.push({ 
-              key: keyName, 
-              value: value,
-              expiration_ttl: body.expiration_ttl
-            });
-          }
-        } catch (err) {
-          console.error('[Keys] Failed to fetch key for TTL update:', keyName, err);
-        }
-      }
-
-      // Write back with new TTL using bulk API
-      let processedCount = 0;
-      let errorCount = 0;
-      const batchSize = 10000;
-
-      for (let i = 0; i < updateData.length; i += batchSize) {
-        const batch = updateData.slice(i, i + batchSize);
-
-        try {
-          const bulkRequest = createCfApiRequest(
-            `/accounts/${env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/bulk`,
-            env,
-            {
-              method: 'PUT',
-              body: JSON.stringify(batch),
-              headers: { 'Content-Type': 'application/json' }
-            }
-          );
-
-          const bulkResponse = await fetch(bulkRequest);
-
-          if (bulkResponse.ok) {
-            processedCount += batch.length;
-          } else {
-            console.error('[Keys] Bulk TTL update failed:', await bulkResponse.text());
-            errorCount += batch.length;
-          }
-        } catch (err) {
-          console.error('[Keys] Batch TTL error:', err);
-          errorCount += batch.length;
-        }
-      }
-
-      // Update job status
-      if (db) {
-        await db.prepare(`
-          UPDATE bulk_jobs 
-          SET status = 'completed', completed_at = CURRENT_TIMESTAMP, processed_keys = ?, error_count = ?
-          WHERE job_id = ?
-        `).bind(processedCount, errorCount, jobId).run();
-      }
-
-      // Log audit entry
-      await auditLog(db, {
-        namespace_id: namespaceId,
-        operation: 'bulk_ttl_update',
-        user_email: userEmail,
-        details: JSON.stringify({ 
+      // Fire and forget - start processing in DO
+      const doRequest = new Request(`https://do/process/bulk-ttl`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          namespaceId,
+          keys: body.keys,
           ttl: body.expiration_ttl,
-          total: body.keys.length,
-          processed: processedCount,
-          errors: errorCount,
-          job_id: jobId
+          userEmail
         })
       });
 
+      // Don't await - let it process in background
+      // @ts-expect-error - Request types are compatible at runtime
+      stub.fetch(doRequest).catch(err => {
+        console.error('[Keys] DO processing error:', err);
+      });
+
+      // Return immediately with job info
       const response: APIResponse = {
         success: true,
         result: {
           job_id: jobId,
-          status: 'completed',
-          total_keys: body.keys.length,
-          processed_keys: processedCount,
-          error_count: errorCount
+          status: 'queued',
+          ws_url: `/api/jobs/${jobId}/ws`,
+          total_keys: body.keys.length
         }
       };
 

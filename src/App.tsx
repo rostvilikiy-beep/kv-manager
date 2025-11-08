@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { api, type KVNamespace, type KVKey } from './services/api'
+import { api, type KVNamespace, type KVKey, type JobProgress } from './services/api'
 import { auth } from './services/auth'
 import { useTheme } from './hooks/useTheme'
 import { Database, Plus, Moon, Sun, Monitor, Loader2, Trash2, Key, Search, History, Download, Upload, Copy, Clock, Tag } from 'lucide-react'
@@ -27,6 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { KeyEditorDialog } from './components/KeyEditorDialog'
 import { SearchKeys } from './components/SearchKeys'
 import { AuditLog } from './components/AuditLog'
+import { BulkProgressDialog } from './components/BulkProgressDialog'
 
 type View = 
   | { type: 'list' }
@@ -91,6 +92,13 @@ export default function App() {
   const [bulkTTL, setBulkTTL] = useState('')
   const [bulkTags, setBulkTags] = useState('')
   const [bulkOperating, setBulkOperating] = useState(false)
+
+  // Progress dialog state
+  const [showProgressDialog, setShowProgressDialog] = useState(false)
+  const [progressJobId, setProgressJobId] = useState('')
+  const [progressWsUrl, setProgressWsUrl] = useState('')
+  const [progressOperationName, setProgressOperationName] = useState('')
+  const [progressNamespace, setProgressNamespace] = useState('')
 
   // Load namespaces on mount
   useEffect(() => {
@@ -311,15 +319,29 @@ export default function App() {
 
     try {
       setDeleting(true)
-      await api.bulkDeleteKeys(namespaceId, selectedKeys)
+      const result = await api.bulkDeleteKeys(namespaceId, selectedKeys)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Bulk Delete')
+      setProgressNamespace(currentView.type === 'namespace' ? currentView.namespaceTitle : '')
+      setShowProgressDialog(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start bulk delete')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  // Handle progress dialog completion
+  const handleProgressComplete = async (result: JobProgress) => {
+    // Refresh keys if still viewing the same namespace
+    if (currentView.type === 'namespace' && result.status === 'completed') {
       setSelectedKeys([])
       setKeysCursor(undefined)
       setKeysListComplete(true)
-      await loadKeys(namespaceId, false, undefined)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete keys')
-    } finally {
-      setDeleting(false)
+      await loadKeys(currentView.namespaceId, false, undefined)
     }
   }
 
@@ -343,18 +365,32 @@ export default function App() {
     try {
       setExporting(true)
       setError('')
-      const blob = await api.exportNamespace(exportNamespaceId, exportFormat)
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${exportNamespaceId}-export.${exportFormat === 'ndjson' ? 'ndjson' : 'json'}`
-      a.click()
-      URL.revokeObjectURL(url)
+      const result = await api.exportNamespace(exportNamespaceId, exportFormat)
       setShowExportDialog(false)
+      
+      // Open progress dialog with export handler
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Export Namespace')
+      const ns = namespaces.find(n => n.id === exportNamespaceId)
+      setProgressNamespace(ns?.title || exportNamespaceId)
+      setShowProgressDialog(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to export namespace')
+      setError(err instanceof Error ? err.message : 'Failed to start export')
     } finally {
       setExporting(false)
+    }
+  }
+
+  const handleExportComplete = async (result: JobProgress) => {
+    // Download the exported file
+    if (result.status === 'completed' && result.result?.downloadUrl) {
+      const filename = `${exportNamespaceId}-export.${result.result.format || 'json'}`
+      try {
+        await api.downloadExport(result.jobId, filename)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to download export')
+      }
     }
   }
 
@@ -367,16 +403,16 @@ export default function App() {
       const result = await api.importKeys(importNamespaceId, importData)
       setShowImportDialog(false)
       setImportData('')
-      alert(`Import completed: ${result.processed_keys}/${result.total_keys} keys imported (${result.error_count} errors)`)
       
-      // Refresh keys if currently viewing this namespace
-      if (currentView.type === 'namespace' && currentView.namespaceId === importNamespaceId) {
-        setKeysCursor(undefined)
-        setKeysListComplete(true)
-        await loadKeys(importNamespaceId, false, undefined)
-      }
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Import Keys')
+      const ns = namespaces.find(n => n.id === importNamespaceId)
+      setProgressNamespace(ns?.title || importNamespaceId)
+      setShowProgressDialog(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to import keys')
+      setError(err instanceof Error ? err.message : 'Failed to start import')
     } finally {
       setImporting(false)
     }
@@ -392,10 +428,15 @@ export default function App() {
       const result = await api.bulkCopyKeys(currentView.namespaceId, selectedKeys, bulkTargetNamespace)
       setShowBulkCopyDialog(false)
       setBulkTargetNamespace('')
-      setSelectedKeys([])
-      alert(`Bulk copy completed: ${result.processed_keys}/${result.total_keys} keys copied (${result.error_count} errors)`)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Bulk Copy')
+      setProgressNamespace(currentView.namespaceTitle)
+      setShowProgressDialog(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to copy keys')
+      setError(err instanceof Error ? err.message : 'Failed to start bulk copy')
     } finally {
       setBulkOperating(false)
     }
@@ -416,15 +457,15 @@ export default function App() {
       const result = await api.bulkUpdateTTL(currentView.namespaceId, selectedKeys, ttl)
       setShowBulkTTLDialog(false)
       setBulkTTL('')
-      setSelectedKeys([])
-      alert(`Bulk TTL update completed: ${result.processed_keys}/${result.total_keys} keys updated (${result.error_count} errors)`)
       
-      // Refresh keys
-      setKeysCursor(undefined)
-      setKeysListComplete(true)
-      await loadKeys(currentView.namespaceId, false, undefined)
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Bulk TTL Update')
+      setProgressNamespace(currentView.namespaceTitle)
+      setShowProgressDialog(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update TTL')
+      setError(err instanceof Error ? err.message : 'Failed to start TTL update')
     } finally {
       setBulkOperating(false)
     }
@@ -437,13 +478,18 @@ export default function App() {
       setBulkOperating(true)
       setError('')
       const tags = bulkTags.split(',').map(t => t.trim()).filter(Boolean)
-      await api.bulkTagKeys(currentView.namespaceId, selectedKeys, tags)
+      const result = await api.bulkTagKeys(currentView.namespaceId, selectedKeys, tags)
       setShowBulkTagDialog(false)
       setBulkTags('')
-      setSelectedKeys([])
-      alert(`Tags applied to ${selectedKeys.length} keys`)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Bulk Tag')
+      setProgressNamespace(currentView.namespaceTitle)
+      setShowProgressDialog(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to apply tags')
+      setError(err instanceof Error ? err.message : 'Failed to start bulk tag')
     } finally {
       setBulkOperating(false)
     }
@@ -1310,6 +1356,23 @@ export default function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Progress Dialog for Bulk Operations */}
+      <BulkProgressDialog
+        open={showProgressDialog}
+        jobId={progressJobId}
+        wsUrl={progressWsUrl}
+        operationName={progressOperationName}
+        namespaceName={progressNamespace}
+        onClose={() => setShowProgressDialog(false)}
+        onComplete={(result) => {
+          handleProgressComplete(result)
+          // Special handling for export operations
+          if (progressOperationName === 'Export Namespace') {
+            handleExportComplete(result)
+          }
+        }}
+      />
     </div>
   )
 }
