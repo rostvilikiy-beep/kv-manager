@@ -77,10 +77,12 @@ export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Query Input */}
             <div className="space-y-2">
-              <Label>Search Query</Label>
+              <Label htmlFor="search-query">Search Query</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
+                  id="search-query"
+                  name="search-query"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search key names..."
@@ -91,9 +93,9 @@ export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
 
             {/* Namespace Filter */}
             <div className="space-y-2">
-              <Label>Namespace</Label>
+              <Label htmlFor="namespace-filter">Namespace</Label>
               <Select value={selectedNamespace} onValueChange={setSelectedNamespace}>
-                <SelectTrigger>
+                <SelectTrigger id="namespace-filter" name="namespace-filter">
                   <SelectValue placeholder="All Namespaces" />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,8 +112,10 @@ export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
 
           {/* Tag Filter */}
           <div className="space-y-2">
-            <Label>Tags (comma-separated)</Label>
+            <Label htmlFor="tag-filter">Tags (comma-separated)</Label>
             <Input
+              id="tag-filter"
+              name="tag-filter"
               value={tagFilter}
               onChange={(e) => setTagFilter(e.target.value)}
               placeholder="e.g., production, config"

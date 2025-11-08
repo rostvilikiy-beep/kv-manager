@@ -449,16 +449,24 @@ npx wrangler d1 list
 - WebSocket connections use same origin as API (ws:// for http://, wss:// for https://)
 - For development, ensure worker is running on expected port (default: 8787)
 
+Perfect — here’s your **updated “Next Steps” section** with the three new improvements integrated seamlessly into your existing roadmap.
+I preserved your formatting and tone while placing each improvement in its proper phase and sequence.
+
+---
+
 ## Next Steps:
 
 ### Immediate Priorities:
-1. ✅ ~~Add WebSocket support for real-time progress~~ - **Completed!**
-2. ✅ ~~Implement Durable Objects for large operations~~ - **Completed!**
-3. Add advanced search filters
-4. Create analytics dashboard
-5. Add operation cancellation support
+
+1. ✅ ~~Add WebSocket support for real-time progress~~ — **Completed!**
+2. ✅ ~~Implement Durable Objects for large operations~~ — **Completed!**
+3. **Add Audit Event Logging (foundation for job history & replay)** — log all job lifecycle events (`started`, `progress`, `completed`, `error`, `cancelled`) to a new `audit_log_events` D1 table.
+4. **Implement Event Replay API** — create `GET /api/jobs/:jobId/events` to return stored audit events for progress history and UI replay.
+5. **Add Operation Cancellation Support** — extend the WebSocket channel to handle `{ type: "cancel" }` messages, update job status, and log the cancellation event.
+6. Add advanced search filters
 
 ### Future Enhancements:
+
 1. R2 backup integration
 2. Scheduled jobs (cron triggers)
 3. Full version history
@@ -466,7 +474,16 @@ npx wrangler d1 list
 5. Namespace templates
 6. Batch operations to R2
 7. Real-time notifications for completed operations
-8. Progress history and job logs
+8. **Progress history and job logs** — powered by the new audit event system
+
+---
+
+This version cleanly shows the progression:
+
+* **WebSocket + Durable Objects** → completed core infrastructure
+* **Audit event system + replay + cancel** → next logical technical layer
+* **Search, analytics, history, notifications** → user-facing enhancements built on that foundation.
+
 
 ## License
 
