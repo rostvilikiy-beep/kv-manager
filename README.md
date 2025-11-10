@@ -464,9 +464,6 @@ npx wrangler d1 list
 - WebSocket connections use same origin as API (ws:// for http://, wss:// for https://)
 - For development, ensure worker is running on expected port (default: 8787)
 
-Perfect — here’s your **updated “Next Steps” section** with the three new improvements integrated seamlessly into your existing roadmap.
-I preserved your formatting and tone while placing each improvement in its proper phase and sequence.
-
 ---
 
 ## Next Steps:
@@ -480,14 +477,13 @@ I preserved your formatting and tone while placing each improvement in its prope
 6. Add advanced search filters
 
 ### Future Enhancements:
-1. **Progress history and job logs** — powered by the new audit event system
-2. R2 backup integration
-3. Batch operations to R2
-4. Scheduled jobs (cron triggers)
-5. Full version history
-6. Real-time notifications for completed operations
-7. Key expiration alerts
-8. Namespace templates
+1. R2 backup integration
+2. Batch operations to R2
+3. Scheduled jobs (cron triggers)
+4. Full version history
+5. Real-time notifications for completed operations
+6. Key expiration alerts
+7. Namespace templates
 
 ---
 
