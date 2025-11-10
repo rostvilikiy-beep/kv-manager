@@ -86,6 +86,15 @@ export interface BulkJob {
   user_email?: string
 }
 
+export interface JobAuditEvent {
+  id?: number
+  job_id: string
+  event_type: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'failed' | 'cancelled'
+  user_email: string
+  timestamp?: string
+  details?: string // JSON object
+}
+
 // WebSocket Progress Message Types
 export interface JobProgress {
   jobId: string

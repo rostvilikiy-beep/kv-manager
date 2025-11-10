@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 8, 2025*
+*Last Updated: November 10, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -61,6 +61,8 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 - Pagination support
 - Export audit logs to CSV
 - Comprehensive operation tracking
+- **Job lifecycle event tracking** - Milestone events (started, 25%, 50%, 75%, completed/failed) for all bulk operations
+- Event history API for job replay and debugging
 
 ### User Interface
 - **Dark/Light Theme**: System, light, and dark theme support
@@ -290,6 +292,12 @@ wrangler deploy
 - `GET /api/audit/user/:userEmail` - Get audit log for a specific user
   - Query params: `limit`, `offset`, `operation`
 
+### Job Events
+- `GET /api/jobs/:jobId/events` - Get lifecycle event history for a job
+  - Returns: Chronological list of events (started, progress_25, progress_50, progress_75, completed/failed)
+  - User authorization: Only job owner can view events
+  - Use case: Job history, debugging, event replay
+
 ## Database Schema
 
 The D1 database (`kv-manager-metadata`) stores:
@@ -306,6 +314,13 @@ The D1 database (`kv-manager-metadata`) stores:
 - User attribution via email
 - Timestamp, operation type, and details
 - Indexed for efficient querying
+
+#### `job_audit_events`
+- Tracks lifecycle events for all bulk jobs (started, progress_25, progress_50, progress_75, completed, failed, cancelled)
+- Stores detailed JSON metadata for each event (processed counts, error counts, percentages)
+- Foreign key relationship to `bulk_jobs` table
+- Indexed by `job_id` and `user_email` for efficient querying
+- Foundation for job history and event replay functionality
 
 #### `bulk_jobs`
 - Tracks import/export and bulk operation progress
@@ -459,9 +474,9 @@ I preserved your formatting and tone while placing each improvement in its prope
 ### Immediate Priorities:
 1. ✅ ~~Add WebSocket support for real-time progress~~ — **Completed!**
 2. ✅ ~~Implement Durable Objects for large operations~~ — **Completed!**
-3. **Add Audit Event Logging (foundation for job history & replay)** — log all job lifecycle events (`started`, `progress`, `completed`, `error`, `cancelled`) to a new `audit_log_events` D1 table.
+3. ✅ ~~Add Audit Event Logging (foundation for job history & replay)~~ — **Completed!**
 4. **Add Operation Cancellation Support** — extend the WebSocket channel to handle `{ type: "cancel" }` messages, update job status, and log the cancellation event.
-5. **Implement Event Replay API** — create `GET /api/jobs/:jobId/events` to return stored audit events for progress history and UI replay.
+5. **Add Job History UI** — display event timeline and progress history using the `GET /api/jobs/:jobId/events` endpoint.
 6. Add advanced search filters
 
 ### Future Enhancements:

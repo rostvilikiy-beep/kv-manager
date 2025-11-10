@@ -1,5 +1,5 @@
 import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Env, KVNamespaceInfo, KVKeyInfo, KeyMetadata, AuditLogEntry, BulkJob, MockKVData } from '../types';
+import type { Env, KVNamespaceInfo, KVKeyInfo, KeyMetadata, AuditLogEntry, BulkJob, MockKVData, JobAuditEvent } from '../types';
 
 /**
  * Create a Cloudflare API request with authentication
@@ -128,6 +128,37 @@ export async function auditLog(
       .run();
   } catch (error) {
     console.error('[Audit] Failed to log audit entry:', error);
+  }
+}
+
+/**
+ * Log a job audit event to D1
+ */
+export async function logJobEvent(
+  db: D1Database | null,
+  event: Omit<JobAuditEvent, 'id' | 'timestamp'>
+): Promise<void> {
+  if (!db) {
+    console.log('[JobAudit] No D1 binding, skipping event log');
+    return;
+  }
+
+  try {
+    await db
+      .prepare(
+        `INSERT INTO job_audit_events (job_id, event_type, user_email, details)
+         VALUES (?, ?, ?, ?)`
+      )
+      .bind(
+        event.job_id,
+        event.event_type,
+        event.user_email,
+        event.details || null
+      )
+      .run();
+    console.log(`[JobAudit] Logged ${event.event_type} event for job ${event.job_id}`);
+  } catch (error) {
+    console.error('[JobAudit] Failed to log job event:', error);
   }
 }
 

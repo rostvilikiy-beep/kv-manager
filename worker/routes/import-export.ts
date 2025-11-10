@@ -224,6 +224,90 @@ export async function handleImportExportRoutes(
       });
     }
 
+    // GET /api/jobs/:jobId/events - Get job audit events
+    const eventsMatch = url.pathname.match(/^\/api\/jobs\/([^/]+)\/events$/);
+    if (eventsMatch && request.method === 'GET') {
+      const jobId = eventsMatch[1];
+
+      console.log('[Jobs] Getting events for job:', jobId);
+
+      if (!db) {
+        return new Response(JSON.stringify({ error: 'Database not available' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      if (isLocalDev) {
+        // Return mock events for local dev
+        const response: APIResponse = {
+          success: true,
+          result: {
+            job_id: jobId,
+            events: [
+              {
+                id: 1,
+                job_id: jobId,
+                event_type: 'started',
+                user_email: 'dev@localhost',
+                timestamp: new Date().toISOString(),
+                details: JSON.stringify({ total: 100 })
+              },
+              {
+                id: 2,
+                job_id: jobId,
+                event_type: 'completed',
+                user_email: 'dev@localhost',
+                timestamp: new Date().toISOString(),
+                details: JSON.stringify({ processed: 100, errors: 0, percentage: 100 })
+              }
+            ]
+          }
+        };
+
+        return new Response(JSON.stringify(response), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      // First, get the job to check ownership
+      const job = await db.prepare(
+        'SELECT user_email FROM bulk_jobs WHERE job_id = ?'
+      ).bind(jobId).first();
+
+      if (!job) {
+        return new Response(JSON.stringify({ error: 'Job not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      // Verify user owns this job
+      if (job.user_email !== userEmail) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      // Fetch all events for this job
+      const events = await db.prepare(
+        'SELECT * FROM job_audit_events WHERE job_id = ? ORDER BY timestamp ASC'
+      ).bind(jobId).all();
+
+      const response: APIResponse = {
+        success: true,
+        result: {
+          job_id: jobId,
+          events: events.results || []
+        }
+      };
+
+      return new Response(JSON.stringify(response), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
     // 404 for unknown routes
     return new Response(JSON.stringify({ error: 'Not Found' }), {
       status: 404,

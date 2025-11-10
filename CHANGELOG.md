@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Job Audit Event Logging**: Comprehensive lifecycle event tracking for all bulk operations and import/export jobs
+  - New `job_audit_events` D1 table stores milestone events: `started`, `progress_25`, `progress_50`, `progress_75`, `completed`, `failed`, `cancelled`
+  - Events include detailed JSON metadata: processed counts, error counts, percentages, and operation-specific data
+  - User-based access control: users can only view events for their own jobs
+  - Foundation for job history viewing and event replay functionality
+  - New API endpoint: `GET /api/jobs/:jobId/events` - Returns chronological event history for a specific job
+
 - **WebSocket-based Real-time Progress Tracking**: All bulk operations now use WebSocket connections for live progress updates
   - Async processing via Cloudflare Durable Objects for bulk delete, copy, TTL update, and tag operations
   - Real-time progress updates showing current key being processed, processed count, error count, and completion percentage
@@ -26,10 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **New API Endpoints**:
   - `GET /api/jobs/:jobId/ws` - WebSocket endpoint for real-time job progress updates
   - `GET /api/jobs/:jobId/download` - Download endpoint for completed export files
+  - `GET /api/jobs/:jobId/events` - Retrieve audit event history for a specific job (user-authorized)
 
 - **Database Schema Enhancements**:
   - Added `current_key` column to `bulk_jobs` table to track the key currently being processed
   - Added `percentage` column to `bulk_jobs` table to store completion percentage (0-100)
+  - Added `job_audit_events` table with foreign key to `bulk_jobs` for lifecycle event tracking
+  - Indexed by `job_id` and `user_email` for efficient querying
 
 ### Changed
 - **Bulk Operations Architecture**:
@@ -51,8 +61,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Improvements
 - Implemented two Durable Object classes:
-  - `BulkOperationDO` - Handles bulk delete, copy, TTL, and tag operations
-  - `ImportExportDO` - Handles import and export operations with file storage
+  - `BulkOperationDO` - Handles bulk delete, copy, TTL, and tag operations with milestone event logging
+  - `ImportExportDO` - Handles import and export operations with file storage and milestone event logging
+- Added `logJobEvent()` helper function in `worker/utils/helpers.ts` for consistent event logging
+- Added `JobAuditEvent` TypeScript interface for type-safe event handling
+- All 6 operation methods (bulk copy, delete, TTL, tag, import, export) now log milestone events automatically
+- Events stored indefinitely in D1 for complete job history tracking
 - Added proper TypeScript type definitions for all WebSocket messages and job parameters
 - Implemented graceful error handling and recovery for WebSocket connections
 - Added comprehensive logging for debugging WebSocket connections and job processing

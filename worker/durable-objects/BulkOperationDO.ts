@@ -7,7 +7,7 @@ import type {
   BulkTagParams, 
   BulkDeleteParams 
 } from '../types';
-import { createCfApiRequest, getD1Binding, auditLog } from '../utils/helpers';
+import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
 interface SessionAttachment {
   sessionId: string;
@@ -238,8 +238,17 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: 0, percentage: 0 }
       });
 
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: keys.length, source: sourceNamespaceId, target: targetNamespaceId })
+      });
+
       const copyData: Array<{ key: string; value: string }> = [];
       let errorCount = 0;
+      let lastMilestone = 0;
 
       // Fetch all key values from source
       for (let i = 0; i < keys.length; i++) {
@@ -283,6 +292,18 @@ export class BulkOperationDO {
               percentage 
             }
           });
+
+          // Log milestone events
+          const milestone = Math.floor(percentage / 25) * 25;
+          if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({ processed: i + 1, errors: errorCount, percentage })
+            });
+            lastMilestone = milestone;
+          }
         }
       }
 
@@ -334,6 +355,18 @@ export class BulkOperationDO {
             percentage 
           }
         });
+
+        // Log milestone events
+        const milestone = Math.floor(percentage / 25) * 25;
+        if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+          await logJobEvent(db, {
+            job_id: jobId,
+            event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+            user_email: userEmail,
+            details: JSON.stringify({ processed: keys.length, errors: errorCount, percentage })
+          });
+          lastMilestone = milestone;
+        }
       }
 
       // Mark as completed
@@ -354,6 +387,14 @@ export class BulkOperationDO {
           percentage: 100 
         },
         result: { processed: writeProcessed, errors: errorCount }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: writeProcessed, errors: errorCount, percentage: 100 })
       });
 
       // Audit log
@@ -381,6 +422,14 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: keys.length, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
       });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
     }
   }
 
@@ -399,8 +448,17 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: 0, percentage: 0 }
       });
 
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: keys.length, ttl })
+      });
+
       let processedCount = 0;
       let errorCount = 0;
+      let lastMilestone = 0;
 
       // Update TTL for each key
       for (let i = 0; i < keys.length; i++) {
@@ -464,6 +522,18 @@ export class BulkOperationDO {
               percentage 
             }
           });
+
+          // Log milestone events
+          const milestone = Math.floor(percentage / 25) * 25;
+          if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({ processed: i + 1, errors: errorCount, percentage })
+            });
+            lastMilestone = milestone;
+          }
         }
       }
 
@@ -485,6 +555,14 @@ export class BulkOperationDO {
           percentage: 100 
         },
         result: { processed: processedCount, errors: errorCount }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: processedCount, errors: errorCount, percentage: 100 })
       });
 
       // Audit log
@@ -512,6 +590,14 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: keys.length, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
       });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
     }
   }
 
@@ -530,8 +616,17 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: 0, percentage: 0 }
       });
 
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: keys.length, tags, operation })
+      });
+
       let processedCount = 0;
       let errorCount = 0;
+      let lastMilestone = 0;
 
       for (let i = 0; i < keys.length; i++) {
         const keyName = keys[i];
@@ -606,6 +701,18 @@ export class BulkOperationDO {
               percentage 
             }
           });
+
+          // Log milestone events
+          const milestone = Math.floor(percentage / 25) * 25;
+          if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({ processed: i + 1, errors: errorCount, percentage })
+            });
+            lastMilestone = milestone;
+          }
         }
       }
 
@@ -627,6 +734,14 @@ export class BulkOperationDO {
           percentage: 100 
         },
         result: { processed: processedCount, errors: errorCount }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: processedCount, errors: errorCount, percentage: 100 })
       });
 
       // Audit log
@@ -655,6 +770,14 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: keys.length, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
       });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
     }
   }
 
@@ -673,8 +796,17 @@ export class BulkOperationDO {
         progress: { total: keys.length, processed: 0, errors: 0, percentage: 0 }
       });
 
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: keys.length })
+      });
+
       let processedCount = 0;
       let errorCount = 0;
+      let lastMilestone = 0;
 
       // Delete keys using bulk API
       const batchSize = 10000;
@@ -723,6 +855,18 @@ export class BulkOperationDO {
             percentage 
           }
         });
+
+        // Log milestone events
+        const milestone = Math.floor(percentage / 25) * 25;
+        if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+          await logJobEvent(db, {
+            job_id: jobId,
+            event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+            user_email: userEmail,
+            details: JSON.stringify({ processed: i + batch.length, errors: errorCount, percentage })
+          });
+          lastMilestone = milestone;
+        }
       }
 
       // Mark as completed
@@ -743,6 +887,14 @@ export class BulkOperationDO {
           percentage: 100 
         },
         result: { processed: processedCount, errors: errorCount }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: processedCount, errors: errorCount, percentage: 100 })
       });
 
       // Audit log
@@ -768,6 +920,14 @@ export class BulkOperationDO {
         status: 'failed',
         progress: { total: keys.length, processed: 0, errors: keys.length, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
+      });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
       });
     }
   }

@@ -1,6 +1,6 @@
 import type { DurableObjectState } from '@cloudflare/workers-types';
 import type { Env, JobProgress, ImportParams, ExportParams } from '../types';
-import { createCfApiRequest, getD1Binding, auditLog } from '../utils/helpers';
+import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
 interface SessionAttachment {
   sessionId: string;
@@ -258,9 +258,18 @@ export class ImportExportDO {
         progress: { total: importData.length, processed: 0, errors: 0, percentage: 0 }
       });
 
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: importData.length, collision })
+      });
+
       let processedCount = 0;
       let errorCount = 0;
       let skippedCount = 0;
+      let lastMilestone = 0;
 
       // Process imports in batches
       const batchSize = 100;
@@ -344,6 +353,18 @@ export class ImportExportDO {
             percentage 
           }
         });
+
+        // Log milestone events
+        const milestone = Math.floor(percentage / 25) * 25;
+        if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+          await logJobEvent(db, {
+            job_id: jobId,
+            event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+            user_email: userEmail,
+            details: JSON.stringify({ processed: i + batch.length, errors: errorCount, percentage })
+          });
+          lastMilestone = milestone;
+        }
       }
 
       // Mark as completed
@@ -368,6 +389,14 @@ export class ImportExportDO {
           errors: errorCount,
           skipped: skippedCount 
         }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: processedCount, errors: errorCount, skipped: skippedCount, percentage: 100 })
       });
 
       // Audit log
@@ -396,6 +425,14 @@ export class ImportExportDO {
         progress: { total: importData.length, processed: 0, errors: importData.length, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
       });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
     }
   }
 
@@ -412,6 +449,14 @@ export class ImportExportDO {
         jobId,
         status: 'running',
         progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
+      });
+
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ format })
       });
 
       // List all keys in namespace
@@ -468,6 +513,7 @@ export class ImportExportDO {
       // Fetch all key values
       const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
       let errorCount = 0;
+      let lastMilestone = 0;
 
       for (let i = 0; i < allKeys.length; i++) {
         const key = allKeys[i];
@@ -515,6 +561,18 @@ export class ImportExportDO {
               percentage 
             }
           });
+
+          // Log milestone events
+          const milestone = Math.floor(percentage / 25) * 25;
+          if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({ processed: i + 1, errors: errorCount, percentage })
+            });
+            lastMilestone = milestone;
+          }
         }
       }
 
@@ -551,6 +609,14 @@ export class ImportExportDO {
         }
       });
 
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: exportData.length, errors: errorCount, percentage: 100 })
+      });
+
       // Audit log
       await auditLog(db, {
         namespace_id: namespaceId,
@@ -574,6 +640,14 @@ export class ImportExportDO {
         status: 'failed',
         progress: { total: 0, processed: 0, errors: 0, percentage: 0 },
         error: error instanceof Error ? error.message : 'Unknown error'
+      });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
       });
     }
   }
