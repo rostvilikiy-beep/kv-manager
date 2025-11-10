@@ -72,7 +72,7 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 
 ## Architecture
 
-- **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.1.12 + Tailwind CSS 3.4.18 + shadcn/ui
+- **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.2.2 + Tailwind CSS 3.4.18 + shadcn/ui
 - **Backend**: Cloudflare Workers + KV + D1 (metadata) + Durable Objects (orchestration)
 - **Real-time Progress**: WebSocket connections via Durable Objects with polling fallback
 - **Auth**: Cloudflare Access (Zero Trust)

@@ -114,7 +114,7 @@ This Docker image packages the complete KV Manager with:
 
 ### Technical Stack
 - React 19.2.0 with TypeScript 5.9.3
-- Vite 7.1.12 for optimized production builds
+- Vite 7.2.2 for optimized production builds
 - Tailwind CSS + shadcn/ui for modern UI
 - Cloudflare Workers runtime for serverless API
 - D1 database for metadata and audit logs
