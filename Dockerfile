@@ -12,6 +12,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Upgrade npm to latest version to fix CVE-2024-21538 (cross-spawn vulnerability)
+RUN npm install -g npm@latest
+
 # Install build dependencies
 RUN apk add --no-cache \
     python3 \
@@ -36,6 +39,9 @@ RUN npm run build
 FROM node:20-alpine AS runtime
 
 WORKDIR /app
+
+# Upgrade npm to latest version to fix CVE-2024-21538 (cross-spawn vulnerability)
+RUN npm install -g npm@latest
 
 # Install runtime dependencies only
 # Note: curl 8.14.1-r2 has CVE-2025-10966 (MEDIUM) with no fix available yet
