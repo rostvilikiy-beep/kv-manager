@@ -7,10 +7,12 @@
 ![Status](https://img.shields.io/badge/status-Production%2FStable-brightgreen)
 [![Security](https://img.shields.io/badge/Security-Enhanced-green.svg)](https://github.com/neverinfamous/kv-manager/blob/main/SECURITY.md)
 
-**Version:** 1.0.0 | **Last Updated:** November 10, 2025 
+**Version:** 1.0.0 | **Last Updated:** November 12, 2025 
 **Base Image:** Node.js 22-alpine | **Architecture:** linux/amd64, linux/arm64
 
 A fully containerized version of the KV Manager for Cloudflare. This Docker image provides a modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys with enterprise-grade authentication via Cloudflare Access (Zero Trust).
+
+> **Development Features:** The latest development version includes operation cancellation support for bulk operations. See the [CHANGELOG](https://github.com/neverinfamous/kv-manager/blob/main/CHANGELOG.md) for unreleased features.
 
 **🎯 [Try the Live Demo](https://kv.adamic.tech/)** - See KV Manager in action
 

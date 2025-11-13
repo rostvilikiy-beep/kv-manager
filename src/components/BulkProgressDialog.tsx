@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useBulkJobProgress } from '../hooks/useBulkJobProgress';
 import type { JobProgress } from '../services/api';
-import { Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, AlertCircle, Ban } from 'lucide-react';
 
 interface BulkProgressDialogProps {
   open: boolean;
@@ -34,18 +34,20 @@ export function BulkProgressDialog({
 }: BulkProgressDialogProps) {
   const [autoCloseTimer, setAutoCloseTimer] = useState<number | null>(null);
   const [canClose, setCanClose] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Only use the hook when dialog is open and we have valid params
   const shouldConnect = open && jobId && wsUrl;
   
-  const { progress, isConnected, error: connectionError } = useBulkJobProgress({
+  const { progress, isConnected, error: connectionError, cancelJob } = useBulkJobProgress({
     jobId: shouldConnect ? jobId : '',
     wsUrl: shouldConnect ? wsUrl : '',
     onComplete: (result) => {
       setCanClose(true);
+      setIsCancelling(false);
       
-      // Auto-close after 5 seconds on success
-      if (result.status === 'completed') {
+      // Auto-close after 5 seconds on success or cancellation
+      if (result.status === 'completed' || result.status === 'cancelled') {
         const timer = window.setTimeout(() => {
           handleClose();
         }, 5000);
@@ -58,6 +60,7 @@ export function BulkProgressDialog({
     },
     onError: () => {
       setCanClose(true);
+      setIsCancelling(false);
     },
   });
 
@@ -77,6 +80,13 @@ export function BulkProgressDialog({
     onClose();
   };
 
+  const handleCancel = () => {
+    if (!isCancelling && (progress?.status === 'queued' || progress?.status === 'running')) {
+      setIsCancelling(true);
+      cancelJob();
+    }
+  };
+
   const getStatusIcon = () => {
     if (!progress) {
       return <Loader2 className="h-5 w-5 animate-spin text-blue-500" />;
@@ -91,6 +101,8 @@ export function BulkProgressDialog({
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       case 'failed':
         return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'cancelled':
+        return <Ban className="h-5 w-5 text-orange-500" />;
       default:
         return <Loader2 className="h-5 w-5 animate-spin text-gray-500" />;
     }
@@ -99,6 +111,10 @@ export function BulkProgressDialog({
   const getStatusText = () => {
     if (!progress) {
       return 'Initializing...';
+    }
+
+    if (isCancelling && (progress.status === 'queued' || progress.status === 'running')) {
+      return 'Cancelling...';
     }
 
     switch (progress.status) {
@@ -110,6 +126,8 @@ export function BulkProgressDialog({
         return 'Completed';
       case 'failed':
         return 'Failed';
+      case 'cancelled':
+        return 'Cancelled';
       default:
         return progress.status;
     }
@@ -162,7 +180,7 @@ export function BulkProgressDialog({
           </div>
 
           {/* Progress Bar */}
-          {progress && progress.status !== 'failed' && (
+          {progress && progress.status !== 'failed' && progress.status !== 'cancelled' && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Progress:</span>
@@ -230,9 +248,47 @@ export function BulkProgressDialog({
               )}
             </div>
           )}
+
+          {/* Cancelled Summary */}
+          {progress?.status === 'cancelled' && (
+            <div className="rounded-md bg-orange-50 p-3 text-sm text-orange-800 dark:bg-orange-900/20 dark:text-orange-200">
+              <p className="font-medium">Operation was cancelled</p>
+              <div className="mt-2 space-y-1">
+                <p>Processed: {processed.toLocaleString()} of {total.toLocaleString()} keys</p>
+                {errors > 0 && (
+                  <p>Errors: {errors.toLocaleString()}</p>
+                )}
+              </div>
+              {autoCloseTimer && (
+                <p className="mt-2 text-xs">Closing automatically in 5 seconds...</p>
+              )}
+            </div>
+          )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
+          {/* Cancel button - only shown when job is running or queued */}
+          {!canClose && (progress?.status === 'queued' || progress?.status === 'running') && (
+            <Button
+              onClick={handleCancel}
+              disabled={isCancelling || !isConnected}
+              variant="destructive"
+              className="mr-auto"
+            >
+              {isCancelling ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <Ban className="mr-2 h-4 w-4" />
+                  Cancel Operation
+                </>
+              )}
+            </Button>
+          )}
+          
           <Button
             onClick={handleClose}
             disabled={!canClose}

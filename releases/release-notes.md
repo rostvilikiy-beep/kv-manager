@@ -2,6 +2,8 @@
 
 🎉 **Initial Release** - A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
+> **Note:** Features marked with 🆕 are unreleased and available in the latest development version.
+
 ## ✨ Key Features
 
 ### Namespace Management
@@ -41,6 +43,7 @@
 - **Real-time Progress Tracking**: WebSocket-based live updates with automatic polling fallback
 - **Async Processing**: Operations execute in background via Durable Objects
 - **Detailed Progress**: View current key, processed count, errors, and percentage completion
+- 🆕 **Operation Cancellation**: Cancel in-progress operations via WebSocket with graceful shutdown
 - Batch processing (10,000 keys per operation)
 
 ### Import/Export

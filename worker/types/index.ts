@@ -98,7 +98,7 @@ export interface JobAuditEvent {
 // WebSocket Progress Message Types
 export interface JobProgress {
   jobId: string
-  status: 'queued' | 'running' | 'completed' | 'failed'
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
   progress: {
     total: number
     processed: number

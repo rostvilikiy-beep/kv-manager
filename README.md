@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 10, 2025*
+*Last Updated: November 12, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -44,6 +44,7 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 - **Bulk Copy**: Copy keys between namespaces
 - **Bulk TTL Update**: Set expiration on multiple keys
 - **Bulk Tag**: Apply tags to multiple keys
+- **Operation Cancellation**: Cancel in-progress operations via WebSocket
 - Progress tracking with job IDs
 - Batch processing (10,000 keys per operation)
 
@@ -83,6 +84,7 @@ All bulk operations (copy, delete, TTL updates, tag operations, import, export) 
 
 - **Async Processing**: Operations start immediately and process in background via Durable Objects
 - **Real-Time Updates**: Progress, current key, percentage, and errors stream via WebSocket
+- **Operation Cancellation**: Cancel running operations via WebSocket with graceful shutdown
 - **Graceful Fallback**: Automatic fallback to HTTP polling if WebSocket connection fails
 - **Reconnection**: Exponential backoff reconnection strategy for dropped connections
 - **Progress Details**: See total keys, processed count, errors, current key being processed, and percentage completion
@@ -382,6 +384,7 @@ Theme preference is stored in localStorage and persists across sessions.
    - **Apply Tags**: Add, remove, or replace tags
    - **Delete Selected**: Remove multiple keys at once
 3. Monitor progress with job status tracking
+4. Cancel operations in progress using the Cancel button (requires WebSocket connection)
 
 ### Searching
 1. Click **Search** in the navigation bar
@@ -472,7 +475,7 @@ npx wrangler d1 list
 1. ✅ ~~Add WebSocket support for real-time progress~~ — **Completed!**
 2. ✅ ~~Implement Durable Objects for large operations~~ — **Completed!**
 3. ✅ ~~Add Audit Event Logging (foundation for job history & replay)~~ — **Completed!**
-4. **Add Operation Cancellation Support** — extend the WebSocket channel to handle `{ type: "cancel" }` messages, update job status, and log the cancellation event.
+4. ✅ ~~Add Operation Cancellation Support~~ — **Completed!** WebSocket channel handles `{ type: "cancel" }` messages, updates job status, and logs cancellation events.
 5. **Add Job History UI** — display event timeline and progress history using the `GET /api/jobs/:jobId/events` endpoint.
 6. Add advanced search filters
 

@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Operation Cancellation Support**: Users can now cancel in-progress bulk operations
+  - Cancel button appears in progress dialog during `queued` or `running` operations
+  - WebSocket-based cancellation via `{ type: "cancel", jobId }` message protocol
+  - Graceful cancellation: operations complete current batch/item before stopping
+  - Job status updates to `cancelled` in D1 database
+  - Cancellation events logged to `job_audit_events` table with partial progress
+  - Visual feedback: orange status indicator, cancelled summary with processed counts
+  - Cancel button disabled when WebSocket is not connected (polling fallback limitation)
+  - Cancelled jobs auto-close progress dialog after 5 seconds
+
 - **Job Audit Event Logging**: Comprehensive lifecycle event tracking for all bulk operations and import/export jobs
   - New `job_audit_events` D1 table stores milestone events: `started`, `progress_25`, `progress_50`, `progress_75`, `completed`, `failed`, `cancelled`
   - Events include detailed JSON metadata: processed counts, error counts, percentages, and operation-specific data
@@ -40,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `percentage` column to `bulk_jobs` table to store completion percentage (0-100)
   - Added `job_audit_events` table with foreign key to `bulk_jobs` for lifecycle event tracking
   - Indexed by `job_id` and `user_email` for efficient querying
+  - Schema already supports `cancelled` status in `bulk_jobs.status` and `job_audit_events.event_type`
 
 ### Changed
 - **Bulk Operations Architecture**:
@@ -58,11 +69,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Users can see which key is currently being processed
   - Connection status indicator shows whether using WebSocket or polling fallback
   - Auto-close progress dialog on successful completion after brief delay
+  - Cancel button with loading state during cancellation
+  - Visual distinction for cancelled operations (orange indicator, dedicated summary section)
 
 ### Technical Improvements
 - Implemented two Durable Object classes:
-  - `BulkOperationDO` - Handles bulk delete, copy, TTL, and tag operations with milestone event logging
-  - `ImportExportDO` - Handles import and export operations with file storage and milestone event logging
+  - `BulkOperationDO` - Handles bulk delete, copy, TTL, and tag operations with milestone event logging and cancellation support
+  - `ImportExportDO` - Handles import and export operations with file storage, milestone event logging, and cancellation support
 - Added `logJobEvent()` helper function in `worker/utils/helpers.ts` for consistent event logging
 - Added `JobAuditEvent` TypeScript interface for type-safe event handling
 - All 6 operation methods (bulk copy, delete, TTL, tag, import, export) now log milestone events automatically
@@ -71,6 +84,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented graceful error handling and recovery for WebSocket connections
 - Added comprehensive logging for debugging WebSocket connections and job processing
 - Fixed all ESLint and TypeScript linting errors related to React hooks and Workers types
+- Cancellation logic integrated into all 6 operation processing methods (copy, delete, TTL, tag, import, export)
+- Added `cancelledJobs: Set<string>` to track cancellation requests in Durable Objects
+- `cancelJob()` function in `useBulkJobProgress` hook sends cancellation messages via WebSocket
+- `handleCancellation()` helper method in both Durable Objects for consistent cancellation handling
+- TypeScript types updated: `JobProgress.status` now includes `'cancelled'` in all type definitions
+- Cancel button component in `BulkProgressDialog` with appropriate disabled states and visual feedback
 
 ### Fixed
 - **CRITICAL**: WebSocket connection loop causing 429 rate limit errors

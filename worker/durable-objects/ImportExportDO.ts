@@ -15,12 +15,14 @@ export class ImportExportDO {
   private env: Env;
   private sessions: Map<WebSocket, SessionAttachment>;
   private exportResults: Map<string, string>; // Store export results temporarily
+  private cancelledJobs: Set<string>;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
     this.sessions = new Map();
     this.exportResults = new Map();
+    this.cancelledJobs = new Set();
   }
 
   /**
@@ -145,6 +147,9 @@ export class ImportExportDO {
       const parsed = JSON.parse(data);
       if (parsed.type === 'ping') {
         ws.send(JSON.stringify({ type: 'pong' }));
+      } else if (parsed.type === 'cancel' && parsed.jobId) {
+        // Handle cancellation request
+        await this.cancelJob(parsed.jobId);
       }
     } catch (error) {
       console.error('[ImportExportDO] Message error:', error);
@@ -210,7 +215,7 @@ export class ImportExportDO {
       if (updates.status !== undefined) {
         setClauses.push('status = ?');
         values.push(updates.status);
-        if (updates.status === 'completed' || updates.status === 'failed') {
+        if (updates.status === 'completed' || updates.status === 'failed' || updates.status === 'cancelled') {
           setClauses.push('completed_at = CURRENT_TIMESTAMP');
         }
       }
@@ -241,6 +246,66 @@ export class ImportExportDO {
     } catch (error) {
       console.error('[ImportExportDO] DB update error:', error);
     }
+  }
+
+  /**
+   * Cancel a job
+   */
+  private async cancelJob(jobId: string): Promise<void> {
+    console.log('[ImportExportDO] Cancelling job:', jobId);
+    this.cancelledJobs.add(jobId);
+    
+    // Acknowledge cancellation request via WebSocket
+    this.broadcastProgress({
+      jobId,
+      status: 'running',
+      progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
+    });
+  }
+
+  /**
+   * Handle job cancellation - update DB, log event, broadcast
+   */
+  private async handleCancellation(
+    jobId: string,
+    userEmail: string,
+    processed: number,
+    errors: number,
+    total: number
+  ): Promise<void> {
+    const db = getD1Binding(this.env);
+    const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+    // Update job status to cancelled
+    await this.updateJobInDB(jobId, {
+      status: 'cancelled',
+      processed_keys: processed,
+      error_count: errors,
+      percentage
+    });
+
+    // Log cancellation event
+    await logJobEvent(db, {
+      job_id: jobId,
+      event_type: 'cancelled',
+      user_email: userEmail,
+      details: JSON.stringify({ processed, errors, percentage, total })
+    });
+
+    // Broadcast cancelled status
+    this.broadcastProgress({
+      jobId,
+      status: 'cancelled',
+      progress: {
+        total,
+        processed,
+        errors,
+        percentage
+      }
+    });
+
+    // Clean up from cancelled jobs set
+    this.cancelledJobs.delete(jobId);
   }
 
   /**
@@ -275,6 +340,13 @@ export class ImportExportDO {
       const batchSize = 100;
       
       for (let i = 0; i < importData.length; i += batchSize) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[ImportExportDO] Job cancelled during import:', jobId);
+          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, importData.length);
+          return;
+        }
+
         const batch = importData.slice(i, i + batchSize);
 
         for (const item of batch) {
@@ -516,6 +588,13 @@ export class ImportExportDO {
       let lastMilestone = 0;
 
       for (let i = 0; i < allKeys.length; i++) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[ImportExportDO] Job cancelled during export:', jobId);
+          await this.handleCancellation(jobId, userEmail, exportData.length, errorCount, allKeys.length);
+          return;
+        }
+
         const key = allKeys[i];
         
         try {

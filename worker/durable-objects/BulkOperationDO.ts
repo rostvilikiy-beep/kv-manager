@@ -21,11 +21,13 @@ export class BulkOperationDO {
   private state: DurableObjectState;
   private env: Env;
   private sessions: Map<WebSocket, SessionAttachment>;
+  private cancelledJobs: Set<string>;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
     this.sessions = new Map();
+    this.cancelledJobs = new Set();
   }
 
   /**
@@ -124,6 +126,9 @@ export class BulkOperationDO {
       const parsed = JSON.parse(data);
       if (parsed.type === 'ping') {
         ws.send(JSON.stringify({ type: 'pong' }));
+      } else if (parsed.type === 'cancel' && parsed.jobId) {
+        // Handle cancellation request
+        await this.cancelJob(parsed.jobId);
       }
     } catch (error) {
       console.error('[BulkOperationDO] Message error:', error);
@@ -189,7 +194,7 @@ export class BulkOperationDO {
       if (updates.status !== undefined) {
         setClauses.push('status = ?');
         values.push(updates.status);
-        if (updates.status === 'completed' || updates.status === 'failed') {
+        if (updates.status === 'completed' || updates.status === 'failed' || updates.status === 'cancelled') {
           setClauses.push('completed_at = CURRENT_TIMESTAMP');
         }
       }
@@ -223,6 +228,66 @@ export class BulkOperationDO {
   }
 
   /**
+   * Cancel a job
+   */
+  private async cancelJob(jobId: string): Promise<void> {
+    console.log('[BulkOperationDO] Cancelling job:', jobId);
+    this.cancelledJobs.add(jobId);
+    
+    // Acknowledge cancellation request via WebSocket
+    this.broadcastProgress({
+      jobId,
+      status: 'running',
+      progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
+    });
+  }
+
+  /**
+   * Handle job cancellation - update DB, log event, broadcast
+   */
+  private async handleCancellation(
+    jobId: string,
+    userEmail: string,
+    processed: number,
+    errors: number,
+    total: number
+  ): Promise<void> {
+    const db = getD1Binding(this.env);
+    const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+    // Update job status to cancelled
+    await this.updateJobInDB(jobId, {
+      status: 'cancelled',
+      processed_keys: processed,
+      error_count: errors,
+      percentage
+    });
+
+    // Log cancellation event
+    await logJobEvent(db, {
+      job_id: jobId,
+      event_type: 'cancelled',
+      user_email: userEmail,
+      details: JSON.stringify({ processed, errors, percentage, total })
+    });
+
+    // Broadcast cancelled status
+    this.broadcastProgress({
+      jobId,
+      status: 'cancelled',
+      progress: {
+        total,
+        processed,
+        errors,
+        percentage
+      }
+    });
+
+    // Clean up from cancelled jobs set
+    this.cancelledJobs.delete(jobId);
+  }
+
+  /**
    * Process bulk copy operation
    */
   async processBulkCopy(params: BulkCopyParams & { jobId: string }): Promise<void> {
@@ -252,6 +317,13 @@ export class BulkOperationDO {
 
       // Fetch all key values from source
       for (let i = 0; i < keys.length; i++) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[BulkOperationDO] Job cancelled during fetch phase:', jobId);
+          await this.handleCancellation(jobId, userEmail, i + 1, errorCount, keys.length);
+          return;
+        }
+
         const keyName = keys[i];
         
         try {
@@ -312,6 +384,13 @@ export class BulkOperationDO {
       let writeProcessed = 0;
 
       for (let i = 0; i < copyData.length; i += batchSize) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[BulkOperationDO] Job cancelled during write phase:', jobId);
+          await this.handleCancellation(jobId, userEmail, keys.length, errorCount, keys.length);
+          return;
+        }
+
         const batch = copyData.slice(i, i + batchSize);
 
         try {
@@ -462,6 +541,13 @@ export class BulkOperationDO {
 
       // Update TTL for each key
       for (let i = 0; i < keys.length; i++) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[BulkOperationDO] Job cancelled during TTL update:', jobId);
+          await this.handleCancellation(jobId, userEmail, i, errorCount, keys.length);
+          return;
+        }
+
         const keyName = keys[i];
         
         try {
@@ -629,6 +715,13 @@ export class BulkOperationDO {
       let lastMilestone = 0;
 
       for (let i = 0; i < keys.length; i++) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[BulkOperationDO] Job cancelled during bulk tag:', jobId);
+          await this.handleCancellation(jobId, userEmail, i, errorCount, keys.length);
+          return;
+        }
+
         const keyName = keys[i];
 
         try {
@@ -812,6 +905,13 @@ export class BulkOperationDO {
       const batchSize = 10000;
       
       for (let i = 0; i < keys.length; i += batchSize) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[BulkOperationDO] Job cancelled during bulk delete:', jobId);
+          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, keys.length);
+          return;
+        }
+
         const batch = keys.slice(i, i + batchSize);
 
         try {

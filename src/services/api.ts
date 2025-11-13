@@ -49,7 +49,7 @@ export interface SearchResult {
 // Job Progress types
 export interface JobProgress {
   jobId: string
-  status: 'queued' | 'running' | 'completed' | 'failed'
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
   progress: {
     total: number
     processed: number

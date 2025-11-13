@@ -13,6 +13,7 @@ interface UseBulkJobProgressReturn {
   progress: JobProgress | null;
   isConnected: boolean;
   error: string | null;
+  cancelJob: () => void;
 }
 
 const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 16000]; // Exponential backoff
@@ -39,6 +40,7 @@ export function useBulkJobProgress({
   const isMountedRef = useRef(true);
   const hasCompletedRef = useRef(false);
   const connectRef = useRef<(() => void) | null>(null);
+  const hasCancelledRef = useRef(false);
 
   // Polling fallback
   const startPolling = useCallback(() => {
@@ -76,7 +78,7 @@ export function useBulkJobProgress({
 
         setProgress(progressUpdate);
 
-        if (progressUpdate.status === 'completed' || progressUpdate.status === 'failed') {
+        if (progressUpdate.status === 'completed' || progressUpdate.status === 'failed' || progressUpdate.status === 'cancelled') {
           hasCompletedRef.current = true;
           
           if (pollingIntervalRef.current) {
@@ -88,6 +90,8 @@ export function useBulkJobProgress({
             onComplete(progressUpdate);
           } else if (progressUpdate.status === 'failed' && onError) {
             onError('Job failed');
+          } else if (progressUpdate.status === 'cancelled' && onError) {
+            onError('Job was cancelled');
           }
         }
       } catch (err) {
@@ -108,6 +112,31 @@ export function useBulkJobProgress({
       pollingIntervalRef.current = null;
     }
   }, []);
+
+  // Cancel job
+  const cancelJob = useCallback(() => {
+    if (hasCancelledRef.current) {
+      console.log('[useBulkJobProgress] Job already cancelled');
+      return;
+    }
+
+    console.log('[useBulkJobProgress] Cancelling job:', jobId);
+    hasCancelledRef.current = true;
+
+    // Send cancel message via WebSocket if connected
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      try {
+        wsRef.current.send(JSON.stringify({ type: 'cancel', jobId }));
+        console.log('[useBulkJobProgress] Cancel message sent via WebSocket');
+      } catch (err) {
+        console.error('[useBulkJobProgress] Failed to send cancel message:', err);
+        setError('Failed to send cancellation request');
+      }
+    } else {
+      console.warn('[useBulkJobProgress] WebSocket not connected, cannot cancel via WebSocket');
+      setError('Cannot cancel: WebSocket not connected');
+    }
+  }, [jobId]);
 
   // Disconnect WebSocket
   const disconnect = useCallback(() => {
@@ -172,13 +201,15 @@ export function useBulkJobProgress({
 
           setProgress(data);
 
-          if (data.status === 'completed' || data.status === 'failed') {
+          if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
             hasCompletedRef.current = true;
 
             if (data.status === 'completed' && onComplete) {
               onComplete(data);
             } else if (data.status === 'failed' && onError) {
               onError(data.error || 'Job failed');
+            } else if (data.status === 'cancelled' && onError) {
+              onError('Job was cancelled');
             }
 
             // Close WebSocket after completion
@@ -272,6 +303,7 @@ export function useBulkJobProgress({
     progress,
     isConnected,
     error,
+    cancelJob,
   };
 }
 
