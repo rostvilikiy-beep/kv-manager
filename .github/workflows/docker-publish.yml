@@ -65,6 +65,22 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Detected version: $VERSION"
     
+    - name: Verify package-lock.json has security fixes
+      run: |
+        echo "🔍 Verifying security patches in package-lock.json..."
+        CROSS_SPAWN_VERSION=$(grep -A 2 '"node_modules/cross-spawn"' package-lock.json | grep '"version"' | cut -d'"' -f4)
+        echo "cross-spawn version: $CROSS_SPAWN_VERSION"
+        if [ "$CROSS_SPAWN_VERSION" != "7.0.6" ] && [ "$CROSS_SPAWN_VERSION" != "7.0.5" ]; then
+          echo "❌ ERROR: cross-spawn version $CROSS_SPAWN_VERSION is vulnerable (need >= 7.0.5)"
+          exit 1
+        fi
+        BRACE_EXP_VERSION=$(grep -A 2 '"node_modules/brace-expansion"' package-lock.json | grep '"version"' | cut -d'"' -f4)
+        echo "brace-expansion version: $BRACE_EXP_VERSION"
+        if [ "$BRACE_EXP_VERSION" != "2.0.2" ]; then
+          echo "⚠️  WARNING: brace-expansion version $BRACE_EXP_VERSION (expected 2.0.2)"
+        fi
+        echo "✅ Security patches verified in package-lock.json"
+    
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -92,6 +108,8 @@ jobs:
         load: true
         tags: local-scan:latest
         cache-from: type=gha
+        no-cache: false
+        pull: true  # Always pull latest base images
 
     # Security scanning with Docker Scout CLI
     - name: Docker Scout security scan
