@@ -7,7 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Progress Tracking Simplified**: Removed WebSocket connections in favor of HTTP polling for increased reliability
+  - Polling-only approach with 1-second intervals until job completion
+  - Eliminates WebSocket connection failures, rate limiting, and complexity
+  - Reduced progress hook from 320 lines to 150 lines (~47% reduction)
+  - Export files download automatically when ready via polling detection
+  - API still returns `ws_url` for compatibility, but it's not used
+  - Note: WebSocket infrastructure remains in Durable Objects but is not utilized by frontend
+
+### Fixed
+- **Accessibility**: Removed empty label warnings in Job History UI
+  - Removed unconnected `<Label>` elements from Select components
+  - Added `aria-label` attributes to all SelectTrigger components
+  - Replaced spacing hack (`<Label>&nbsp;</Label>`) with proper flex layout
+  
+- **Database Schema**: Added missing columns to production databases
+  - Created migrations for `job_audit_events` table
+  - Created migrations for `current_key` and `percentage` columns in `bulk_jobs`
+  - Both migrations are idempotent and safe to run multiple times
+  - Migration guide provided at [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)
+
 ### Added
+- **Migration Infrastructure**: Comprehensive migration system for database updates
+  - Single migration file: `apply_all_migrations.sql` for one-step updates
+  - Idempotent migrations safe to run multiple times
+  - Detailed migration guide with troubleshooting and verification steps
+  - Instructions for both production (`--remote`) and development (`--local`) databases
+
 - **Advanced Job History Filters**: Comprehensive filtering and sorting system for job history
   - **Namespace Filter**: Filter jobs by specific namespace from dropdown
   - **Date Range Filter**: Select preset ranges (Last 24h, Last 7 days, Last 30 days) or custom date range with calendar picker

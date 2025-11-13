@@ -476,8 +476,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
             </div>
 
             {/* Reset Filters */}
-            <div className="space-y-2">
-              <Label>&nbsp;</Label>
+            <div className="flex items-end">
               <Button
                 variant="outline"
                 onClick={handleResetFilters}

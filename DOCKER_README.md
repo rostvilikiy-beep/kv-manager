@@ -98,9 +98,8 @@ This Docker image packages the complete KV Manager with:
 - **Key Operations** - Full CRUD operations with cursor-based pagination and TTL management
 - **Metadata & Tags (D1-Backed)** - Unlimited tags and custom JSON metadata (no size limit)
 - **Search & Discovery** - Cross-namespace search by key name with tag filtering
-- **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with real-time WebSocket progress tracking
-- **Operation cancellation** - Job cancelation support for bulk operations
-- **Import/Export** - JSON/NDJSON format support with collision handling and live progress updates
+- **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with HTTP polling progress tracking
+- **Import/Export** - JSON/NDJSON format support with collision handling and automatic file downloads
 - **Async Processing** - Background job execution via Durable Objects for large operations
 - **Backup & Restore** - Single-version backup and restore for keys
 - **Job History UI** - View complete history of all bulk operations with event timeline visualization, advanced filtering (namespace, date range, job ID search, error threshold), and multi-column sorting
@@ -121,8 +120,8 @@ This Docker image packages the complete KV Manager with:
 - Tailwind CSS + shadcn/ui for modern UI
 - Cloudflare Workers runtime for serverless API
 - D1 database for metadata and audit logs
-- Durable Objects for orchestration and WebSocket management
-- WebSocket connections for real-time progress updates with HTTP polling fallback
+- Durable Objects for orchestration and job processing
+- HTTP polling for reliable progress tracking (1-second intervals)
 
 ---
 
@@ -174,9 +173,17 @@ cd kv-manager
 
 Initialize the schema:
 
+**For new installations:**
 ```bash
 npx wrangler d1 execute kv-manager-metadata --remote --file=worker/schema.sql
 ```
+
+**For existing installations (upgrading):**
+```bash
+npx wrangler d1 execute kv-manager-metadata --remote --file=worker/migrations/apply_all_migrations.sql
+```
+
+See the [MIGRATION_GUIDE.md](https://github.com/neverinfamous/kv-manager/blob/main/MIGRATION_GUIDE.md) for detailed migration instructions.
 
 ### 2. Get Your Cloudflare Account ID
 

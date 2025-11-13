@@ -6,6 +6,20 @@
 
 ## 🆕 Unreleased Features
 
+### Simplified Progress Tracking
+Progress tracking has been simplified to use HTTP polling instead of WebSockets:
+
+- **Polling-Only Approach** - Removed WebSocket complexity for more reliable progress tracking
+- **1-Second Intervals** - Status polls every second until job completion
+- **Automatic Downloads** - Export files download automatically when ready
+- **Cleaner Code** - Reduced progress hook from 320 lines to 150 lines
+- **No Connection Issues** - Eliminates WebSocket connection failures and rate limiting
+
+**Migration Required:**
+- Database migration needed for existing installations (see [MIGRATION_GUIDE.md](../MIGRATION_GUIDE.md))
+- Single migration file adds: `job_audit_events` table and progress tracking columns
+- Idempotent and safe to run multiple times
+
 ### Advanced Job History Filters
 The Job History UI now includes enterprise-grade filtering and sorting capabilities:
 

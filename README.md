@@ -44,8 +44,7 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 - **Bulk Copy**: Copy keys between namespaces
 - **Bulk TTL Update**: Set expiration on multiple keys
 - **Bulk Tag**: Apply tags to multiple keys
-- **Operation Cancellation**: Cancel in-progress operations via WebSocket
-- Progress tracking with job IDs
+- Progress tracking with job IDs and event history
 - Batch processing (10,000 keys per operation)
 
 ### Import/Export
@@ -86,19 +85,18 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 
 - **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.2.2 + Tailwind CSS 3.4.18 + shadcn/ui
 - **Backend**: Cloudflare Workers + KV + D1 (metadata) + Durable Objects (orchestration)
-- **Real-time Progress**: WebSocket connections via Durable Objects with polling fallback
+- **Progress Tracking**: HTTP polling for job status (simple and reliable)
 - **Auth**: Cloudflare Access (Zero Trust)
 
-### WebSocket-Based Progress Tracking
+### Progress Tracking
 
-All bulk operations (copy, delete, TTL updates, tag operations, import, export) now use **WebSocket connections** for real-time progress updates:
+All bulk operations (copy, delete, TTL updates, tag operations, import, export) use **HTTP polling** for progress updates:
 
 - **Async Processing**: Operations start immediately and process in background via Durable Objects
-- **Real-Time Updates**: Progress, current key, percentage, and errors stream via WebSocket
-- **Operation Cancellation**: Cancel running operations via WebSocket with graceful shutdown
-- **Graceful Fallback**: Automatic fallback to HTTP polling if WebSocket connection fails
-- **Reconnection**: Exponential backoff reconnection strategy for dropped connections
+- **Polling Updates**: Progress, current key, percentage, and errors retrieved via HTTP polling (1-second intervals)
+- **Job History**: Complete event timeline for every job with milestone tracking
 - **Progress Details**: See total keys, processed count, errors, current key being processed, and percentage completion
+- **Simple & Reliable**: No WebSocket connection issues or complexity
 
 ## Docker Deployment
 
@@ -206,9 +204,18 @@ wrangler d1 create kv-manager-metadata
 Copy the `database_id` from the output to your `wrangler.toml` file.
 
 3. **Initialize D1 schema**:
+
+For new installations:
 ```bash
 wrangler d1 execute kv-manager-metadata --remote --file=worker/schema.sql
 ```
+
+For existing installations (upgrading), run the migration:
+```bash
+wrangler d1 execute kv-manager-metadata --remote --file=worker/migrations/apply_all_migrations.sql
+```
+
+See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructions.
 
 4. **Set secrets**:
 
@@ -291,12 +298,11 @@ wrangler deploy
 ### Import/Export
 - `GET /api/export/:namespaceId` - Start async export of namespace keys and values
   - Query params: `format` (json|ndjson)
-  - Returns: `job_id`, `status`, `ws_url`
+  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
 - `POST /api/import/:namespaceId` - Start async import of keys into namespace
   - Query params: `collision` (skip|overwrite|fail)
-  - Returns: `job_id`, `status`, `ws_url`
-- `GET /api/jobs/:jobId` - Get status of bulk job (polling endpoint)
-- `GET /api/jobs/:jobId/ws` - WebSocket endpoint for real-time progress updates
+  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
+- `GET /api/jobs/:jobId` - Get status of bulk job (polling endpoint - recommended)
 - `GET /api/jobs/:jobId/download` - Download completed export file
 
 ### Job History
@@ -406,8 +412,7 @@ Theme preference is stored in localStorage and persists across sessions.
    - **Update TTL**: Set expiration time on selected keys
    - **Apply Tags**: Add, remove, or replace tags
    - **Delete Selected**: Remove multiple keys at once
-3. Monitor progress with job status tracking
-4. Cancel operations in progress using the Cancel button (requires WebSocket connection)
+3. Monitor progress with job status tracking via polling
 
 ### Searching
 1. Click **Search** in the navigation bar
@@ -505,11 +510,11 @@ npx wrangler d1 list
 - Verify D1 database is properly initialized
 - Try searching without filters first
 
-### WebSocket connection issues
-- Progress tracking automatically falls back to HTTP polling if WebSocket fails
-- Check browser console for connection errors
-- Verify firewall/proxy settings allow WebSocket connections
-- WebSocket connections use same origin as API (ws:// for http://, wss:// for https://)
+### Progress tracking issues
+- All progress tracking uses HTTP polling (no WebSocket connections)
+- Jobs poll for status every second until completion
+- Check browser console for API errors if progress isn't updating
+- Verify D1 database has the required tables (see MIGRATION_GUIDE.md)
 - For development, ensure worker is running on expected port (default: 8787)
 
 ---

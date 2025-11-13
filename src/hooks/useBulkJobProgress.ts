@@ -16,34 +16,30 @@ interface UseBulkJobProgressReturn {
   cancelJob: () => void;
 }
 
-const RECONNECT_DELAYS = [500, 1000, 2000]; // Faster backoff for quick jobs
-const MAX_RECONNECT_ATTEMPTS = 3; // Fail faster and switch to polling
-const POLLING_INTERVAL = 1000; // Poll every second for faster feedback
+const POLLING_INTERVAL = 1000; // Poll every second
 
 /**
- * Custom hook for tracking bulk job progress via WebSocket with polling fallback
+ * Custom hook for tracking bulk job progress via polling
+ * 
+ * Note: This hook uses HTTP polling instead of WebSockets for simplicity and reliability.
+ * WebSockets are unnecessary for typical job durations and can cause connection issues.
  */
 export function useBulkJobProgress({
   jobId,
-  wsUrl,
+  // @ts-expect-error - wsUrl kept for API compatibility but not used (polling only)
+  wsUrl, // eslint-disable-line @typescript-eslint/no-unused-vars
   onComplete,
   onError,
 }: UseBulkJobProgressOptions): UseBulkJobProgressReturn {
   const [progress, setProgress] = useState<JobProgress | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectAttemptsRef = useRef(0);
-  const reconnectTimeoutRef = useRef<number | null>(null);
   const pollingIntervalRef = useRef<number | null>(null);
   const isMountedRef = useRef(true);
   const hasCompletedRef = useRef(false);
-  const connectRef = useRef<(() => void) | null>(null);
   const hasCancelledRef = useRef(false);
-  const isConnectingRef = useRef(false); // Prevent multiple simultaneous connections
 
-  // Polling fallback
+  // Polling
   const startPolling = useCallback(() => {
     // Don't start polling if jobId is empty
     if (!jobId) {
@@ -51,7 +47,7 @@ export function useBulkJobProgress({
       return;
     }
     
-    console.log('[useBulkJobProgress] Starting polling fallback for job:', jobId);
+    console.log('[useBulkJobProgress] Starting polling for job:', jobId);
     
     if (pollingIntervalRef.current) {
       return; // Already polling
@@ -121,204 +117,33 @@ export function useBulkJobProgress({
     }
   }, []);
 
-  // Cancel job
+  // Cancel job (not implemented - requires backend support)
   const cancelJob = useCallback(() => {
     if (hasCancelledRef.current) {
       console.log('[useBulkJobProgress] Job already cancelled');
       return;
     }
 
-    console.log('[useBulkJobProgress] Cancelling job:', jobId);
+    console.log('[useBulkJobProgress] Cancel not implemented - requires WebSocket connection');
     hasCancelledRef.current = true;
+    setError('Cancel functionality requires WebSocket support');
+  }, []);
 
-    // Send cancel message via WebSocket if connected
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      try {
-        wsRef.current.send(JSON.stringify({ type: 'cancel', jobId }));
-        console.log('[useBulkJobProgress] Cancel message sent via WebSocket');
-      } catch (err) {
-        console.error('[useBulkJobProgress] Failed to send cancel message:', err);
-        setError('Failed to send cancellation request');
-      }
-    } else {
-      console.warn('[useBulkJobProgress] WebSocket not connected, cannot cancel via WebSocket');
-      setError('Cannot cancel: WebSocket not connected');
-    }
-  }, [jobId]);
-
-  // Disconnect WebSocket
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-
-    stopPolling();
-  }, [stopPolling]);
-
-  // Connect to WebSocket
-  const connect = useCallback(() => {
-    // Prevent multiple simultaneous connection attempts
-    if (wsRef.current || hasCompletedRef.current || isConnectingRef.current) {
-      return;
-    }
-
-    // Don't attempt to connect if wsUrl or jobId is empty
-    if (!wsUrl || !jobId) {
-      console.log('[useBulkJobProgress] Skipping connection - missing wsUrl or jobId');
-      return;
-    }
-
-    // Mark as connecting
-    isConnectingRef.current = true;
-
-    // Determine WebSocket URL
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = new URL(import.meta.env.VITE_WORKER_API || window.location.origin).host;
-    const fullWsUrl = `${protocol}//${host}${wsUrl}`;
-
-    console.log('[useBulkJobProgress] Connecting to WebSocket:', fullWsUrl);
-
-    try {
-      const ws = new WebSocket(fullWsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        if (!isMountedRef.current) return;
-        
-        console.log('[useBulkJobProgress] WebSocket connected');
-        isConnectingRef.current = false; // Connection established
-        setIsConnected(true);
-        setError(null);
-        reconnectAttemptsRef.current = 0;
-        stopPolling(); // Stop polling if it was running
-      };
-
-      ws.onmessage = (event) => {
-        if (!isMountedRef.current || hasCompletedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data) as JobProgress;
-          // Log only safe, non-user-controlled metadata to prevent log injection
-          console.log('[useBulkJobProgress] Received progress update:', {
-            status: data.status,
-            percentage: data.progress?.percentage,
-            processed: data.progress?.processed,
-            total: data.progress?.total
-          });
-
-          setProgress(data);
-
-          if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
-            hasCompletedRef.current = true;
-
-            if (data.status === 'completed' && onComplete) {
-              onComplete(data);
-            } else if (data.status === 'failed' && onError) {
-              onError(data.error || 'Job failed');
-            } else if (data.status === 'cancelled' && onError) {
-              onError('Job was cancelled');
-            }
-
-            // Close WebSocket after completion
-            if (ws.readyState === WebSocket.OPEN) {
-              ws.close();
-            }
-          }
-        } catch (err) {
-          console.error('[useBulkJobProgress] Failed to parse message:', err);
-        }
-      };
-
-      ws.onerror = () => {
-        console.error('[useBulkJobProgress] WebSocket error occurred');
-        isConnectingRef.current = false; // Connection failed
-        setIsConnected(false);
-      };
-
-      ws.onclose = (event) => {
-        if (!isMountedRef.current) return;
-
-        // Only log the numeric close code, not the reason (which could contain user data)
-        console.log('[useBulkJobProgress] WebSocket closed with code:', event.code);
-        isConnectingRef.current = false; // Connection closed
-        setIsConnected(false);
-        wsRef.current = null;
-
-        // Don't reconnect if job is complete or if closed normally
-        if (hasCompletedRef.current || event.code === 1000) {
-          return;
-        }
-
-        // Try to reconnect with exponential backoff
-        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-          const delay = RECONNECT_DELAYS[reconnectAttemptsRef.current] || RECONNECT_DELAYS[RECONNECT_DELAYS.length - 1];
-          reconnectAttemptsRef.current++;
-
-          console.log(`[useBulkJobProgress] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
-
-          reconnectTimeoutRef.current = window.setTimeout(() => {
-            if (isMountedRef.current && !hasCompletedRef.current && connectRef.current) {
-              connectRef.current();
-            }
-          }, delay);
-        } else {
-          // Max reconnect attempts reached, fall back to polling
-          console.log('[useBulkJobProgress] Max reconnect attempts reached, falling back to polling');
-          setError('WebSocket connection failed, using polling fallback');
-          startPolling();
-        }
-      };
-
-      // Send ping to keep connection alive
-      const pingInterval = window.setInterval(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'ping' }));
-        }
-      }, 30000); // Ping every 30 seconds
-
-      // Store ping interval for cleanup
-      ws.addEventListener('close', () => {
-        clearInterval(pingInterval);
-      });
-    } catch (err) {
-      console.error('[useBulkJobProgress] Failed to create WebSocket:', err);
-      isConnectingRef.current = false; // Connection attempt failed
-      setError('Failed to establish WebSocket connection');
-      startPolling(); // Fall back to polling immediately
-    }
-  }, [jobId, wsUrl, onComplete, onError, startPolling, stopPolling]);
-
-  // Store connect in ref to avoid circular dependency
-  useEffect(() => {
-    connectRef.current = connect;
-  }, [connect]);
-
-  // Connect on mount, disconnect on unmount
+  // Start polling on mount, stop on unmount
   useEffect(() => {
     isMountedRef.current = true;
-    
-    // Start with polling instead of WebSocket
-    // WebSocket fails too quickly for small jobs, causing connection storms
-    // Polling is more reliable and simpler for typical use cases
     startPolling();
 
     return () => {
       isMountedRef.current = false;
-      disconnect();
+      stopPolling();
     };
-  }, [startPolling, disconnect]);
+  }, [startPolling, stopPolling]);
 
   return {
     progress,
-    isConnected,
+    isConnected: false, // No WebSocket connection
     error,
     cancelJob,
   };
 }
-
