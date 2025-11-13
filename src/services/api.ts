@@ -218,9 +218,10 @@ class APIService {
    * Get namespace info
    */
   async getNamespaceInfo(namespaceId: string): Promise<KVNamespace> {
-    const response = await fetch(`${WORKER_API}/api/namespaces/${namespaceId}/info`, {
-      credentials: 'include'
-    })
+    const response = await fetch(
+      `${WORKER_API}/api/namespaces/${namespaceId}/info`,
+      this.getFetchOptions()
+    )
     
     await this.handleResponse(response);
     
@@ -242,7 +243,7 @@ class APIService {
 
     const response = await fetch(
       `${WORKER_API}/api/keys/${namespaceId}/list?${params.toString()}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -257,7 +258,7 @@ class APIService {
   async getKey(namespaceId: string, keyName: string): Promise<KVKeyWithValue> {
     const response = await fetch(
       `${WORKER_API}/api/keys/${namespaceId}/${encodeURIComponent(keyName)}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -333,7 +334,7 @@ class APIService {
   async getMetadata(namespaceId: string, keyName: string): Promise<KeyMetadata> {
     const response = await fetch(
       `${WORKER_API}/api/metadata/${namespaceId}/${encodeURIComponent(keyName)}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -380,7 +381,7 @@ class APIService {
 
     const response = await fetch(
       `${WORKER_API}/api/search?${params.toString()}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -395,13 +396,13 @@ class APIService {
   async checkBackup(namespaceId: string, keyName: string): Promise<boolean> {
     const response = await fetch(
       `${WORKER_API}/api/backup/${namespaceId}/${encodeURIComponent(keyName)}/check`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
     
     const data = await response.json()
-    return data.result.exists
+    return data.result?.exists ?? false
   }
 
   /**
@@ -504,7 +505,7 @@ class APIService {
   async exportNamespace(namespaceId: string, format: 'json' | 'ndjson' = 'json'): Promise<BulkJobResponse> {
     const response = await fetch(
       `${WORKER_API}/api/export/${namespaceId}?format=${format}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -545,7 +546,7 @@ class APIService {
   async getJobStatus(jobId: string): Promise<Record<string, unknown>> {
     const response = await fetch(
       `${WORKER_API}/api/jobs/${jobId}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -568,7 +569,7 @@ class APIService {
 
     const response = await fetch(
       `${WORKER_API}/api/audit/${namespaceId}?${params.toString()}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -591,7 +592,7 @@ class APIService {
 
     const response = await fetch(
       `${WORKER_API}/api/audit/user/${encodeURIComponent(userEmail)}?${params.toString()}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -606,7 +607,7 @@ class APIService {
   async downloadExport(jobId: string, filename: string): Promise<void> {
     const response = await fetch(
       `${WORKER_API}/api/jobs/${jobId}/download`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -626,7 +627,7 @@ class APIService {
   async getJobEvents(jobId: string): Promise<JobEventsResponse> {
     const response = await fetch(
       `${WORKER_API}/api/jobs/${jobId}/events`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
@@ -666,7 +667,7 @@ class APIService {
 
     const response = await fetch(
       `${WORKER_API}/api/jobs?${params.toString()}`,
-      { credentials: 'include' }
+      this.getFetchOptions()
     )
     
     await this.handleResponse(response);
