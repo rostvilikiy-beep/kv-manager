@@ -63,11 +63,12 @@ export async function handleImportExportRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Export] Starting async processing in DO for job:', jobId);
+
+      // Start processing - await to ensure the request is actually sent
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Export] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Export] DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {
@@ -142,7 +143,7 @@ export async function handleImportExportRoutes(
       const id = env.IMPORT_EXPORT_DO.idFromName(jobId);
       const stub = env.IMPORT_EXPORT_DO.get(id);
 
-      // Fire and forget - start processing in DO
+      // Start processing in DO
       const doRequest = new Request(`https://do/process/import`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -155,11 +156,12 @@ export async function handleImportExportRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Import] Starting async processing in DO for job:', jobId);
+
+      // Await to ensure the request is actually sent
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Import] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Import] DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {
@@ -508,14 +510,14 @@ export async function handleImportExportRoutes(
     });
   } catch (error) {
     console.error('[ImportExport] Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    console.error('[ImportExport] Error stack:', errorStack);
+    // Log detailed error information but don't expose to users
+    if (error instanceof Error) {
+      console.error('[ImportExport] Error message:', error.message);
+      console.error('[ImportExport] Error stack:', error.stack);
+    }
     return new Response(
       JSON.stringify({ 
-        error: 'Internal Server Error',
-        message: isLocalDev ? errorMessage : undefined,
-        stack: isLocalDev ? errorStack : undefined
+        error: 'Internal Server Error'
       }),
       {
         status: 500,

@@ -145,7 +145,17 @@ export class BulkOperationDO {
       console.log('[BulkOperationDO] WebSocket closed:', session.sessionId, code, reason);
       this.sessions.delete(ws);
     }
-    ws.close(code, 'Durable Object is closing WebSocket');
+    // Don't try to close an already closed WebSocket
+    // Code 1005 is reserved and should never be sent explicitly
+    try {
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CLOSING) {
+        // Use 1000 (normal closure) if we received a reserved code like 1005
+        const closeCode = (code === 1005 || code === 1006) ? 1000 : code;
+        ws.close(closeCode, 'Durable Object is closing WebSocket');
+      }
+    } catch (error) {
+      console.error('[BulkOperationDO] Error closing WebSocket:', error);
+    }
   }
 
   /**

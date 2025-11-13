@@ -39,6 +39,7 @@ export class ImportExportDO {
     // Job processing endpoints
     if (url.pathname.startsWith('/process/')) {
       const jobType = url.pathname.split('/')[2];
+      console.log('[ImportExportDO] Received processing request for job type:', jobType);
       
       try {
         const contentType = request.headers.get('Content-Type');
@@ -46,6 +47,7 @@ export class ImportExportDO {
         
         if (contentType?.includes('application/json')) {
           body = await request.json();
+          console.log('[ImportExportDO] Processing job with params:', JSON.stringify(body));
         } else {
           // For imports with raw data
           const text = await request.text();
@@ -54,12 +56,15 @@ export class ImportExportDO {
         
         switch (jobType) {
           case 'import':
+            console.log('[ImportExportDO] Starting import process');
             await this.processImport(body as ImportParams & { jobId: string });
             break;
           case 'export':
+            console.log('[ImportExportDO] Starting export process');
             await this.processExport(body as ExportParams & { jobId: string });
             break;
           default:
+            console.log('[ImportExportDO] Unknown job type:', jobType);
             return new Response(JSON.stringify({ error: 'Unknown job type' }), {
               status: 400,
               headers: { 'Content-Type': 'application/json' }
@@ -166,7 +171,17 @@ export class ImportExportDO {
       console.log('[ImportExportDO] WebSocket closed:', session.sessionId, code, reason);
       this.sessions.delete(ws);
     }
-    ws.close(code, 'Durable Object is closing WebSocket');
+    // Don't try to close an already closed WebSocket
+    // Code 1005 is reserved and should never be sent explicitly
+    try {
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CLOSING) {
+        // Use 1000 (normal closure) if we received a reserved code like 1005
+        const closeCode = (code === 1005 || code === 1006) ? 1000 : code;
+        ws.close(closeCode, 'Durable Object is closing WebSocket');
+      }
+    } catch (error) {
+      console.error('[ImportExportDO] Error closing WebSocket:', error);
+    }
   }
 
   /**
@@ -515,7 +530,10 @@ export class ImportExportDO {
     const { jobId, namespaceId, format, userEmail } = params;
     const db = getD1Binding(this.env);
 
+    console.log('[ImportExportDO] Starting export processing for job:', jobId, 'namespace:', namespaceId, 'format:', format);
+
     try {
+      console.log('[ImportExportDO] Updating job status to running:', jobId);
       await this.updateJobInDB(jobId, { status: 'running', processed_keys: 0, error_count: 0 });
       this.broadcastProgress({
         jobId,
@@ -524,6 +542,7 @@ export class ImportExportDO {
       });
 
       // Log started event
+      console.log('[ImportExportDO] Logging started event for job:', jobId);
       await logJobEvent(db, {
         job_id: jobId,
         event_type: 'started',
