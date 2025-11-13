@@ -113,7 +113,9 @@ jobs:
           cat scout_output.txt
           
           # Check if critical or high vulnerabilities are present in the output
-          if grep -E "(CRITICAL|HIGH)" scout_output.txt | grep -v "0  " > /dev/null; then
+          # Look for non-zero counts in CRITICAL or HIGH columns (format: "1C" or "2H")
+          if grep -E "^\s+[1-9][0-9]*C\s+" scout_output.txt > /dev/null || \
+             grep -E "^\s+0C\s+[1-9][0-9]*H\s+" scout_output.txt > /dev/null; then
             echo "❌ Critical or high severity vulnerabilities detected"
             echo "🚨 Build blocked due to unacceptable security risk"
             exit 1

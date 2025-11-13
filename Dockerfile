@@ -38,6 +38,9 @@ FROM node:20-alpine AS runtime
 WORKDIR /app
 
 # Install runtime dependencies only
+# Note: curl 8.14.1-r2 has CVE-2025-10966 (MEDIUM) with no fix available yet
+# Note: busybox 1.37.0-r19 has CVE-2025-46394 & CVE-2024-58251 (LOW) with no fixes available yet
+# These are accepted risks as they are in Alpine base packages with no available patches
 RUN apk add --no-cache \
     curl \
     ca-certificates
