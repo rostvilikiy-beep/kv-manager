@@ -507,11 +507,6 @@ npx wrangler d1 list
 ### Future Enhancements:
 1. R2 backup integration
 2. Batch operations to R2
-3. Scheduled jobs (cron triggers)
-4. Full version history
-5. Real-time notifications for completed operations
-6. Key expiration alerts
-7. Namespace templates
 
 ---
 
