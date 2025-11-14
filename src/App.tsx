@@ -284,6 +284,11 @@ export default function App() {
           setError('TTL must be a positive number')
           return
         }
+        // Cloudflare KV requires minimum TTL of 60 seconds
+        if (ttl < 60) {
+          setError('TTL must be at least 60 seconds (Cloudflare KV minimum)')
+          return
+        }
         options.expiration_ttl = ttl
       }
       if (newKeyMetadata.trim()) {
@@ -1153,10 +1158,14 @@ export default function App() {
               <Input
                 id="key-ttl"
                 type="number"
-                placeholder="Leave empty for no expiration"
+                placeholder="Leave empty for no expiration (minimum 60)"
                 value={newKeyTTL}
                 onChange={(e) => setNewKeyTTL(e.target.value)}
+                min="60"
               />
+              <p className="text-sm text-muted-foreground">
+                Optional. Set time-to-live in seconds (minimum 60).
+              </p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="key-metadata">Metadata (JSON)</Label>

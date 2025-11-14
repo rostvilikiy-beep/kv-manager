@@ -36,7 +36,9 @@ export function KeyEditorDialog({
   const [value, setValue] = useState('')
   const [originalValue, setOriginalValue] = useState('')
   const [metadata, setMetadata] = useState('')
+  const [originalMetadata, setOriginalMetadata] = useState('')
   const [ttl, setTTL] = useState('')
+  const [originalTTL, setOriginalTTL] = useState('')
   const [hasBackup, setHasBackup] = useState(false)
   const [saving, setSaving] = useState(false)
   const [restoring, setRestoring] = useState(false)
@@ -57,8 +59,17 @@ export function KeyEditorDialog({
       setValueSize(result.size || new Blob([result.value]).size)
       
       if (result.metadata) {
-        setMetadata(JSON.stringify(result.metadata, null, 2))
+        const metadataStr = JSON.stringify(result.metadata, null, 2)
+        setMetadata(metadataStr)
+        setOriginalMetadata(metadataStr)
+      } else {
+        setMetadata('')
+        setOriginalMetadata('')
       }
+      
+      // Note: TTL/expiration cannot be retrieved from KV API, so we don't set originalTTL
+      setTTL('')
+      setOriginalTTL('')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load key')
     } finally {
@@ -85,7 +96,9 @@ export function KeyEditorDialog({
       setValue('')
       setOriginalValue('')
       setMetadata('')
+      setOriginalMetadata('')
       setTTL('')
+      setOriginalTTL('')
       setError('')
       setActiveTab('value')
       setShowFormatted(false)
@@ -112,6 +125,11 @@ export function KeyEditorDialog({
       const ttlNum = parseInt(ttl)
       if (isNaN(ttlNum) || ttlNum <= 0) {
         setError('TTL must be a positive number')
+        return
+      }
+      // Cloudflare KV requires minimum TTL of 60 seconds
+      if (ttlNum < 60) {
+        setError('TTL must be at least 60 seconds (Cloudflare KV minimum)')
         return
       }
     }
@@ -248,9 +266,10 @@ export function KeyEditorDialog({
                     placeholder="Leave empty for no expiration"
                     value={ttl}
                     onChange={(e) => setTTL(e.target.value)}
+                    min="60"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Set time-to-live in seconds. Key will expire after this duration.
+                    Set time-to-live in seconds (minimum 60). Key will expire after this duration.
                   </p>
                 </div>
 
@@ -334,7 +353,10 @@ export function KeyEditorDialog({
               >
                 Cancel
               </Button>
-              <Button onClick={handleSave} disabled={saving || value === originalValue}>
+              <Button 
+                onClick={handleSave} 
+                disabled={saving || (value === originalValue && metadata === originalMetadata && ttl === originalTTL)}
+              >
                 {saving ? (
                   <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
                 ) : (

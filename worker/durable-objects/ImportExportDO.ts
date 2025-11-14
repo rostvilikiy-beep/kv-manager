@@ -356,7 +356,8 @@ export class ImportExportDO {
       let skippedCount = 0;
       let lastMilestone = 0;
 
-      // Process imports in batches
+      // Process imports using bulk write API (supports metadata)
+      // Batch size of 10,000 is KV API limit
       const batchSize = 100;
       
       for (let i = 0; i < importData.length; i += batchSize) {
@@ -369,10 +370,10 @@ export class ImportExportDO {
 
         const batch = importData.slice(i, i + batchSize);
 
-        for (const item of batch) {
-          try {
-            // Check if key exists for collision handling
-            if (collision === 'skip' || collision === 'fail') {
+        // Check for collisions if needed
+        if (collision === 'skip' || collision === 'fail') {
+          for (const item of batch) {
+            try {
               const checkRequest = createCfApiRequest(
                 `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(item.name)}`,
                 this.env
@@ -382,47 +383,122 @@ export class ImportExportDO {
               if (checkResponse.ok) {
                 if (collision === 'skip') {
                   skippedCount++;
-                  continue;
+                  // Mark this item to skip
+                  (item as { _skip?: boolean })._skip = true;
                 } else if (collision === 'fail') {
                   throw new Error(`Key already exists: ${item.name}`);
                 }
               }
+            } catch (err) {
+              console.error('[ImportExportDO] Collision check error for key:', item.name, err);
+              if (collision === 'fail') {
+                throw err;
+              }
+            }
+          }
+        }
+
+        // Prepare bulk write data
+        const bulkData = batch
+          .filter(item => !(item as { _skip?: boolean })._skip)
+          .map(item => {
+            // Support both 'ttl' and 'expiration_ttl' field names
+            const ttlValue = item.ttl || item.expiration_ttl;
+            
+            const kvItem: {
+              key: string;
+              value: string;
+              expiration_ttl?: number;
+              expiration?: number;
+              metadata?: Record<string, unknown>;
+              base64?: boolean;
+            } = {
+              key: item.name,
+              value: item.value
+            };
+
+            if (ttlValue) {
+              kvItem.expiration_ttl = ttlValue;
+            }
+            if (item.expiration) {
+              kvItem.expiration = item.expiration;
+            }
+            if (item.metadata) {
+              // KV native metadata
+              kvItem.metadata = item.metadata;
             }
 
-            // Build URL with optional expiration_ttl
-            let url = `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(item.name)}`;
-            if (item.expiration_ttl) {
-              url += `?expiration_ttl=${item.expiration_ttl}`;
-            }
+            return kvItem;
+          });
 
-            // Put key
-            const putRequest = createCfApiRequest(
-              url,
+        // Use bulk write API
+        if (bulkData.length > 0) {
+          try {
+            const bulkRequest = createCfApiRequest(
+              `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/bulk`,
               this.env,
               {
                 method: 'PUT',
-                body: item.value,
-                headers: { 
-                  'Content-Type': 'text/plain',
-                  ...(item.metadata ? { 'metadata': JSON.stringify(item.metadata) } : {})
+                body: JSON.stringify(bulkData),
+                headers: {
+                  'Content-Type': 'application/json'
                 }
               }
             );
 
-            const putResponse = await fetch(putRequest);
+            const bulkResponse = await fetch(bulkRequest);
 
-            if (putResponse.ok) {
-              processedCount++;
+            if (bulkResponse.ok) {
+              processedCount += bulkData.length;
+
+              // Store tags and D1 custom_metadata if provided
+              // Note: 'metadata' field goes to KV native (above), 'custom_metadata' goes to D1 (here)
+              for (const item of batch) {
+                if ((item as { _skip?: boolean })._skip) continue;
+
+                // Always create/update D1 entry for imported keys (for search indexing)
+                // But only store tags/custom_metadata if explicitly provided
+                if (db) {
+                  try {
+                    // Important: Use custom_metadata field only, NOT metadata field
+                    const customMetadataValue = item.custom_metadata ? JSON.stringify(item.custom_metadata) : null;
+                    const tagsValue = item.tags ? JSON.stringify(item.tags) : null;
+
+                    // Log what we're storing for debugging
+                    if (tagsValue || customMetadataValue) {
+                      console.log(`[ImportExportDO] Storing D1 metadata for ${item.name}: tags=${tagsValue !== null}, custom_metadata=${customMetadataValue !== null}`);
+                    }
+
+                    await db.prepare(`
+                      INSERT INTO key_metadata (namespace_id, key_name, tags, custom_metadata, created_at, updated_at)
+                      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                      ON CONFLICT(namespace_id, key_name) 
+                      DO UPDATE SET 
+                        tags = excluded.tags, 
+                        custom_metadata = excluded.custom_metadata, 
+                        updated_at = CURRENT_TIMESTAMP
+                    `).bind(
+                      namespaceId,
+                      item.name,
+                      tagsValue,
+                      customMetadataValue
+                    ).run();
+                  } catch (dbErr) {
+                    console.error('[ImportExportDO] Failed to store D1 metadata for key:', item.name, dbErr);
+                    // Don't fail the import if D1 metadata storage fails
+                  }
+                }
+              }
             } else {
-              console.error('[ImportExportDO] Failed to import key:', item.name, await putResponse.text());
-              errorCount++;
+              const errorText = await bulkResponse.text();
+              console.error('[ImportExportDO] Bulk write failed:', errorText);
+              errorCount += bulkData.length;
             }
           } catch (err) {
-            console.error('[ImportExportDO] Import error for key:', item.name, err);
-            errorCount++;
+            console.error('[ImportExportDO] Bulk write error:', err);
+            errorCount += bulkData.length;
             
             if (collision === 'fail') {
-              // Stop processing on fail mode
               throw err;
             }
           }

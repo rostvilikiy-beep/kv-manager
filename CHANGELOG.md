@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Import/Export Metadata Support**: Enhanced import functionality with dual metadata system support
+  - Import now supports both `metadata` (KV native) and `custom_metadata` (D1) fields
+  - `metadata` field stores data in Cloudflare KV (1024 byte limit, retrieved with key)
+  - `custom_metadata` field stores data in D1 database (unlimited size, searchable)
+  - `tags` field stores tags in D1 for organization and search
+  - Support for both `ttl` and `expiration_ttl` field names in imports
+  - Bulk write API implementation for proper KV native metadata storage
+  - Comprehensive import format documentation with field descriptions
+
 ### Changed
 - **Progress Tracking Simplified**: Removed WebSocket connections in favor of HTTP polling for increased reliability
   - Polling-only approach with 1-second intervals until job completion
@@ -16,7 +26,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - API still returns `ws_url` for compatibility, but it's not used
   - Note: WebSocket infrastructure remains in Durable Objects but is not utilized by frontend
 
+- **Import Processing**: Switched from individual PUT requests to bulk write API
+  - Improves import performance with batched writes (100 keys per batch)
+  - Properly handles KV native metadata via bulk write API
+  - Separates KV native metadata from D1 custom metadata storage
+  - D1 entries always created for imported keys (enables search indexing)
+
 ### Fixed
+- **Import Metadata Handling**: Fixed incorrect metadata field mapping during imports
+  - `metadata` field now correctly stored in KV native metadata (not D1)
+  - `custom_metadata` field correctly stored in D1 database
+  - Previous bug caused `metadata` to be duplicated into D1 custom metadata
+  - Import now properly distinguishes between the two metadata systems
+
+- **TTL Validation**: Added minimum TTL validation to prevent API errors
+  - Cloudflare KV requires minimum 60 seconds for TTL
+  - Added validation in both Create Key and Edit Key dialogs
+  - Clear error message: "TTL must be at least 60 seconds (Cloudflare KV minimum)"
+  - HTML5 `min="60"` attribute added to TTL input fields
+  - Updated placeholder text and help text to indicate minimum value
+
+- **Edit Key Dialog**: Fixed Save Changes button not enabling when only metadata/TTL changed
+  - Button now tracks changes to value, metadata, and TTL separately
+  - Changing only KV Native Metadata now enables Save Changes button
+  - Changing only TTL now enables Save Changes button
+  - Added state tracking for original metadata and TTL values
+
 - **Accessibility**: Removed empty label warnings in Job History UI
   - Removed unconnected `<Label>` elements from Select components
   - Added `aria-label` attributes to all SelectTrigger components
@@ -27,6 +62,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created migrations for `current_key` and `percentage` columns in `bulk_jobs`
   - Both migrations are idempotent and safe to run multiple times
   - Migration guide provided at [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)
+
+### Technical Improvements
+- **TypeScript Types**: Updated `ImportParams` interface to support dual metadata system
+  - Clarified `metadata` field for KV native metadata
+  - Added `custom_metadata` field for D1 database storage
+  - Added `expiration` field for Unix timestamp expiration
+  - Comprehensive inline documentation for each field
 
 ### Added
 - **Migration Infrastructure**: Comprehensive migration system for database updates

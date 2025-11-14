@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 13, 2025*
+*Last Updated: November 14, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -20,17 +20,19 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 ### Key Operations
 - List keys with cursor-based pagination
 - Create, update, and delete individual keys
-- Full CRUD operations with metadata support
-- TTL (expiration) management
-- KV native metadata (1024 byte limit)
+- Full CRUD operations with dual metadata support
+- **TTL (expiration) management** - Minimum 60 seconds
+- **KV Native Metadata** - Up to 1024 bytes, stored in Cloudflare KV
+- **D1 Custom Metadata** - Unlimited size, stored in D1 database
 - Single-version backup and restore
 
-### Metadata & Tags (D1-Backed)
-- Add unlimited tags to keys for organization
-- Store custom JSON metadata (no size limit)
+### Metadata & Tags
+- **KV Native Metadata**: Store up to 1024 bytes of JSON metadata directly in Cloudflare KV (retrieved with key value)
+- **D1 Custom Metadata**: Store unlimited JSON metadata in D1 database (searchable, no size limit)
+- **Tags (D1-Backed)**: Add unlimited tags to keys for organization and filtering
 - Search and filter by tags
 - Bulk tag operations (add/remove/replace)
-- Separate from KV's native metadata system
+- Two separate metadata systems for different use cases
 
 ### Search & Discovery
 - Cross-namespace search by key name (partial matches)
@@ -410,8 +412,9 @@ Theme preference is stored in localStorage and persists across sessions.
 2. Click **Add Key** to create a new key-value pair
 3. Select multiple keys using checkboxes for bulk operations
 4. Edit individual keys by clicking on them
-5. View and modify TTL (expiration) settings
-6. Add tags and custom metadata in the "Metadata & Tags" tab
+5. View and modify TTL (expiration) settings - **minimum 60 seconds**
+6. Add **KV Native Metadata** (1024 byte limit) and **D1 Custom Metadata** (unlimited) in the "Metadata & Tags" tab
+7. Apply tags for organization and searchability
 
 ### Bulk Operations
 1. Select multiple keys using checkboxes
@@ -463,6 +466,44 @@ Theme preference is stored in localStorage and persists across sessions.
 3. Filter by operation type (create, update, delete, etc.)
 4. Use pagination to browse historical entries
 5. Export logs to CSV for external analysis
+
+### Import/Export with Metadata
+
+When importing keys via JSON or NDJSON, you can include multiple types of metadata:
+
+```json
+[
+  {
+    "name": "example-key",
+    "value": "example-value",
+    "ttl": 600,
+    "metadata": {
+      "type": "example",
+      "source": "import"
+    },
+    "custom_metadata": {
+      "extended_info": "large data here",
+      "description": "detailed information"
+    },
+    "tags": ["production", "important"]
+  }
+]
+```
+
+**Field Descriptions:**
+- `name` (required): Key name
+- `value` (required): Key value
+- `ttl` (optional): Time-to-live in seconds (minimum 60). Alternative: `expiration_ttl`
+- `expiration` (optional): Unix timestamp for absolute expiration
+- `metadata` (optional): **KV Native Metadata** - Stored in Cloudflare KV (1024 byte limit)
+- `custom_metadata` (optional): **D1 Custom Metadata** - Stored in D1 database (no size limit, searchable)
+- `tags` (optional): Array of tags stored in D1 for organization and search
+
+**Important Notes:**
+- `metadata` field → Stored in Cloudflare KV as native metadata (fast access, size limited)
+- `custom_metadata` field → Stored in D1 database (searchable, no size limit)
+- Both metadata types can be used simultaneously
+- Export operations include both KV native metadata and D1 tags/custom metadata
 
 ### Syncing Existing Keys for Search
 If you have keys created outside the UI (via API, CLI, etc.) that don't appear in search:

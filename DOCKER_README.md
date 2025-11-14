@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/status-Production%2FStable-brightgreen)
 [![Security](https://img.shields.io/badge/Security-Enhanced-green.svg)](https://github.com/neverinfamous/kv-manager/blob/main/SECURITY.md)
 
-**Version:** 1.0.0 | **Last Updated:** November 13, 2025 
+**Version:** 1.0.0 | **Last Updated:** November 14, 2025 
 **Base Image:** Node.js 20-alpine | **Architecture:** linux/amd64, linux/arm64
 
 A fully containerized version of the KV Manager for Cloudflare. This Docker image provides a modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys with enterprise-grade authentication via Cloudflare Access (Zero Trust).
@@ -95,8 +95,11 @@ This Docker image packages the complete KV Manager with:
 
 ### Core Features
 - **Namespace Management** - Create, delete, rename, and browse KV namespaces with key counts
-- **Key Operations** - Full CRUD operations with cursor-based pagination and TTL management
-- **Metadata & Tags (D1-Backed)** - Unlimited tags and custom JSON metadata (no size limit)
+- **Key Operations** - Full CRUD operations with cursor-based pagination and TTL management (minimum 60 seconds)
+- **Dual Metadata System**:
+  - **KV Native Metadata** - Up to 1024 bytes, stored in Cloudflare KV (retrieved with key)
+  - **D1 Custom Metadata** - Unlimited size, stored in D1 database (searchable)
+- **Tags (D1-Backed)** - Unlimited tags for organization and filtering
 - **Search & Discovery** - Cross-namespace search by key name with tag filtering
 - **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with HTTP polling progress tracking
 - **Import/Export** - JSON/NDJSON format support with collision handling and automatic file downloads

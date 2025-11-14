@@ -51,17 +51,19 @@ The Job History UI now includes enterprise-grade filtering and sorting capabilit
 ### Key Operations
 - List keys with cursor-based pagination
 - Create, update, and delete individual keys
-- Full CRUD operations with metadata support
-- TTL (expiration) management
-- KV native metadata (1024 byte limit)
+- Full CRUD operations with dual metadata support
+- **TTL (expiration) management** - Minimum 60 seconds
+- **KV Native Metadata** - Up to 1024 bytes, stored in Cloudflare KV
+- **D1 Custom Metadata** - Unlimited size, stored in D1 database
 - Single-version backup and restore
 
-### Metadata & Tags (D1-Backed)
-- Add unlimited tags to keys for organization
-- Store custom JSON metadata (no size limit)
+### Metadata & Tags
+- **KV Native Metadata** - Store up to 1024 bytes of JSON metadata directly in Cloudflare KV (retrieved with key value)
+- **D1 Custom Metadata** - Store unlimited JSON metadata in D1 database (searchable, no size limit)
+- **Tags (D1-Backed)** - Add unlimited tags to keys for organization and filtering
 - Search and filter by tags
 - Bulk tag operations (add/remove/replace)
-- Separate from KV's native metadata system
+- Two separate metadata systems for different use cases
 
 ### Search & Discovery
 - Cross-namespace search by key name
@@ -84,6 +86,9 @@ The Job History UI now includes enterprise-grade filtering and sorting capabilit
 ### Import/Export
 - Export namespaces in JSON or NDJSON format
 - Auto-detect format on import
+- **Dual Metadata Support**: Import with both `metadata` (KV native) and `custom_metadata` (D1) fields
+- **TTL Support**: Use `ttl` or `expiration_ttl` fields (minimum 60 seconds)
+- **Tags Support**: Import tags for organization and search
 - Collision handling (skip/overwrite/fail)
 - **Real-time Progress Tracking**: WebSocket-based live updates during import/export
 - **Async Processing**: Large imports/exports process in background
