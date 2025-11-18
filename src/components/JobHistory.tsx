@@ -8,7 +8,7 @@ import { Badge } from './ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
 import { api, type JobListItem, type KVNamespace } from '../services/api';
-import { Loader2, CheckCircle2, XCircle, Ban, AlertCircle, FileText, Download, Upload, Copy, Clock, Tag, Trash2, Search, Calendar as CalendarIcon, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Ban, AlertCircle, FileText, Download, Upload, Copy, Clock, Tag, Trash2, Search, Calendar as CalendarIcon, ArrowUp, ArrowDown, X, Database, RefreshCw } from 'lucide-react';
 import { JobHistoryDialog } from './JobHistoryDialog';
 import { format } from 'date-fns';
 
@@ -265,6 +265,10 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
         return <Clock className="h-4 w-4" />;
       case 'bulk_tag':
         return <Tag className="h-4 w-4" />;
+      case 'r2_backup':
+        return <Database className="h-4 w-4" />;
+      case 'r2_restore':
+        return <RefreshCw className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
@@ -284,6 +288,10 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
         return 'Bulk TTL Update';
       case 'bulk_tag':
         return 'Bulk Tag';
+      case 'r2_backup':
+        return 'R2 Backup';
+      case 'r2_restore':
+        return 'R2 Restore';
       default:
         return operationType;
     }
@@ -343,6 +351,8 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
                   <SelectItem value="bulk_delete">Bulk Delete</SelectItem>
                   <SelectItem value="bulk_ttl_update">Bulk TTL Update</SelectItem>
                   <SelectItem value="bulk_tag">Bulk Tag</SelectItem>
+                  <SelectItem value="r2_backup">R2 Backup</SelectItem>
+                  <SelectItem value="r2_restore">R2 Restore</SelectItem>
                 </SelectContent>
               </Select>
             </div>

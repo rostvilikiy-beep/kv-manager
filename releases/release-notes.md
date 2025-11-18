@@ -6,6 +6,35 @@
 
 ## 🆕 Unreleased Features
 
+### R2 Backup & Restore
+Complete R2 integration for secure namespace backups directly to Cloudflare R2 storage:
+
+- **Backup to R2** - Create full snapshots of any namespace to R2 with one click
+- **Restore from R2** - Browse and select from available backups to restore
+- **List Backups** - View all backups with timestamps and file sizes
+- **Format Support** - Both JSON and NDJSON backup formats supported
+- **Progress Tracking** - Real-time progress updates via HTTP polling (same as Import/Export)
+- **Job History** - R2 operations appear in job history with dedicated icons
+- **Organized Storage** - Backups stored at `backups/{namespaceId}/{timestamp}.json`
+- **Optional Feature** - Works with or without R2 bucket configured
+- **UI Integration** - New "Backup to R2" and "Restore from R2" buttons on namespace cards
+
+**Setup:**
+```bash
+# Create R2 bucket
+wrangler r2 bucket create kv-manager-backups
+
+# Add to wrangler.toml
+[[r2_buckets]]
+binding = "BACKUP_BUCKET"
+bucket_name = "kv-manager-backups"
+```
+
+**New API Endpoints:**
+- `GET /api/r2-backup/:namespaceId/list` - List available backups for namespace
+- `POST /api/r2-backup/:namespaceId` - Start async backup to R2
+- `POST /api/r2-restore/:namespaceId` - Start async restore from R2 backup
+
 ### Simplified Progress Tracking
 Progress tracking has been simplified to use HTTP polling instead of WebSockets:
 

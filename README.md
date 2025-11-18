@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 14, 2025*
+*Last Updated: November 18, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -57,11 +57,20 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 - Progress tracking for large operations
 - Download exported data as files
 
+### R2 Backup & Restore
+- **Backup to R2**: Create full snapshots of namespaces directly to R2 storage
+- **Restore from R2**: Select and restore from available R2 backups
+- Organized storage: `backups/{namespaceId}/{timestamp}.json`
+- List all available backups with timestamps and sizes
+- Same format support as Import/Export (JSON/NDJSON)
+- Progress tracking identical to Import/Export operations
+- No file downloads required - data stored securely in R2
+
 ### Job History
 - **Job History UI** - View complete history of all bulk operations
 - Timeline visualization showing job lifecycle events
 - Filter jobs by status (completed, failed, cancelled, running, queued)
-- Filter by operation type (export, import, bulk delete, bulk copy, bulk TTL, bulk tag)
+- Filter by operation type (export, import, bulk delete, bulk copy, bulk TTL, bulk tag, R2 backup, R2 restore)
 - Job cards displaying operation details, namespace, timestamps, and progress
 - Click any job to view detailed event timeline with milestones
 - "View History" button in progress dialog for immediate access
@@ -87,7 +96,7 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 ## Architecture
 
 - **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.2.2 + Tailwind CSS 3.4.18 + shadcn/ui
-- **Backend**: Cloudflare Workers + KV + D1 (metadata) + Durable Objects (orchestration)
+- **Backend**: Cloudflare Workers + KV + D1 (metadata) + R2 (backups) + Durable Objects (orchestration)
 - **Progress Tracking**: HTTP polling for job status (simple and reliable)
 - **Auth**: Cloudflare Access (Zero Trust)
 
@@ -158,7 +167,12 @@ cp .env.example .env
 npx wrangler d1 execute kv-manager-metadata-dev --local --file=worker/schema.sql
 ```
 
-4. **Start the development servers**:
+4. **(Optional) Create R2 bucket for backups**:
+```bash
+npx wrangler r2 bucket create kv-manager-backups-dev
+```
+
+5. **Start the development servers**:
 
 In Terminal 1, start the frontend:
 
@@ -172,7 +186,7 @@ In Terminal 2, start the worker:
 npx wrangler dev --config wrangler.dev.toml --local
 ```
 
-5. **Access the application**:
+6. **Access the application**:
 - Frontend: http://localhost:5173
 - Worker API: http://localhost:8787
 
@@ -182,6 +196,7 @@ npx wrangler dev --config wrangler.dev.toml --local
 - Mock data is returned when no Cloudflare credentials are provided
 - No secrets required for local development
 - CORS is configured to allow `http://localhost:5173`
+- R2 backup features work in local mode with mock data if R2 bucket not configured
 
 ## Production Deployment
 
@@ -220,7 +235,15 @@ wrangler d1 execute kv-manager-metadata --remote --file=worker/migrations/apply_
 
 See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructions.
 
-4. **Set secrets**:
+4. **(Optional) Create R2 bucket for backups**:
+
+```bash
+wrangler r2 bucket create kv-manager-backups
+```
+
+Update the `bucket_name` in your `wrangler.toml` file to match the created bucket name.
+
+5. **Set secrets**:
 
 Set your Cloudflare Account ID:
 
@@ -246,7 +269,7 @@ Set your Policy AUD tag:
 wrangler secret put POLICY_AUD
 ```
 
-5. **Build and deploy**:
+6. **Build and deploy**:
 
 Build the application:
 
@@ -265,7 +288,9 @@ wrangler deploy
 - All API requests require valid Cloudflare Access JWT
 - Audit logging captures all destructive operations
 - D1 stores metadata, tags, and audit logs
+- R2 stores backups organized by namespace and timestamp
 - Durable Objects handle bulk operations exceeding 10,000 keys
+- R2 backup/restore operations are optional; the app works without R2 configured
 
 ## API Endpoints
 
@@ -309,12 +334,22 @@ wrangler deploy
 - `GET /api/jobs/:jobId` - Get status of bulk job (polling endpoint - recommended)
 - `GET /api/jobs/:jobId/download` - Download completed export file
 
+### R2 Backup & Restore
+- `GET /api/r2-backup/:namespaceId/list` - List available R2 backups for a namespace
+  - Returns: Array of backup objects with path, timestamp, size, uploaded date
+- `POST /api/r2-backup/:namespaceId` - Start async backup to R2
+  - Query params: `format` (json|ndjson)
+  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
+- `POST /api/r2-restore/:namespaceId` - Start async restore from R2
+  - Body: `{ backupPath: string }`
+  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
+
 ### Job History
 - `GET /api/jobs` - Get paginated list of user's jobs
   - Query params: 
     - `limit`, `offset` - Pagination
     - `status` - Filter by job status (completed, failed, cancelled, running, queued)
-    - `operation_type` - Filter by operation (export, import, bulk_copy, bulk_delete, bulk_ttl_update, bulk_tag)
+    - `operation_type` - Filter by operation (export, import, bulk_copy, bulk_delete, bulk_ttl_update, bulk_tag, r2_backup, r2_restore)
     - `namespace_id` - Filter by specific namespace
     - `start_date`, `end_date` - Filter by date range (ISO timestamps)
     - `job_id` - Search by job ID (partial match with LIKE)
@@ -424,6 +459,26 @@ Theme preference is stored in localStorage and persists across sessions.
    - **Apply Tags**: Add, remove, or replace tags
    - **Delete Selected**: Remove multiple keys at once
 3. Monitor progress with job status tracking via polling
+
+### R2 Backup & Restore
+1. **Creating Backups**:
+   - Click **Backup to R2** on any namespace card
+   - Select format (JSON or NDJSON)
+   - Monitor progress via job tracking
+   - Backups are stored in R2 at `backups/{namespaceId}/{timestamp}.json`
+
+2. **Restoring from Backups**:
+   - Click **Restore from R2** on any namespace card
+   - View list of available backups with timestamps and sizes
+   - Select a backup to restore
+   - Monitor progress via job tracking
+   - All keys are restored with overwrite behavior (existing keys are replaced)
+
+3. **Notes**:
+   - Backups include all key-value pairs, metadata, tags, and TTLs
+   - Restores behave identically to Import operations
+   - No collision strategy options (always overwrites)
+   - Requires R2 bucket to be configured in `wrangler.toml`
 
 ### Searching
 1. Click **Search** in the navigation bar

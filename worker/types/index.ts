@@ -1,5 +1,5 @@
 // Import Cloudflare Workers types
-import type { Fetcher, D1Database, DurableObjectNamespace } from '@cloudflare/workers-types';
+import type { Fetcher, D1Database, DurableObjectNamespace, R2Bucket } from '@cloudflare/workers-types';
 
 // Cloudflare Worker Environment
 export interface Env {
@@ -7,6 +7,7 @@ export interface Env {
   METADATA: D1Database
   BULK_OPERATION_DO: DurableObjectNamespace
   IMPORT_EXPORT_DO: DurableObjectNamespace
+  BACKUP_BUCKET?: R2Bucket // Optional for local dev
   
   // Cloudflare API credentials (secrets in production, undefined in local dev)
   ACCOUNT_ID?: string
@@ -158,6 +159,25 @@ export interface ExportParams {
   namespaceId: string
   format: 'json' | 'ndjson'
   userEmail: string
+}
+
+export interface R2BackupParams {
+  namespaceId: string
+  format: 'json' | 'ndjson'
+  userEmail: string
+}
+
+export interface R2RestoreParams {
+  namespaceId: string
+  backupPath: string  // e.g., "backups/ns-123/1234567890.json"
+  userEmail: string
+}
+
+export interface R2BackupListItem {
+  path: string
+  timestamp: number
+  size: number
+  uploaded: string
 }
 
 // API Response Wrapper

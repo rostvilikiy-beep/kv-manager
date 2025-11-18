@@ -1,5 +1,5 @@
 import type { DurableObjectState } from '@cloudflare/workers-types';
-import type { Env, JobProgress, ImportParams, ExportParams } from '../types';
+import type { Env, JobProgress, ImportParams, ExportParams, R2BackupParams, R2RestoreParams } from '../types';
 import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
 interface SessionAttachment {
@@ -62,6 +62,14 @@ export class ImportExportDO {
           case 'export':
             console.log('[ImportExportDO] Starting export process');
             await this.processExport(body as ExportParams & { jobId: string });
+            break;
+          case 'r2-backup':
+            console.log('[ImportExportDO] Starting R2 backup process');
+            await this.processR2Backup(body as R2BackupParams & { jobId: string });
+            break;
+          case 'r2-restore':
+            console.log('[ImportExportDO] Starting R2 restore process');
+            await this.processR2Restore(body as R2RestoreParams & { jobId: string });
             break;
           default:
             console.log('[ImportExportDO] Unknown job type:', jobType);
@@ -817,6 +825,525 @@ export class ImportExportDO {
 
     } catch (error) {
       console.error('[ImportExportDO] Export error:', error);
+      
+      await this.updateJobInDB(jobId, { status: 'failed' });
+      
+      this.broadcastProgress({
+        jobId,
+        status: 'failed',
+        progress: { total: 0, processed: 0, errors: 0, percentage: 0 },
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
+    }
+  }
+
+  /**
+   * Process R2 backup operation
+   */
+  async processR2Backup(params: R2BackupParams & { jobId: string }): Promise<void> {
+    const { jobId, namespaceId, format, userEmail } = params;
+    const db = getD1Binding(this.env);
+
+    console.log('[ImportExportDO] Starting R2 backup processing for job:', jobId, 'namespace:', namespaceId, 'format:', format);
+
+    try {
+      console.log('[ImportExportDO] Updating job status to running:', jobId);
+      await this.updateJobInDB(jobId, { status: 'running', processed_keys: 0, error_count: 0 });
+      this.broadcastProgress({
+        jobId,
+        status: 'running',
+        progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
+      });
+
+      // Log started event
+      console.log('[ImportExportDO] Logging started event for job:', jobId);
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ format })
+      });
+
+      // List all keys in namespace (same as export)
+      let allKeys: Array<{ name: string }> = [];
+      let cursor: string | undefined;
+      
+      do {
+        const params = new URLSearchParams();
+        params.set('limit', '1000');
+        if (cursor) params.set('cursor', cursor);
+
+        const listRequest = createCfApiRequest(
+          `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/keys?${params.toString()}`,
+          this.env
+        );
+        const listResponse = await fetch(listRequest);
+        
+        if (!listResponse.ok) {
+          throw new Error(`Failed to list keys: ${listResponse.status}`);
+        }
+
+        const listData = await listResponse.json() as { 
+          result: Array<{ name: string }>;
+          result_info: { cursor?: string };
+        };
+        
+        allKeys = allKeys.concat(listData.result || []);
+        cursor = listData.result_info?.cursor;
+
+        // Update progress for listing phase (first 10%)
+        const percentage = Math.min(10, Math.round((allKeys.length / 10000) * 10));
+        this.broadcastProgress({
+          jobId,
+          status: 'running',
+          progress: { 
+            total: allKeys.length, 
+            processed: 0, 
+            errors: 0,
+            percentage 
+          }
+        });
+      } while (cursor);
+
+      console.log('[ImportExportDO] Found', allKeys.length, 'keys to backup');
+
+      // Update total count and status to running
+      await this.updateJobInDB(jobId, { 
+        status: 'running',
+        total_keys: allKeys.length,
+        processed_keys: 0, 
+        error_count: 0, 
+        percentage: 10 
+      });
+      this.broadcastProgress({
+        jobId,
+        status: 'running',
+        progress: { total: allKeys.length, processed: 0, errors: 0, percentage: 10 }
+      });
+
+      // Fetch all key values (same as export)
+      const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
+      let errorCount = 0;
+      let lastMilestone = 0;
+
+      for (let i = 0; i < allKeys.length; i++) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[ImportExportDO] Job cancelled during R2 backup:', jobId);
+          await this.handleCancellation(jobId, userEmail, exportData.length, errorCount, allKeys.length);
+          return;
+        }
+
+        const key = allKeys[i];
+        
+        try {
+          const valueRequest = createCfApiRequest(
+            `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(key.name)}`,
+            this.env
+          );
+          const valueResponse = await fetch(valueRequest);
+          
+          if (valueResponse.ok) {
+            const value = await valueResponse.text();
+            exportData.push({
+              name: key.name,
+              value: value,
+              metadata: {}
+            });
+          } else {
+            errorCount++;
+          }
+        } catch (err) {
+          console.error('[ImportExportDO] Failed to fetch key:', key.name, err);
+          errorCount++;
+        }
+
+        // Broadcast progress every 10 keys or on last key
+        if ((i + 1) % 10 === 0 || i === allKeys.length - 1) {
+          // 10% for listing, 90% for fetching values
+          const percentage = 10 + Math.round(((i + 1) / allKeys.length) * 90);
+          await this.updateJobInDB(jobId, { 
+            processed_keys: i + 1,
+            error_count: errorCount,
+            current_key: key.name,
+            percentage
+          });
+          this.broadcastProgress({
+            jobId,
+            status: 'running',
+            progress: { 
+              total: allKeys.length, 
+              processed: i + 1, 
+              errors: errorCount,
+              currentKey: key.name,
+              percentage 
+            }
+          });
+
+          // Log milestone events
+          const milestone = Math.floor(percentage / 25) * 25;
+          if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({ processed: i + 1, errors: errorCount, percentage })
+            });
+            lastMilestone = milestone;
+          }
+        }
+      }
+
+      // Format response data
+      const responseBody = format === 'ndjson'
+        ? exportData.map(item => JSON.stringify(item)).join('\n')
+        : JSON.stringify(exportData, null, 2);
+
+      // Store in R2 instead of temporary storage
+      if (this.env.BACKUP_BUCKET) {
+        const timestamp = Date.now();
+        const extension = format === 'ndjson' ? 'ndjson' : 'json';
+        const backupPath = `backups/${namespaceId}/${timestamp}.${extension}`;
+        
+        console.log('[ImportExportDO] Storing backup to R2:', backupPath);
+        
+        await this.env.BACKUP_BUCKET.put(backupPath, responseBody, {
+          httpMetadata: { 
+            contentType: format === 'ndjson' ? 'application/x-ndjson' : 'application/json'
+          }
+        });
+
+        console.log('[ImportExportDO] Backup stored successfully in R2');
+
+        // Mark as completed
+        await this.updateJobInDB(jobId, { 
+          status: 'completed',
+          processed_keys: exportData.length,
+          error_count: errorCount,
+          percentage: 100
+        });
+
+        this.broadcastProgress({
+          jobId,
+          status: 'completed',
+          progress: { 
+            total: allKeys.length, 
+            processed: exportData.length, 
+            errors: errorCount,
+            percentage: 100 
+          },
+          result: { 
+            processed: exportData.length, 
+            errors: errorCount,
+            backup_path: backupPath,
+            format
+          }
+        });
+
+        // Log completed event
+        await logJobEvent(db, {
+          job_id: jobId,
+          event_type: 'completed',
+          user_email: userEmail,
+          details: JSON.stringify({ processed: exportData.length, errors: errorCount, percentage: 100, backup_path: backupPath })
+        });
+
+        // Audit log
+        await auditLog(db, {
+          namespace_id: namespaceId,
+          operation: 'r2_backup',
+          user_email: userEmail,
+          details: JSON.stringify({ 
+            format,
+            key_count: exportData.length,
+            errors: errorCount,
+            job_id: jobId,
+            backup_path: backupPath
+          })
+        });
+      } else {
+        throw new Error('R2 bucket not configured');
+      }
+
+    } catch (error) {
+      console.error('[ImportExportDO] R2 backup error:', error);
+      
+      await this.updateJobInDB(jobId, { status: 'failed' });
+      
+      this.broadcastProgress({
+        jobId,
+        status: 'failed',
+        progress: { total: 0, processed: 0, errors: 0, percentage: 0 },
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+
+      // Log failed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'failed',
+        user_email: userEmail,
+        details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
+      });
+    }
+  }
+
+  /**
+   * Process R2 restore operation
+   */
+  async processR2Restore(params: R2RestoreParams & { jobId: string }): Promise<void> {
+    const { jobId, namespaceId, backupPath, userEmail } = params;
+    const db = getD1Binding(this.env);
+
+    console.log('[ImportExportDO] Starting R2 restore processing for job:', jobId, 'from:', backupPath);
+
+    try {
+      // Fetch backup data from R2
+      if (!this.env.BACKUP_BUCKET) {
+        throw new Error('R2 bucket not configured');
+      }
+
+      console.log('[ImportExportDO] Fetching backup from R2:', backupPath);
+      const backupObject = await this.env.BACKUP_BUCKET.get(backupPath);
+      
+      if (!backupObject) {
+        throw new Error('Backup not found in R2');
+      }
+
+      const backupData = await backupObject.text();
+      console.log('[ImportExportDO] Backup data fetched, size:', backupData.length);
+
+      // Parse import data (auto-detect JSON vs NDJSON)
+      let importData: Array<{ 
+        name: string; 
+        value: string; 
+        metadata?: Record<string, unknown>;
+        custom_metadata?: Record<string, unknown>;
+        tags?: string[];
+        expiration_ttl?: number;
+        ttl?: number;
+        expiration?: number;
+      }>;
+      
+      try {
+        // Try JSON array first
+        importData = JSON.parse(backupData);
+        if (!Array.isArray(importData)) {
+          throw new Error('Expected array');
+        }
+      } catch {
+        // Try NDJSON
+        importData = backupData.split('\n')
+          .filter(line => line.trim())
+          .map(line => JSON.parse(line));
+      }
+
+      console.log('[ImportExportDO] Parsed', importData.length, 'items from backup');
+
+      // Now process as import with overwrite collision handling
+      await this.updateJobInDB(jobId, { status: 'running', processed_keys: 0, error_count: 0, total_keys: importData.length });
+      this.broadcastProgress({
+        jobId,
+        status: 'running',
+        progress: { total: importData.length, processed: 0, errors: 0, percentage: 0 }
+      });
+
+      // Log started event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({ total: importData.length, backup_path: backupPath })
+      });
+
+      let processedCount = 0;
+      let errorCount = 0;
+      let lastMilestone = 0;
+
+      // Process imports using bulk write API (same as import)
+      const batchSize = 100;
+      
+      for (let i = 0; i < importData.length; i += batchSize) {
+        // Check for cancellation
+        if (this.cancelledJobs.has(jobId)) {
+          console.log('[ImportExportDO] Job cancelled during R2 restore:', jobId);
+          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, importData.length);
+          return;
+        }
+
+        const batch = importData.slice(i, i + batchSize);
+
+        // Prepare bulk write data
+        const bulkData = batch.map(item => {
+          const ttlValue = item.ttl || item.expiration_ttl;
+          
+          const kvItem: {
+            key: string;
+            value: string;
+            expiration_ttl?: number;
+            expiration?: number;
+            metadata?: Record<string, unknown>;
+            base64?: boolean;
+          } = {
+            key: item.name,
+            value: item.value
+          };
+
+          if (ttlValue) {
+            kvItem.expiration_ttl = ttlValue;
+          }
+          if (item.expiration) {
+            kvItem.expiration = item.expiration;
+          }
+          if (item.metadata) {
+            kvItem.metadata = item.metadata;
+          }
+
+          return kvItem;
+        });
+
+        // Use bulk write API
+        if (bulkData.length > 0) {
+          try {
+            const bulkRequest = createCfApiRequest(
+              `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/bulk`,
+              this.env,
+              {
+                method: 'PUT',
+                body: JSON.stringify(bulkData),
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+
+            const bulkResponse = await fetch(bulkRequest);
+
+            if (bulkResponse.ok) {
+              processedCount += bulkData.length;
+
+              // Store tags and D1 custom_metadata if provided
+              for (const item of batch) {
+                if (db) {
+                  try {
+                    const customMetadataValue = item.custom_metadata ? JSON.stringify(item.custom_metadata) : null;
+                    const tagsValue = item.tags ? JSON.stringify(item.tags) : null;
+
+                    await db.prepare(`
+                      INSERT INTO key_metadata (namespace_id, key_name, tags, custom_metadata, created_at, updated_at)
+                      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                      ON CONFLICT(namespace_id, key_name) 
+                      DO UPDATE SET 
+                        tags = excluded.tags, 
+                        custom_metadata = excluded.custom_metadata, 
+                        updated_at = CURRENT_TIMESTAMP
+                    `).bind(
+                      namespaceId,
+                      item.name,
+                      tagsValue,
+                      customMetadataValue
+                    ).run();
+                  } catch (dbErr) {
+                    console.error('[ImportExportDO] Failed to store D1 metadata for key:', item.name, dbErr);
+                  }
+                }
+              }
+            } else {
+              const errorText = await bulkResponse.text();
+              console.error('[ImportExportDO] Bulk write failed:', errorText);
+              errorCount += bulkData.length;
+            }
+          } catch (err) {
+            console.error('[ImportExportDO] Bulk write error:', err);
+            errorCount += bulkData.length;
+          }
+        }
+
+        // Broadcast progress after each batch
+        const percentage = Math.round(((i + batch.length) / importData.length) * 100);
+        await this.updateJobInDB(jobId, { 
+          processed_keys: i + batch.length,
+          error_count: errorCount,
+          percentage
+        });
+        this.broadcastProgress({
+          jobId,
+          status: 'running',
+          progress: { 
+            total: importData.length, 
+            processed: i + batch.length, 
+            errors: errorCount,
+            percentage 
+          }
+        });
+
+        // Log milestone events
+        const milestone = Math.floor(percentage / 25) * 25;
+        if (milestone >= 25 && milestone > lastMilestone && milestone < 100) {
+          await logJobEvent(db, {
+            job_id: jobId,
+            event_type: `progress_${milestone}` as 'progress_25' | 'progress_50' | 'progress_75',
+            user_email: userEmail,
+            details: JSON.stringify({ processed: i + batch.length, errors: errorCount, percentage })
+          });
+          lastMilestone = milestone;
+        }
+      }
+
+      // Mark as completed
+      await this.updateJobInDB(jobId, { 
+        status: 'completed',
+        processed_keys: processedCount,
+        error_count: errorCount,
+        percentage: 100
+      });
+
+      this.broadcastProgress({
+        jobId,
+        status: 'completed',
+        progress: { 
+          total: importData.length, 
+          processed: processedCount, 
+          errors: errorCount,
+          percentage: 100 
+        },
+        result: { 
+          processed: processedCount, 
+          errors: errorCount
+        }
+      });
+
+      // Log completed event
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'completed',
+        user_email: userEmail,
+        details: JSON.stringify({ processed: processedCount, errors: errorCount, percentage: 100 })
+      });
+
+      // Audit log
+      await auditLog(db, {
+        namespace_id: namespaceId,
+        operation: 'r2_restore',
+        user_email: userEmail,
+        details: JSON.stringify({ 
+          total: importData.length,
+          processed: processedCount,
+          errors: errorCount,
+          backup_path: backupPath,
+          job_id: jobId
+        })
+      });
+
+    } catch (error) {
+      console.error('[ImportExportDO] R2 restore error:', error);
       
       await this.updateJobInDB(jobId, { status: 'failed' });
       

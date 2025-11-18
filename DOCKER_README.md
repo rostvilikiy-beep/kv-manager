@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/status-Production%2FStable-brightgreen)
 [![Security](https://img.shields.io/badge/Security-Enhanced-green.svg)](https://github.com/neverinfamous/kv-manager/blob/main/SECURITY.md)
 
-**Version:** 1.0.0 | **Last Updated:** November 14, 2025 
+**Version:** 1.0.0 | **Last Updated:** November 18, 2025 
 **Base Image:** Node.js 20-alpine | **Architecture:** linux/amd64, linux/arm64
 
 A fully containerized version of the KV Manager for Cloudflare. This Docker image provides a modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys with enterprise-grade authentication via Cloudflare Access (Zero Trust).
@@ -103,6 +103,7 @@ This Docker image packages the complete KV Manager with:
 - **Search & Discovery** - Cross-namespace search by key name with tag filtering
 - **Bulk Operations** - Bulk delete, copy, TTL update, and tag operations with HTTP polling progress tracking
 - **Import/Export** - JSON/NDJSON format support with collision handling and automatic file downloads
+- 🆕 **R2 Backup & Restore** - Create full namespace snapshots to R2 storage and restore from available backups (unreleased)
 - **Async Processing** - Background job execution via Durable Objects for large operations
 - **Backup & Restore** - Single-version backup and restore for keys
 - **Job History UI** - View complete history of all bulk operations with event timeline visualization, advanced filtering (namespace, date range, job ID search, error threshold), and multi-column sorting
@@ -123,6 +124,7 @@ This Docker image packages the complete KV Manager with:
 - Tailwind CSS + shadcn/ui for modern UI
 - Cloudflare Workers runtime for serverless API
 - D1 database for metadata and audit logs
+- R2 storage for namespace backups (optional, unreleased)
 - Durable Objects for orchestration and job processing
 - HTTP polling for reliable progress tracking (1-second intervals)
 

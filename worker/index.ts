@@ -10,6 +10,7 @@ import { handleBackupRoutes } from './routes/backup';
 import { handleImportExportRoutes } from './routes/import-export';
 import { handleAuditRoutes } from './routes/audit';
 import { handleAdminRoutes } from './routes/admin';
+import { handleR2BackupRoutes } from './routes/r2-backup';
 
 /**
  * Main request handler
@@ -113,6 +114,10 @@ async function handleApiRequest(request: Request, env: Env): Promise<Response> {
 
   if (url.pathname.startsWith('/api/export') || url.pathname.startsWith('/api/import') || url.pathname.startsWith('/api/jobs')) {
     return await handleImportExportRoutes(request, env, url, corsHeaders, isLocalDev, userEmail);
+  }
+
+  if (url.pathname.startsWith('/api/r2-backup') || url.pathname.startsWith('/api/r2-restore')) {
+    return await handleR2BackupRoutes(request, env, url, corsHeaders, isLocalDev, userEmail);
   }
 
   if (url.pathname.startsWith('/api/audit')) {

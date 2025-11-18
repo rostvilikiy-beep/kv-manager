@@ -16,6 +16,11 @@ binding = "METADATA"
 database_name = "kv-manager-metadata-dev"
 database_id = "local-dev-database"
 
+# R2 bucket for backups (local development)
+[[r2_buckets]]
+binding = "BACKUP_BUCKET"
+bucket_name = "kv-manager-backups-dev"
+
 # Durable Objects bindings (local)
 [[durable_objects.bindings]]
 name = "BULK_OPERATION_DO"

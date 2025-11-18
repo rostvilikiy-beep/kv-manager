@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { api, type KVNamespace, type KVKey, type JobProgress } from './services/api'
+import { api, type KVNamespace, type KVKey, type JobProgress, type R2BackupListItem } from './services/api'
 import { auth } from './services/auth'
 import { useTheme } from './hooks/useTheme'
 import { Database, Plus, Moon, Sun, Monitor, Loader2, Trash2, Key, Search, History, Download, Upload, Copy, Clock, Tag, RefreshCw } from 'lucide-react'
@@ -85,6 +85,15 @@ export default function App() {
   const [importData, setImportData] = useState('')
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
+
+  // R2 Backup/Restore state
+  const [showR2BackupDialog, setShowR2BackupDialog] = useState(false)
+  const [showR2RestoreDialog, setShowR2RestoreDialog] = useState(false)
+  const [r2NamespaceId, setR2NamespaceId] = useState('')
+  const [r2BackupFormat, setR2BackupFormat] = useState<'json' | 'ndjson'>('json')
+  const [r2Backups, setR2Backups] = useState<R2BackupListItem[]>([])
+  const [selectedR2Backup, setSelectedR2Backup] = useState('')
+  const [loadingR2Backups, setLoadingR2Backups] = useState(false)
 
   // Bulk operations state (copy, TTL, tags)
   const [showBulkCopyDialog, setShowBulkCopyDialog] = useState(false)
@@ -437,6 +446,70 @@ export default function App() {
     }
   }
 
+  // R2 Backup/Restore handlers
+  const openR2BackupDialog = (namespaceId: string) => {
+    setR2NamespaceId(namespaceId)
+    setShowR2BackupDialog(true)
+  }
+
+  const openR2RestoreDialog = async (namespaceId: string) => {
+    setR2NamespaceId(namespaceId)
+    setLoadingR2Backups(true)
+    setShowR2RestoreDialog(true)
+    try {
+      const backups = await api.listR2Backups(namespaceId)
+      setR2Backups(backups)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to list backups')
+    } finally {
+      setLoadingR2Backups(false)
+    }
+  }
+
+  const handleR2Backup = async () => {
+    try {
+      setExporting(true)
+      setError('')
+      const result = await api.backupToR2(r2NamespaceId, r2BackupFormat)
+      setShowR2BackupDialog(false)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Backup to R2')
+      const ns = namespaces.find(n => n.id === r2NamespaceId)
+      setProgressNamespace(ns?.title || r2NamespaceId)
+      setShowProgressDialog(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start R2 backup')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const handleR2Restore = async () => {
+    if (!selectedR2Backup) return
+    
+    try {
+      setImporting(true)
+      setError('')
+      const result = await api.restoreFromR2(r2NamespaceId, selectedR2Backup)
+      setShowR2RestoreDialog(false)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Restore from R2')
+      const ns = namespaces.find(n => n.id === r2NamespaceId)
+      setProgressNamespace(ns?.title || r2NamespaceId)
+      setShowProgressDialog(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start R2 restore')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   // Bulk operations handlers
   const handleBulkCopy = async () => {
     if (!bulkTargetNamespace || selectedKeys.length === 0 || currentView.type !== 'namespace') return
@@ -745,6 +818,26 @@ export default function App() {
                             >
                               <Upload className="h-3.5 w-3.5 mr-1" />
                               Import
+                            </Button>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => openR2BackupDialog(ns.id)}
+                            >
+                              <Database className="h-3.5 w-3.5 mr-1" />
+                              Backup to R2
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => openR2RestoreDialog(ns.id)}
+                            >
+                              <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                              Restore from R2
                             </Button>
                           </div>
                           <div className="flex gap-2">
@@ -1286,6 +1379,89 @@ export default function App() {
             <Button onClick={handleImport} disabled={importing || !importData.trim()}>
               {importing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Import
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* R2 Backup Dialog */}
+      <Dialog open={showR2BackupDialog} onOpenChange={setShowR2BackupDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Backup to R2</DialogTitle>
+            <DialogDescription>
+              Create a backup of this namespace in R2 storage.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Backup Format</Label>
+              <Select value={r2BackupFormat} onValueChange={(v) => setR2BackupFormat(v as 'json' | 'ndjson')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="json">JSON (Array format)</SelectItem>
+                  <SelectItem value="ndjson">NDJSON (Line-delimited)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowR2BackupDialog(false)} disabled={exporting}>
+              Cancel
+            </Button>
+            <Button onClick={handleR2Backup} disabled={exporting}>
+              {exporting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Backup to R2
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* R2 Restore Dialog */}
+      <Dialog open={showR2RestoreDialog} onOpenChange={setShowR2RestoreDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Restore from R2</DialogTitle>
+            <DialogDescription>
+              Select a backup to restore to this namespace. This will overwrite existing keys.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {loadingR2Backups ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : r2Backups.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No backups found for this namespace
+              </p>
+            ) : (
+              <div className="grid gap-2">
+                <Label>Select Backup</Label>
+                <Select value={selectedR2Backup} onValueChange={setSelectedR2Backup}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a backup..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {r2Backups.map(backup => (
+                      <SelectItem key={backup.path} value={backup.path}>
+                        {new Date(backup.uploaded).toLocaleString()} ({(backup.size / 1024).toFixed(2)} KB)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowR2RestoreDialog(false)} disabled={importing}>
+              Cancel
+            </Button>
+            <Button onClick={handleR2Restore} disabled={importing || !selectedR2Backup}>
+              {importing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Restore from R2
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -20,6 +20,12 @@ binding = "METADATA"
 database_name = "kv-manager-metadata"
 database_id = "YOUR_D1_DATABASE_ID" # Get this from: wrangler d1 create kv-manager-metadata
 
+# R2 bucket for backups (optional)
+# Create with: wrangler r2 bucket create kv-manager-backups
+[[r2_buckets]]
+binding = "BACKUP_BUCKET"
+bucket_name = "kv-manager-backups"
+
 # Durable Objects bindings
 [[durable_objects.bindings]]
 name = "BULK_OPERATION_DO"

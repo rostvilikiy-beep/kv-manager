@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **R2 Backup & Restore**: Complete R2 integration for namespace backups
+  - **Backup to R2**: Create full snapshots of namespaces directly to R2 storage
+  - **Restore from R2**: Select and restore from available R2 backups via UI
+  - **List Backups**: View all available backups with timestamps and file sizes
+  - Organized storage structure: `backups/{namespaceId}/{timestamp}.json`
+  - Support for both JSON and NDJSON backup formats
+  - Progress tracking identical to Import/Export operations (HTTP polling)
+  - Job history integration with R2 backup/restore operation types
+  - Optional R2 bucket binding (app works without R2 configured)
+  - Mock data support in local development mode
+  - Three new API endpoints:
+    - `GET /api/r2-backup/:namespaceId/list` - List available backups
+    - `POST /api/r2-backup/:namespaceId` - Start async backup to R2
+    - `POST /api/r2-restore/:namespaceId` - Start async restore from R2
+  - New wrangler.toml R2 bucket binding: `BACKUP_BUCKET`
+  - UI buttons added to namespace cards for easy access
+  - Backup/Restore dialogs with format selection and backup list
+  - Audit logging for both r2_backup and r2_restore operations
+  - Complete documentation in README with setup instructions
+
 - **Import/Export Metadata Support**: Enhanced import functionality with dual metadata system support
   - Import now supports both `metadata` (KV native) and `custom_metadata` (D1) fields
   - `metadata` field stores data in Cloudflare KV (1024 byte limit, retrieved with key)

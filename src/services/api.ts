@@ -74,6 +74,14 @@ export interface BulkJobResponse {
   total_keys?: number
 }
 
+// R2 Backup types
+export interface R2BackupListItem {
+  path: string
+  timestamp: number
+  size: number
+  uploaded: string
+}
+
 // Job Event types
 export interface JobEvent {
   id: number
@@ -547,6 +555,61 @@ class APIService {
     const response = await fetch(
       `${WORKER_API}/api/jobs/${jobId}`,
       this.getFetchOptions()
+    )
+    
+    await this.handleResponse(response);
+    
+    const data = await response.json()
+    return data.result
+  }
+
+  /**
+   * List R2 backups for a namespace
+   */
+  async listR2Backups(namespaceId: string): Promise<R2BackupListItem[]> {
+    const response = await fetch(
+      `${WORKER_API}/api/r2-backup/${namespaceId}/list`,
+      this.getFetchOptions()
+    )
+    
+    await this.handleResponse(response);
+    
+    const data = await response.json()
+    return data.result
+  }
+
+  /**
+   * Backup namespace to R2 (async with job tracking)
+   */
+  async backupToR2(namespaceId: string, format: 'json' | 'ndjson' = 'json'): Promise<BulkJobResponse> {
+    const response = await fetch(
+      `${WORKER_API}/api/r2-backup/${namespaceId}?format=${format}`,
+      {
+        method: 'POST',
+        credentials: 'include'
+      }
+    )
+    
+    await this.handleResponse(response);
+    
+    const data = await response.json()
+    return data.result
+  }
+
+  /**
+   * Restore namespace from R2 backup (async with job tracking)
+   */
+  async restoreFromR2(namespaceId: string, backupPath: string): Promise<BulkJobResponse> {
+    const response = await fetch(
+      `${WORKER_API}/api/r2-restore/${namespaceId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ backupPath })
+      }
     )
     
     await this.handleResponse(response);
