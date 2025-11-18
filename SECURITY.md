@@ -117,6 +117,29 @@ npx wrangler secret put POLICY_AUD
 
 ## Known Security Considerations
 
+### Docker Image Dependencies
+
+The Docker image may show the following vulnerabilities in security scans:
+
+**npm CLI Dependencies (Accepted Risk)**:
+- `glob@11.0.3` - CVE-2025-64756 (HIGH): Command injection in glob CLI's `-c/--cmd` option
+- `glob@10.4.5` - CVE-2025-64756 (HIGH): Command injection in glob CLI's `-c/--cmd` option  
+- `tar@7.5.1` - CVE-2025-64118 (MEDIUM): Race condition vulnerability
+
+**Why These Are Accepted Risks**:
+- These vulnerabilities exist in npm's own CLI dependencies, not in our application code
+- Our application uses patched versions (glob@11.1.0, tar@7.5.2) via package.json overrides
+- The glob vulnerability only affects the glob CLI tool with specific flags we don't use
+- The tar vulnerability is a race condition unlikely to be exploitable in Docker builds
+- npm team has not yet released a version with patched dependencies (as of npm@11.6.2)
+- These dependencies are only present during the Docker build process
+
+**Alpine Base Package Vulnerabilities (Accepted Risk)**:
+- `curl@8.14.1-r2` - CVE-2025-10966 (MEDIUM): No fix available from Alpine Linux
+- `busybox@1.37.0-r19` - CVE-2025-46394, CVE-2024-58251 (LOW): No fixes available from Alpine Linux
+
+We monitor these vulnerabilities and will update as soon as patches become available.
+
 ### Local Development Mode
 
 - Mock data mode bypasses authentication for `localhost`
