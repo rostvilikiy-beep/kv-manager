@@ -44,9 +44,12 @@ WORKDIR /app
 RUN npm install -g npm@latest
 
 # Install runtime dependencies only
-# Note: curl 8.14.1-r2 has CVE-2025-10966 (MEDIUM) with no fix available yet
-# Note: busybox 1.37.0-r19 has CVE-2025-46394 & CVE-2024-58251 (LOW) with no fixes available yet
-# These are accepted risks as they are in Alpine base packages with no available patches
+# Security Notes:
+# - glob upgraded to 11.1.0 to fix CVE-2025-64756 (HIGH) - command injection vulnerability
+# - tar upgraded to 7.5.2 to fix CVE-2025-64118 (MEDIUM) - race condition vulnerability
+# - curl 8.14.1-r2 has CVE-2025-10966 (MEDIUM) with no fix available yet (Alpine base package)
+# - busybox 1.37.0-r19 has CVE-2025-46394 & CVE-2024-58251 (LOW) with no fixes available yet (Alpine base package)
+# Alpine base package vulnerabilities (curl, busybox) are accepted risks with no available patches
 RUN apk add --no-cache \
     curl \
     ca-certificates
