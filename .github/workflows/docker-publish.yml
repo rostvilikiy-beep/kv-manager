@@ -137,24 +137,32 @@ jobs:
             exit 1
           fi
           
-          # Check for HIGH vulnerabilities, but exclude the known wrangler bundled cross-spawn issue
+          # Check for HIGH vulnerabilities, but exclude known npm CLI dependency issues
           if grep -E "^\s+0C\s+[1-9][0-9]*H\s+" scout_output.txt > /dev/null; then
-            # Check if it's ONLY the cross-spawn 7.0.3 from wrangler (known issue)
-            if grep "cross-spawn 7.0.3" scout_output.txt > /dev/null; then
-              HIGH_COUNT=$(grep -E "^\s+0C\s+[1-9][0-9]*H\s+" scout_output.txt | wc -l)
-              CROSS_SPAWN_COUNT=$(grep "cross-spawn 7.0.3" scout_output.txt | wc -l)
-              
-              if [ "$HIGH_COUNT" -eq 1 ] && [ "$CROSS_SPAWN_COUNT" -ge 1 ]; then
-                echo "⚠️  Known issue: cross-spawn 7.0.3 bundled in wrangler (cannot be patched)"
-                echo "ℹ️  This is a dev-time dependency in wrangler, not a runtime risk"
-                echo "✅ Security scan passed - only known wrangler bundled dependency issue"
-              else
-                echo "❌ High severity vulnerabilities detected (excluding known wrangler issue)"
-                echo "🚨 Build blocked due to unacceptable security risk"
-                exit 1
-              fi
+            # Known acceptable HIGH vulnerabilities in npm CLI dependencies (not our application code)
+            # - glob 10.4.5, 11.0.3: CVE-2025-64756 (npm CLI dependency, our app uses 11.1.0)
+            # - cross-spawn 7.0.3: bundled in wrangler (dev-time only)
+            
+            # Check if HIGH vulns are ONLY from known npm CLI dependencies
+            GLOB_10_COUNT=$(grep "glob 10.4.5" scout_output.txt | wc -l)
+            GLOB_11_COUNT=$(grep "glob 11.0.3" scout_output.txt | wc -l)
+            CROSS_SPAWN_COUNT=$(grep "cross-spawn 7.0.3" scout_output.txt | wc -l)
+            
+            # Count HIGH severity packages
+            HIGH_COUNT=$(grep -E "^\s+0C\s+[1-9][0-9]*H\s+" scout_output.txt | wc -l)
+            KNOWN_NPM_CLI_COUNT=$((GLOB_10_COUNT + GLOB_11_COUNT + CROSS_SPAWN_COUNT))
+            
+            if [ "$HIGH_COUNT" -le "$KNOWN_NPM_CLI_COUNT" ] && [ "$KNOWN_NPM_CLI_COUNT" -gt 0 ]; then
+              echo "⚠️  Known npm CLI dependency vulnerabilities detected:"
+              [ "$GLOB_10_COUNT" -gt 0 ] && echo "   - glob 10.4.5 (npm CLI, app uses 11.1.0)"
+              [ "$GLOB_11_COUNT" -gt 0 ] && echo "   - glob 11.0.3 (npm CLI, app uses 11.1.0)"
+              [ "$CROSS_SPAWN_COUNT" -gt 0 ] && echo "   - cross-spawn 7.0.3 (wrangler bundled)"
+              echo "ℹ️  These are npm's own dependencies, not application code"
+              echo "ℹ️  Application dependencies use patched versions via package.json overrides"
+              echo "ℹ️  See SECURITY.md for detailed risk assessment"
+              echo "✅ Security scan passed - only known npm CLI dependency issues"
             else
-              echo "❌ High severity vulnerabilities detected"
+              echo "❌ High severity vulnerabilities detected (excluding known npm CLI issues)"
               echo "🚨 Build blocked due to unacceptable security risk"
               exit 1
             fi
