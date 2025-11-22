@@ -8,6 +8,8 @@
 
 *Version 1.0.0 | Last Updated: November 22, 2025*
 
+A full-featured management platform for Cloudflare Workers KV, designed for engineering teams and large-scale workloads. Browse namespaces, run bulk operations, search across your entire KV footprint, manage metadata and tags, automate backups to R2, and secure everything with Cloudflare Access Zero Trust.
+
 Run KV Manager in Docker with full Cloudflare KV management capabilities and enterprise authentication.
 
 **🎯 [Live Demo](https://kv.adamic.tech/)** | **📚 [Full Documentation](https://github.com/neverinfamous/kv-manager/wiki)** | **📰 [Release Article](https://adamic.tech/articles/2025-11-05-kv-manager-v1-0-0)**

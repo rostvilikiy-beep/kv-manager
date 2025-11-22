@@ -76,7 +76,7 @@ export interface BulkJob {
   job_id: string
   namespace_id: string
   operation_type: string
-  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
+  status: 'queued' | 'running' | 'completed' | 'failed'
   total_keys?: number
   processed_keys?: number
   error_count?: number
@@ -90,16 +90,16 @@ export interface BulkJob {
 export interface JobAuditEvent {
   id?: number
   job_id: string
-  event_type: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'failed' | 'cancelled'
+  event_type: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'failed'
   user_email: string
   timestamp?: string
   details?: string // JSON object
 }
 
-// WebSocket Progress Message Types
+// Job Progress Message Types (used by Durable Objects)
 export interface JobProgress {
   jobId: string
-  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
+  status: 'queued' | 'running' | 'completed' | 'failed'
   progress: {
     total: number
     processed: number

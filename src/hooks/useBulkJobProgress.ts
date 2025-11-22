@@ -11,9 +11,7 @@ interface UseBulkJobProgressOptions {
 
 interface UseBulkJobProgressReturn {
   progress: JobProgress | null;
-  isConnected: boolean;
   error: string | null;
-  cancelJob: () => void;
 }
 
 const POLLING_INTERVAL = 2000; // Poll every 2 seconds (reduced from 1s to avoid rate limits)
@@ -21,10 +19,10 @@ const MAX_POLLING_INTERVAL = 10000; // Max 10 seconds between polls
 const RATE_LIMIT_BACKOFF = 3000; // Add 3 seconds on rate limit
 
 /**
- * Custom hook for tracking bulk job progress via polling
+ * Custom hook for tracking bulk job progress via HTTP polling
  * 
- * Note: This hook uses HTTP polling instead of WebSockets for simplicity and reliability.
- * WebSockets are unnecessary for typical job durations and can cause connection issues.
+ * Polls the job status endpoint every 2 seconds to get real-time progress updates.
+ * Automatically stops polling when job completes or fails.
  */
 export function useBulkJobProgress({
   jobId,
@@ -40,7 +38,6 @@ export function useBulkJobProgress({
   const currentIntervalRef = useRef(POLLING_INTERVAL);
   const isMountedRef = useRef(true);
   const hasCompletedRef = useRef(false);
-  const hasCancelledRef = useRef(false);
   const consecutiveErrorsRef = useRef(0);
 
   // Stop polling
@@ -102,7 +99,7 @@ export function useBulkJobProgress({
 
         setProgress(progressUpdate);
 
-        if (progressUpdate.status === 'completed' || progressUpdate.status === 'failed' || progressUpdate.status === 'cancelled') {
+        if (progressUpdate.status === 'completed' || progressUpdate.status === 'failed') {
           hasCompletedRef.current = true;
           
           if (pollingIntervalRef.current) {
@@ -114,8 +111,6 @@ export function useBulkJobProgress({
             onComplete(progressUpdate);
           } else if (progressUpdate.status === 'failed' && onError) {
             onError('Job failed');
-          } else if (progressUpdate.status === 'cancelled' && onError) {
-            onError('Job was cancelled');
           }
         }
       } catch (err) {
@@ -166,19 +161,7 @@ export function useBulkJobProgress({
     poll();
     pollingIntervalRef.current = window.setInterval(poll, currentIntervalRef.current);
     console.log('[useBulkJobProgress] Interval created:', pollingIntervalRef.current);
-  }, []);
-
-  // Cancel job (not implemented - requires backend support)
-  const cancelJob = useCallback(() => {
-    if (hasCancelledRef.current) {
-      console.log('[useBulkJobProgress] Job already cancelled');
-      return;
-    }
-
-    console.log('[useBulkJobProgress] Cancel not implemented - requires WebSocket connection');
-    hasCancelledRef.current = true;
-    setError('Cancel functionality requires WebSocket support');
-  }, []);
+  }, [jobId, onComplete, onError, stopPolling]);
 
   // Start polling on mount, stop on unmount
   useEffect(() => {
@@ -196,12 +179,10 @@ export function useBulkJobProgress({
       isMountedRef.current = false;
       stopPolling();
     };
-  }, [jobId]);
+  }, [jobId, startPolling, stopPolling]);
 
   return {
     progress,
-    isConnected: false, // No WebSocket connection
     error,
-    cancelJob,
   };
 }

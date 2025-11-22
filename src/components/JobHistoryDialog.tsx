@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { api, type JobEvent, type JobEventDetails } from '../services/api';
-import { Loader2, CheckCircle2, XCircle, AlertCircle, Ban, Circle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, AlertCircle, Circle } from 'lucide-react';
 
 interface JobHistoryDialogProps {
   open: boolean;
@@ -53,8 +53,6 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       case 'failed':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'cancelled':
-        return <Ban className="h-5 w-5 text-orange-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
@@ -74,8 +72,6 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
         return 'Completed';
       case 'failed':
         return 'Failed';
-      case 'cancelled':
-        return 'Cancelled';
       default:
         return eventType;
     }
@@ -166,7 +162,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
                 {events.map((event) => {
                   const time = formatTimestamp(event.timestamp);
                   const details = renderEventDetails(event);
-                  const isTerminal = ['completed', 'failed', 'cancelled'].includes(event.event_type);
+                  const isTerminal = ['completed', 'failed'].includes(event.event_type);
 
                   return (
                     <div key={event.id} className="relative pl-8">

@@ -49,7 +49,7 @@ export interface SearchResult {
 // Job Progress types
 export interface JobProgress {
   jobId: string
-  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
+  status: 'queued' | 'running' | 'completed' | 'failed'
   progress: {
     total: number
     processed: number
@@ -86,7 +86,7 @@ export interface R2BackupListItem {
 export interface JobEvent {
   id: number
   job_id: string
-  event_type: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'failed' | 'cancelled'
+  event_type: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'failed'
   user_email: string
   timestamp: string
   details: string | null
@@ -111,7 +111,7 @@ export interface JobListItem {
   job_id: string
   namespace_id: string
   operation_type: string
-  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
+  status: 'queued' | 'running' | 'completed' | 'failed'
   total_keys: number | null
   processed_keys: number | null
   error_count: number | null

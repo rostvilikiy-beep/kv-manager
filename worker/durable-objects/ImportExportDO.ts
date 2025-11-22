@@ -2,39 +2,25 @@ import type { DurableObjectState } from '@cloudflare/workers-types';
 import type { Env, JobProgress, ImportParams, ExportParams, R2BackupParams, R2RestoreParams, BatchR2BackupParams, BatchR2RestoreParams } from '../types';
 import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
-interface SessionAttachment {
-  sessionId: string;
-}
-
 /**
- * Durable Object for handling large import/export operations with WebSocket progress updates
- * Uses Hibernation API to minimize duration charges
+ * Durable Object for handling large import/export operations
  */
 export class ImportExportDO {
   private state: DurableObjectState;
   private env: Env;
-  private sessions: Map<WebSocket, SessionAttachment>;
   private exportResults: Map<string, string>; // Store export results temporarily
-  private cancelledJobs: Set<string>;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
-    this.sessions = new Map();
     this.exportResults = new Map();
-    this.cancelledJobs = new Set();
   }
 
   /**
-   * Handle incoming requests (WebSocket upgrades and job initiation)
+   * Handle incoming requests for job processing and downloads
    */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    
-    // WebSocket upgrade request
-    if (request.headers.get('Upgrade') === 'websocket') {
-      return this.handleWebSocketUpgrade(request);
-    }
 
     // Job processing endpoints
     if (url.pathname.startsWith('/process/')) {
@@ -132,95 +118,12 @@ export class ImportExportDO {
   }
 
   /**
-   * Handle WebSocket upgrade
+   * Broadcast progress (no-op: WebSocket support removed, progress tracked via D1 polling)
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private handleWebSocketUpgrade(_request: Request): Response {
-    // @ts-expect-error - WebSocketPair is available in Workers runtime
-    const pair = new WebSocketPair();
-    const [client, server] = Object.values(pair);
-
-    // Use Hibernation API
-    // @ts-expect-error - WebSocket types differ between DOM and Workers runtime but are compatible
-    this.state.acceptWebSocket(server);
-
-    const sessionId = crypto.randomUUID();
-    // @ts-expect-error - WebSocket types differ between DOM and Workers runtime but are compatible
-    this.sessions.set(server, { sessionId });
-
-    console.log('[ImportExportDO] WebSocket connected:', sessionId);
-
-    return new Response(null, {
-      status: 101,
-      // @ts-expect-error - webSocket property is available in Workers runtime
-      webSocket: client,
-    });
-  }
-
-  /**
-   * Handle incoming WebSocket messages (Hibernation API)
-   */
-  async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string): Promise<void> {
-    try {
-      const data = typeof message === 'string' ? message : new TextDecoder().decode(message);
-      console.log('[ImportExportDO] Received message:', data);
-      
-      const parsed = JSON.parse(data);
-      if (parsed.type === 'ping') {
-        ws.send(JSON.stringify({ type: 'pong' }));
-      } else if (parsed.type === 'cancel' && parsed.jobId) {
-        // Handle cancellation request
-        await this.cancelJob(parsed.jobId);
-      }
-    } catch (error) {
-      console.error('[ImportExportDO] Message error:', error);
-    }
-  }
-
-  /**
-   * Handle WebSocket close (Hibernation API)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async webSocketClose(ws: WebSocket, code: number, reason: string, _wasClean: boolean): Promise<void> {
-    const session = this.sessions.get(ws);
-    if (session) {
-      console.log('[ImportExportDO] WebSocket closed:', session.sessionId, code, reason);
-      this.sessions.delete(ws);
-    }
-    // Don't try to close an already closed WebSocket
-    // Code 1005 is reserved and should never be sent explicitly
-    try {
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CLOSING) {
-        // Use 1000 (normal closure) if we received a reserved code like 1005
-        const closeCode = (code === 1005 || code === 1006) ? 1000 : code;
-        ws.close(closeCode, 'Durable Object is closing WebSocket');
-      }
-    } catch (error) {
-      console.error('[ImportExportDO] Error closing WebSocket:', error);
-    }
-  }
-
-  /**
-   * Handle WebSocket errors (Hibernation API)
-   */
-  async webSocketError(ws: WebSocket, error: unknown): Promise<void> {
-    console.error('[ImportExportDO] WebSocket error:', error);
-    this.sessions.delete(ws);
-  }
-
-  /**
-   * Broadcast progress to all connected WebSocket clients
-   */
-  private broadcastProgress(progress: JobProgress): void {
-    const message = JSON.stringify(progress);
-    
-    this.state.getWebSockets().forEach((ws) => {
-      try {
-        ws.send(message);
-      } catch (error) {
-        console.error('[ImportExportDO] Failed to send to client:', error);
-      }
-    });
+  private broadcastProgress(_progress: JobProgress): void {
+    // No-op: Frontend uses HTTP polling instead of WebSockets
+    // This method is kept to avoid refactoring all process methods
   }
 
   /**
@@ -247,7 +150,7 @@ export class ImportExportDO {
       if (updates.status !== undefined) {
         setClauses.push('status = ?');
         values.push(updates.status);
-        if (updates.status === 'completed' || updates.status === 'failed' || updates.status === 'cancelled') {
+        if (updates.status === 'completed' || updates.status === 'failed') {
           setClauses.push('completed_at = CURRENT_TIMESTAMP');
         }
       }
@@ -285,66 +188,6 @@ export class ImportExportDO {
   }
 
   /**
-   * Cancel a job
-   */
-  private async cancelJob(jobId: string): Promise<void> {
-    console.log('[ImportExportDO] Cancelling job:', jobId);
-    this.cancelledJobs.add(jobId);
-    
-    // Acknowledge cancellation request via WebSocket
-    this.broadcastProgress({
-      jobId,
-      status: 'running',
-      progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
-    });
-  }
-
-  /**
-   * Handle job cancellation - update DB, log event, broadcast
-   */
-  private async handleCancellation(
-    jobId: string,
-    userEmail: string,
-    processed: number,
-    errors: number,
-    total: number
-  ): Promise<void> {
-    const db = getD1Binding(this.env);
-    const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
-
-    // Update job status to cancelled
-    await this.updateJobInDB(jobId, {
-      status: 'cancelled',
-      processed_keys: processed,
-      error_count: errors,
-      percentage
-    });
-
-    // Log cancellation event
-    await logJobEvent(db, {
-      job_id: jobId,
-      event_type: 'cancelled',
-      user_email: userEmail,
-      details: JSON.stringify({ processed, errors, percentage, total })
-    });
-
-    // Broadcast cancelled status
-    this.broadcastProgress({
-      jobId,
-      status: 'cancelled',
-      progress: {
-        total,
-        processed,
-        errors,
-        percentage
-      }
-    });
-
-    // Clean up from cancelled jobs set
-    this.cancelledJobs.delete(jobId);
-  }
-
-  /**
    * Process import operation
    */
   async processImport(params: ImportParams & { jobId: string }): Promise<void> {
@@ -377,13 +220,6 @@ export class ImportExportDO {
       const batchSize = 100;
       
       for (let i = 0; i < importData.length; i += batchSize) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[ImportExportDO] Job cancelled during import:', jobId);
-          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, importData.length);
-          return;
-        }
-
         const batch = importData.slice(i, i + batchSize);
 
         // Check for collisions if needed
@@ -710,13 +546,6 @@ export class ImportExportDO {
       let lastMilestone = 0;
 
       for (let i = 0; i < allKeys.length; i++) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[ImportExportDO] Job cancelled during export:', jobId);
-          await this.handleCancellation(jobId, userEmail, exportData.length, errorCount, allKeys.length);
-          return;
-        }
-
         const key = allKeys[i];
         
         try {
@@ -943,13 +772,6 @@ export class ImportExportDO {
       let lastMilestone = 0;
 
       for (let i = 0; i < allKeys.length; i++) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[ImportExportDO] Job cancelled during R2 backup:', jobId);
-          await this.handleCancellation(jobId, userEmail, exportData.length, errorCount, allKeys.length);
-          return;
-        }
-
         const key = allKeys[i];
         
         try {
@@ -1179,13 +1001,6 @@ export class ImportExportDO {
       const batchSize = 100;
       
       for (let i = 0; i < importData.length; i += batchSize) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[ImportExportDO] Job cancelled during R2 restore:', jobId);
-          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, importData.length);
-          return;
-        }
-
         const batch = importData.slice(i, i + batchSize);
 
         // Prepare bulk write data
@@ -1404,11 +1219,6 @@ export class ImportExportDO {
 
     // Process each namespace sequentially
     for (const namespaceId of namespaceIds) {
-      if (this.cancelledJobs.has(jobId)) {
-        console.log(`[ImportExportDO] Job ${jobId} cancelled`);
-        break;
-      }
-
       try {
         console.log(`[ImportExportDO] Backing up namespace ${namespaceId} (${processed + 1}/${namespaceIds.length})`);
         
@@ -1524,7 +1334,7 @@ export class ImportExportDO {
     }
 
     // Mark job as completed or failed
-    const finalStatus = this.cancelledJobs.has(jobId) ? 'cancelled' : (errors === namespaceIds.length ? 'failed' : 'completed');
+    const finalStatus = errors === namespaceIds.length ? 'failed' : 'completed';
     
     if (db) {
       await db.prepare(`
@@ -1535,7 +1345,7 @@ export class ImportExportDO {
       
       await logJobEvent(db, {
         job_id: jobId,
-        event_type: finalStatus as 'completed' | 'failed' | 'cancelled',
+        event_type: finalStatus as 'completed' | 'failed',
         user_email: userEmail,
         details: JSON.stringify({
           processed,
@@ -1583,11 +1393,6 @@ export class ImportExportDO {
 
     // Process each namespace sequentially
     for (const namespaceId of namespaceIds) {
-      if (this.cancelledJobs.has(jobId)) {
-        console.log(`[ImportExportDO] Job ${jobId} cancelled`);
-        break;
-      }
-
       const backupPath = restoreMap[namespaceId];
       
       try {
@@ -1698,7 +1503,7 @@ export class ImportExportDO {
     }
 
     // Mark job as completed or failed
-    const finalStatus = this.cancelledJobs.has(jobId) ? 'cancelled' : (errors === namespaceIds.length ? 'failed' : 'completed');
+    const finalStatus = errors === namespaceIds.length ? 'failed' : 'completed';
     
     if (db) {
       await db.prepare(`
@@ -1709,7 +1514,7 @@ export class ImportExportDO {
       
       await logJobEvent(db, {
         job_id: jobId,
-        event_type: finalStatus as 'completed' | 'failed' | 'cancelled',
+        event_type: finalStatus as 'completed' | 'failed',
         user_email: userEmail,
         details: JSON.stringify({
           processed,

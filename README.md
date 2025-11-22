@@ -2,7 +2,7 @@
 
 *Version 1.0.0 | Last Updated: November 22, 2025*
 
-A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
+A full-featured management platform for Cloudflare Workers KV, designed for engineering teams and large-scale workloads. Browse namespaces, run bulk operations, search across your entire KV footprint, manage metadata and tags, automate backups to R2, and secure everything with Cloudflare Access Zero Trust.
 
 **🎯 [Try the Live Demo](https://kv.adamic.tech/)** - See KV Manager in action
 

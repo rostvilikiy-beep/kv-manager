@@ -8,7 +8,7 @@ import { Badge } from './ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
 import { api, type JobListItem, type KVNamespace } from '../services/api';
-import { Loader2, CheckCircle2, XCircle, Ban, AlertCircle, FileText, Download, Upload, Copy, Clock, Tag, Trash2, Search, Calendar as CalendarIcon, ArrowUp, ArrowDown, X, Database, RefreshCw } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, AlertCircle, FileText, Download, Upload, Copy, Clock, Tag, Trash2, Search, Calendar as CalendarIcon, ArrowUp, ArrowDown, X, Database, RefreshCw } from 'lucide-react';
 import { JobHistoryDialog } from './JobHistoryDialog';
 import { format } from 'date-fns';
 
@@ -225,13 +225,6 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
             Failed
           </Badge>
         );
-      case 'cancelled':
-        return (
-          <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-            <Ban className="h-3 w-3 mr-1" />
-            Cancelled
-          </Badge>
-        );
       case 'running':
         return (
           <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
@@ -330,7 +323,6 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
                   <SelectItem value="running">Running</SelectItem>
                   <SelectItem value="queued">Queued</SelectItem>
                 </SelectContent>

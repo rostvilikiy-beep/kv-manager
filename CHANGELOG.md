@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **WebSocket Support**: Removed unused WebSocket infrastructure
+  - Removed WebSocket upgrade endpoint from worker
+  - Removed WebSocket handler methods from Durable Objects (BulkOperationDO, ImportExportDO)
+  - Removed WebSocket session tracking and broadcasting
+  - Converted `broadcastProgress()` to no-op methods to preserve compatibility
+  - Updated comments to reflect HTTP polling architecture
+  - Rationale: Frontend exclusively uses HTTP polling; WebSocket code was dead weight adding complexity
+
+- **Job Cancellation Feature**: Removed non-functional job cancellation capability
+  - Removed cancel button from bulk progress dialog
+  - Removed `cancelJob` function from progress tracking hook
+  - Removed cancellation logic from Durable Objects (BulkOperationDO, ImportExportDO)
+  - Removed `'cancelled'` status from TypeScript type definitions
+  - Removed cancelled status UI indicators from job history
+  - Note: Database schema retains `'cancelled'` status for backward compatibility with existing historical records
+  - Rationale: Feature never worked after migration to HTTP polling, and jobs complete too quickly to make cancellation practical
+
 ### Added
 - **Batch R2 Backup & Restore**: Multi-namespace backup and restore operations to/from R2
   - **Batch Backup Selected to R2**: Back up multiple selected namespaces to R2 in a single operation

@@ -9,37 +9,23 @@ import type {
 } from '../types';
 import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
-interface SessionAttachment {
-  sessionId: string;
-}
-
 /**
- * Durable Object for orchestrating bulk KV operations with WebSocket progress updates
- * Uses Hibernation API to minimize duration charges
+ * Durable Object for orchestrating bulk KV operations
  */
 export class BulkOperationDO {
   private state: DurableObjectState;
   private env: Env;
-  private sessions: Map<WebSocket, SessionAttachment>;
-  private cancelledJobs: Set<string>;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
-    this.sessions = new Map();
-    this.cancelledJobs = new Set();
   }
 
   /**
-   * Handle incoming requests (WebSocket upgrades and job initiation)
+   * Handle incoming requests for job processing
    */
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    
-    // WebSocket upgrade request
-    if (request.headers.get('Upgrade') === 'websocket') {
-      return this.handleWebSocketUpgrade(request);
-    }
 
     // Job processing endpoints
     if (url.pathname.startsWith('/process/')) {
@@ -89,96 +75,12 @@ export class BulkOperationDO {
   }
 
   /**
-   * Handle WebSocket upgrade
+   * Broadcast progress (no-op: WebSocket support removed, progress tracked via D1 polling)
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private handleWebSocketUpgrade(_request: Request): Response {
-    // @ts-expect-error - WebSocketPair is available in Workers runtime
-    const pair = new WebSocketPair();
-    const [client, server] = Object.values(pair);
-
-    // Use Hibernation API - allows DO to hibernate without disconnecting clients
-    // @ts-expect-error - WebSocket types differ between DOM and Workers runtime but are compatible
-    this.state.acceptWebSocket(server);
-
-    const sessionId = crypto.randomUUID();
-    // @ts-expect-error - WebSocket types differ between DOM and Workers runtime but are compatible
-    this.sessions.set(server, { sessionId });
-
-    console.log('[BulkOperationDO] WebSocket connected:', sessionId);
-
-    return new Response(null, {
-      status: 101,
-      // @ts-expect-error - webSocket property is available in Workers runtime
-      webSocket: client,
-    });
-  }
-
-  /**
-   * Handle incoming WebSocket messages (Hibernation API)
-   */
-  async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string): Promise<void> {
-    try {
-      const data = typeof message === 'string' ? message : new TextDecoder().decode(message);
-      console.log('[BulkOperationDO] Received message:', data);
-      
-      // Clients can send ping messages to keep connection alive
-      const parsed = JSON.parse(data);
-      if (parsed.type === 'ping') {
-        ws.send(JSON.stringify({ type: 'pong' }));
-      } else if (parsed.type === 'cancel' && parsed.jobId) {
-        // Handle cancellation request
-        await this.cancelJob(parsed.jobId);
-      }
-    } catch (error) {
-      console.error('[BulkOperationDO] Message error:', error);
-    }
-  }
-
-  /**
-   * Handle WebSocket close (Hibernation API)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async webSocketClose(ws: WebSocket, code: number, reason: string, _wasClean: boolean): Promise<void> {
-    const session = this.sessions.get(ws);
-    if (session) {
-      console.log('[BulkOperationDO] WebSocket closed:', session.sessionId, code, reason);
-      this.sessions.delete(ws);
-    }
-    // Don't try to close an already closed WebSocket
-    // Code 1005 is reserved and should never be sent explicitly
-    try {
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CLOSING) {
-        // Use 1000 (normal closure) if we received a reserved code like 1005
-        const closeCode = (code === 1005 || code === 1006) ? 1000 : code;
-        ws.close(closeCode, 'Durable Object is closing WebSocket');
-      }
-    } catch (error) {
-      console.error('[BulkOperationDO] Error closing WebSocket:', error);
-    }
-  }
-
-  /**
-   * Handle WebSocket errors (Hibernation API)
-   */
-  async webSocketError(ws: WebSocket, error: unknown): Promise<void> {
-    console.error('[BulkOperationDO] WebSocket error:', error);
-    this.sessions.delete(ws);
-  }
-
-  /**
-   * Broadcast progress to all connected WebSocket clients
-   */
-  private broadcastProgress(progress: JobProgress): void {
-    const message = JSON.stringify(progress);
-    
-    this.state.getWebSockets().forEach((ws) => {
-      try {
-        ws.send(message);
-      } catch (error) {
-        console.error('[BulkOperationDO] Failed to send to client:', error);
-      }
-    });
+  private broadcastProgress(_progress: JobProgress): void {
+    // No-op: Frontend uses HTTP polling instead of WebSockets
+    // This method is kept to avoid refactoring all process methods
   }
 
   /**
@@ -204,7 +106,7 @@ export class BulkOperationDO {
       if (updates.status !== undefined) {
         setClauses.push('status = ?');
         values.push(updates.status);
-        if (updates.status === 'completed' || updates.status === 'failed' || updates.status === 'cancelled') {
+        if (updates.status === 'completed' || updates.status === 'failed') {
           setClauses.push('completed_at = CURRENT_TIMESTAMP');
         }
       }
@@ -238,66 +140,6 @@ export class BulkOperationDO {
   }
 
   /**
-   * Cancel a job
-   */
-  private async cancelJob(jobId: string): Promise<void> {
-    console.log('[BulkOperationDO] Cancelling job:', jobId);
-    this.cancelledJobs.add(jobId);
-    
-    // Acknowledge cancellation request via WebSocket
-    this.broadcastProgress({
-      jobId,
-      status: 'running',
-      progress: { total: 0, processed: 0, errors: 0, percentage: 0 }
-    });
-  }
-
-  /**
-   * Handle job cancellation - update DB, log event, broadcast
-   */
-  private async handleCancellation(
-    jobId: string,
-    userEmail: string,
-    processed: number,
-    errors: number,
-    total: number
-  ): Promise<void> {
-    const db = getD1Binding(this.env);
-    const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
-
-    // Update job status to cancelled
-    await this.updateJobInDB(jobId, {
-      status: 'cancelled',
-      processed_keys: processed,
-      error_count: errors,
-      percentage
-    });
-
-    // Log cancellation event
-    await logJobEvent(db, {
-      job_id: jobId,
-      event_type: 'cancelled',
-      user_email: userEmail,
-      details: JSON.stringify({ processed, errors, percentage, total })
-    });
-
-    // Broadcast cancelled status
-    this.broadcastProgress({
-      jobId,
-      status: 'cancelled',
-      progress: {
-        total,
-        processed,
-        errors,
-        percentage
-      }
-    });
-
-    // Clean up from cancelled jobs set
-    this.cancelledJobs.delete(jobId);
-  }
-
-  /**
    * Process bulk copy operation
    */
   async processBulkCopy(params: BulkCopyParams & { jobId: string }): Promise<void> {
@@ -327,13 +169,6 @@ export class BulkOperationDO {
 
       // Fetch all key values from source
       for (let i = 0; i < keys.length; i++) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[BulkOperationDO] Job cancelled during fetch phase:', jobId);
-          await this.handleCancellation(jobId, userEmail, i + 1, errorCount, keys.length);
-          return;
-        }
-
         const keyName = keys[i];
         
         try {
@@ -394,13 +229,6 @@ export class BulkOperationDO {
       let writeProcessed = 0;
 
       for (let i = 0; i < copyData.length; i += batchSize) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[BulkOperationDO] Job cancelled during write phase:', jobId);
-          await this.handleCancellation(jobId, userEmail, keys.length, errorCount, keys.length);
-          return;
-        }
-
         const batch = copyData.slice(i, i + batchSize);
 
         try {
@@ -551,13 +379,6 @@ export class BulkOperationDO {
 
       // Update TTL for each key
       for (let i = 0; i < keys.length; i++) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[BulkOperationDO] Job cancelled during TTL update:', jobId);
-          await this.handleCancellation(jobId, userEmail, i, errorCount, keys.length);
-          return;
-        }
-
         const keyName = keys[i];
         
         try {
@@ -725,13 +546,6 @@ export class BulkOperationDO {
       let lastMilestone = 0;
 
       for (let i = 0; i < keys.length; i++) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[BulkOperationDO] Job cancelled during bulk tag:', jobId);
-          await this.handleCancellation(jobId, userEmail, i, errorCount, keys.length);
-          return;
-        }
-
         const keyName = keys[i];
 
         try {
@@ -915,13 +729,6 @@ export class BulkOperationDO {
       const batchSize = 10000;
       
       for (let i = 0; i < keys.length; i += batchSize) {
-        // Check for cancellation
-        if (this.cancelledJobs.has(jobId)) {
-          console.log('[BulkOperationDO] Job cancelled during bulk delete:', jobId);
-          await this.handleCancellation(jobId, userEmail, processedCount, errorCount, keys.length);
-          return;
-        }
-
         const batch = keys.slice(i, i + batchSize);
 
         try {
