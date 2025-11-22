@@ -1,135 +1,44 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 21, 2025*
+*Version 1.0.0 | Last Updated: November 22, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
 **🎯 [Try the Live Demo](https://kv.adamic.tech/)** - See KV Manager in action
 
+**📚 [Full Documentation Wiki](https://github.com/neverinfamous/kv-manager/wiki)** - Complete guides and API reference
+
 **📰 [Read the v1.0.0 Release Article](https://adamic.tech/articles/2025-11-05-kv-manager-v1-0-0)** - Learn more about features, architecture, and deployment
 
-## Features
+## ✨ Key Features
 
-### Namespace Management
-- Create, delete, and rename KV namespaces
-- Browse namespaces with key counts and metadata
-- Export entire namespaces to JSON or NDJSON format
-- Import keys from JSON or NDJSON files
-- Namespace-level audit logging
+- **🗂️ Namespace & Key Management** - Full CRUD operations with cursor-based pagination
+- **📊 Dual Metadata System** - KV Native (1024 bytes) + D1 Custom (unlimited) metadata
+- **🏷️ Tag Organization** - Unlimited tags stored in D1 for easy filtering and search
+- **🔍 Advanced Search** - Cross-namespace search by key name, tags, and custom metadata
+- **⚡ Bulk Operations** - Process thousands of keys efficiently (delete, copy, TTL, tags)
+- **📥 Import/Export** - JSON/NDJSON support with collision handling
+- **☁️ R2 Backup & Restore** - Cloud-native backup with batch operations
+- **📈 Job History** - Complete audit trail with event timelines and advanced filtering
+- **🔐 Enterprise Auth** - Cloudflare Access (Zero Trust) integration
+- **🎨 Modern UI** - Dark/light themes, responsive design, built with React + Tailwind CSS
 
-### Key Operations
-- List keys with cursor-based pagination
-- Create, update, and delete individual keys
-- Full CRUD operations with dual metadata support
-- **TTL (expiration) management** - Minimum 60 seconds
-- **KV Native Metadata** - Up to 1024 bytes, stored in Cloudflare KV
-- **D1 Custom Metadata** - Unlimited size, stored in D1 database
-- Single-version backup and restore
+**[See Complete Feature List →](https://github.com/neverinfamous/kv-manager/wiki/Home#-what-is-kv-manager)**
 
-### Metadata & Tags
-- **KV Native Metadata**: Store up to 1024 bytes of JSON metadata directly in Cloudflare KV (retrieved with key value)
-- **D1 Custom Metadata**: Store unlimited JSON metadata in D1 database (searchable, no size limit)
-- **Tags (D1-Backed)**: Add unlimited tags to keys for organization and filtering
-- Search and filter by tags
-- Bulk tag operations (add/remove/replace)
-- Two separate metadata systems for different use cases
+## 🏗️ Architecture
 
-### Search & Discovery
-- Cross-namespace search by key name (partial matches)
-- Filter by specific namespaces
-- Filter by tags (multiple tag support)
-- Real-time search with debouncing
-- Quick navigation to search results
-- **Note**: Search queries D1 metadata (key names, tags, custom metadata) - not KV values
-
-### Bulk Operations
-- **Bulk Delete**: Remove multiple keys at once
-- **Bulk Copy**: Copy keys between namespaces
-- **Bulk TTL Update**: Set expiration on multiple keys
-- **Bulk Tag**: Apply tags to multiple keys
-- **Batch R2 Backup**: Back up multiple selected namespaces to R2 in a single operation
-- **Batch R2 Restore**: Restore multiple namespaces from R2 backups simultaneously
-- Progress tracking with job IDs and event history
-- Batch processing (10,000 keys per operation)
-
-### Import/Export
-- Export namespaces in JSON or NDJSON format
-- Auto-detect format on import
-- Collision handling (skip/overwrite/fail)
-- Progress tracking for large operations
-- Download exported data as files
-
-### R2 Backup & Restore
-- **Backup to R2**: Create full snapshots of namespaces directly to R2 storage
-- **Restore from R2**: Select and restore from available R2 backups
-- **Batch Backup to R2**: Back up multiple selected namespaces to R2 in a single operation
-- **Batch Restore from R2**: Restore multiple namespaces from R2 backups simultaneously
-- Organized storage: `backups/{namespaceId}/{timestamp}.json`
-- List all available backups with timestamps and sizes
-- Same format support as Import/Export (JSON/NDJSON)
-- Progress tracking identical to Import/Export operations
-- Multi-selection toolbar for batch operations with namespace checkboxes
-- No file downloads required - data stored securely in R2
-
-### Job History
-- **Job History UI** - View complete history of all bulk operations
-- Timeline visualization showing job lifecycle events
-- Filter jobs by status (completed, failed, cancelled, running, queued)
-- Filter by operation type (export, import, bulk delete, bulk copy, bulk TTL, bulk tag, R2 backup, R2 restore, batch R2 backup, batch R2 restore)
-- Advanced filters: namespace, date range, job ID search, error threshold
-- Multi-column sorting with ascending/descending order
-- Job cards displaying operation details, namespace, timestamps, and progress
-- Click any job to view detailed event timeline with milestones
-- "View History" button in progress dialog for immediate access
-- Pagination support for large job histories
-- User-specific history (only see your own jobs)
-
-### Audit Logging
-- Track all operations with user attribution
-- Filter by namespace or user
-- Filter by operation type
-- Pagination support
-- Export audit logs to CSV
-- Comprehensive operation tracking
-- **Job lifecycle event tracking** - Milestone events (started, 25%, 50%, 75%, completed/failed/cancelled) for all bulk operations
-- Event history API for job replay and debugging
-
-### User Interface
-- **Dark/Light Theme**: System, light, and dark theme support
-- **Navigation**: Switch between Namespaces, Search, Job History, and Audit Log views
-- **Responsive Design**: Works on desktop and mobile
-- **Modern UI**: Built with shadcn/ui components and Tailwind CSS
-
-## Architecture
-
-- **Frontend**: React 19.2.0 + TypeScript 5.9.3 + Vite 7.2.2 + Tailwind CSS 3.4.18 + shadcn/ui
-- **Backend**: Cloudflare Workers + KV + D1 (metadata) + R2 (backups) + Durable Objects (orchestration)
-- **Progress Tracking**: HTTP polling for job status (simple and reliable)
+- **Frontend**: React 19 + TypeScript 5.9 + Vite 7 + Tailwind CSS + shadcn/ui
+- **Backend**: Cloudflare Workers + KV + D1 + R2 + Durable Objects
 - **Auth**: Cloudflare Access (Zero Trust)
+- **Progress Tracking**: HTTP polling (no WebSockets)
 
-### Progress Tracking
+**[Architecture Details →](https://github.com/neverinfamous/kv-manager/wiki/Architecture)**
 
-All bulk operations (copy, delete, TTL updates, tag operations, import, export) use **HTTP polling** for progress updates:
-
-- **Async Processing**: Operations start immediately and process in background via Durable Objects
-- **Polling Updates**: Progress, current key, percentage, and errors retrieved via HTTP polling (1-second intervals)
-- **Job History**: Complete event timeline for every job with milestone tracking
-- **Progress Details**: See total keys, processed count, errors, current key being processed, and percentage completion
-- **Simple & Reliable**: No WebSocket connection issues or complexity
-
-## Docker Deployment
-
-**🐳 Quick Start with Docker**
-
-Pull the latest image:
+## 🐳 Docker Quick Start
 
 ```bash
 docker pull writenotenow/kv-manager:latest
-```
 
-Run the container:
-
-```bash
 docker run -d \
   -p 8787:8787 \
   -e ACCOUNT_ID=your_cloudflare_account_id \
@@ -140,517 +49,134 @@ docker run -d \
   writenotenow/kv-manager:latest
 ```
 
-Access at `http://localhost:8787`
+**[Full Docker Guide →](https://github.com/neverinfamous/kv-manager/wiki/Docker-Deployment)** - Docker Compose, Kubernetes, reverse proxy, security
 
-**📖 Full Docker Documentation:** See [DOCKER_README.md](./DOCKER_README.md) for complete deployment guides including:
-- Docker Compose configurations
-- Kubernetes deployments
-- Reverse proxy examples (Nginx, Traefik, Caddy)
-- Security best practices
-- Troubleshooting guide
+## 💻 Local Development
 
-## Local Development
+**Prerequisites:** Node.js 18+, Wrangler CLI
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- Wrangler CLI (`npm install -g wrangler`)
-
-### Setup
-
-1. **Install dependencies**:
 ```bash
+# Install dependencies
 npm install
-```
 
-2. **Create environment file**:
-```bash
-cp .env.example .env
-```
-
-3. **Initialize local D1 database**:
-```bash
+# Initialize D1 database
 npx wrangler d1 execute kv-manager-metadata-dev --local --file=worker/schema.sql
+
+# Start dev servers (2 terminals)
+npm run dev  # Terminal 1: Frontend (http://localhost:5173)
+npx wrangler dev --config wrangler.dev.toml --local  # Terminal 2: Worker (http://localhost:8787)
 ```
 
-4. **(Optional) Create R2 bucket for backups**:
-```bash
-npx wrangler r2 bucket create kv-manager-backups-dev
-```
+**Note:** Auth bypassed for localhost. Mock data provided without credentials.
 
-5. **Start the development servers**:
+**[Complete Setup Guide →](https://github.com/neverinfamous/kv-manager/wiki/Installation)**
 
-In Terminal 1, start the frontend:
+## 🚀 Production Deployment
 
 ```bash
-npm run dev
-```
-
-In Terminal 2, start the worker:
-
-```bash
-npx wrangler dev --config wrangler.dev.toml --local
-```
-
-6. **Access the application**:
-- Frontend: http://localhost:5173
-- Worker API: http://localhost:8787
-
-### Local Development Notes
-
-- Authentication is **bypassed** for localhost requests
-- Mock data is returned when no Cloudflare credentials are provided
-- No secrets required for local development
-- CORS is configured to allow `http://localhost:5173`
-- R2 backup features work in local mode with mock data if R2 bucket not configured
-
-## Production Deployment
-
-### Prerequisites
-
-- Cloudflare account
-- Domain (optional, can use workers.dev)
-- Cloudflare Access configured for your domain
-
-### Setup
-
-1. **Create production configuration**:
-```bash
-cp wrangler.toml.example wrangler.toml
-```
-
-2. **Create D1 database**:
-
-```bash
+# Create D1 database
 wrangler d1 create kv-manager-metadata
-```
 
-Copy the `database_id` from the output to your `wrangler.toml` file.
-
-3. **Initialize D1 schema**:
-
-For new installations:
-```bash
+# Initialize schema (new installation)
 wrangler d1 execute kv-manager-metadata --remote --file=worker/schema.sql
-```
 
-For existing installations (upgrading), run the migration:
-```bash
+# Or migrate (existing installation)
 wrangler d1 execute kv-manager-metadata --remote --file=worker/migrations/apply_all_migrations.sql
-```
 
-See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructions.
-
-4. **(Optional) Create R2 bucket for backups**:
-
-```bash
-wrangler r2 bucket create kv-manager-backups
-```
-
-Update the `bucket_name` in your `wrangler.toml` file to match the created bucket name.
-
-5. **Set secrets**:
-
-Set your Cloudflare Account ID:
-
-```bash
+# Set secrets
 wrangler secret put ACCOUNT_ID
-```
-
-Set your API Key:
-
-```bash
 wrangler secret put API_KEY
-```
-
-Set your Team Domain:
-
-```bash
 wrangler secret put TEAM_DOMAIN
-```
-
-Set your Policy AUD tag:
-
-```bash
 wrangler secret put POLICY_AUD
-```
 
-6. **Build and deploy**:
-
-Build the application:
-
-```bash
+# Build and deploy
 npm run build
-```
-
-Deploy to Cloudflare:
-
-```bash
 wrangler deploy
 ```
 
-### Production Notes
+**[Production Deployment Guide →](https://github.com/neverinfamous/kv-manager/wiki/Production-Deployment)** - Complete setup with Cloudflare Access configuration
 
-- All API requests require valid Cloudflare Access JWT
-- Audit logging captures all destructive operations
-- D1 stores metadata, tags, and audit logs
-- R2 stores backups organized by namespace and timestamp
-- Durable Objects handle bulk operations exceeding 10,000 keys
-- R2 backup/restore operations are optional; the app works without R2 configured
+## 📚 Documentation
 
-## API Endpoints
+### User Guides
+- **[User Guide](https://github.com/neverinfamous/kv-manager/wiki/User-Guide)** - Complete usage instructions
+- **[Namespace Management](https://github.com/neverinfamous/kv-manager/wiki/Namespace-Management)** - Creating, managing, and organizing namespaces
+- **[Key Operations](https://github.com/neverinfamous/kv-manager/wiki/Key-Operations)** - Working with keys and values
+- **[Metadata and Tags](https://github.com/neverinfamous/kv-manager/wiki/Metadata-and-Tags)** - Using dual metadata systems
+- **[Search and Discovery](https://github.com/neverinfamous/kv-manager/wiki/Search-and-Discovery)** - Finding keys across namespaces
+- **[Bulk Operations](https://github.com/neverinfamous/kv-manager/wiki/Bulk-Operations)** - Batch processing at scale
+- **[Import and Export](https://github.com/neverinfamous/kv-manager/wiki/Import-and-Export)** - Data migration
+- **[R2 Backup and Restore](https://github.com/neverinfamous/kv-manager/wiki/R2-Backup-and-Restore)** - Cloud backups
+- **[Job History](https://github.com/neverinfamous/kv-manager/wiki/Job-History)** - Monitoring operations
+- **[Audit Logging](https://github.com/neverinfamous/kv-manager/wiki/Audit-Logging)** - Compliance and tracking
 
-### Namespaces
-- `GET /api/namespaces` - List all namespaces
-- `POST /api/namespaces` - Create a new namespace
-- `DELETE /api/namespaces/:id` - Delete a namespace
-- `PATCH /api/namespaces/:id/rename` - Rename a namespace
-- `GET /api/namespaces/:id/info` - Get namespace information and statistics
+### Technical Documentation
+- **[API Reference](https://github.com/neverinfamous/kv-manager/wiki/API-Reference)** - Complete REST API documentation
+- **[Architecture](https://github.com/neverinfamous/kv-manager/wiki/Architecture)** - System design and components
+- **[Database Schema](https://github.com/neverinfamous/kv-manager/wiki/Database-Schema)** - D1 database structure
+- **[Authentication](https://github.com/neverinfamous/kv-manager/wiki/Authentication)** - Cloudflare Access integration
 
-### Keys
-- `GET /api/keys/:namespaceId/list` - List keys with cursor-based pagination
-- `GET /api/keys/:namespaceId/:keyName` - Get a key's value and metadata
-- `PUT /api/keys/:namespaceId/:keyName` - Create or update a key
-- `DELETE /api/keys/:namespaceId/:keyName` - Delete a key
-- `POST /api/keys/:namespaceId/bulk-delete` - Delete multiple keys
-- `POST /api/keys/:namespaceId/bulk-copy` - Copy keys to another namespace
-- `POST /api/keys/:namespaceId/bulk-ttl` - Update TTL on multiple keys
+### Deployment & Operations
+- **[Installation](https://github.com/neverinfamous/kv-manager/wiki/Installation)** - Local development setup
+- **[Production Deployment](https://github.com/neverinfamous/kv-manager/wiki/Production-Deployment)** - Deploy to Cloudflare Workers
+- **[Docker Deployment](https://github.com/neverinfamous/kv-manager/wiki/Docker-Deployment)** - Docker, Compose, Kubernetes
+- **[Migration Guide](https://github.com/neverinfamous/kv-manager/wiki/Migration-Guide)** - Upgrading from older versions
+- **[Troubleshooting](https://github.com/neverinfamous/kv-manager/wiki/Troubleshooting)** - Common issues and solutions
+- **[Security Best Practices](https://github.com/neverinfamous/kv-manager/wiki/Security-Best-Practices)** - Hardening your deployment
 
-### Metadata & Tags
-- `GET /api/metadata/:namespaceId/:keyName` - Get D1-backed metadata and tags
-- `PUT /api/metadata/:namespaceId/:keyName` - Update metadata and tags
-- `POST /api/metadata/:namespaceId/bulk-tag` - Apply tags to multiple keys (add/remove/replace)
+## 🗄️ Database
 
-### Search
-- `GET /api/search` - Search keys across namespaces by key name, tags, or custom metadata
-  - Query params: `query` (key name pattern), `namespaceId` (namespace filter), `tags` (comma-separated)
-  - **Note**: Only searches keys with metadata in D1; does not search KV values
+KV Manager uses Cloudflare D1 (SQLite) for metadata, tags, audit logs, and job tracking.
 
-### Backup & Restore
-- `POST /api/backup/:namespaceId/:keyName/undo` - Restore key to previous version
-- `GET /api/backup/:namespaceId/:keyName/check` - Check if backup exists
+**[Database Schema Documentation →](https://github.com/neverinfamous/kv-manager/wiki/Database-Schema)**
 
-### Import/Export
-- `GET /api/export/:namespaceId` - Start async export of namespace keys and values
-  - Query params: `format` (json|ndjson)
-  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
-- `POST /api/import/:namespaceId` - Start async import of keys into namespace
-  - Query params: `collision` (skip|overwrite|fail)
-  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
-- `GET /api/jobs/:jobId` - Get status of bulk job (polling endpoint - recommended)
-- `GET /api/jobs/:jobId/download` - Download completed export file
+## 🎨 User Interface
 
-### R2 Backup & Restore
-- `GET /api/r2-backup/:namespaceId/list` - List available R2 backups for a namespace
-  - Returns: Array of backup objects with path, timestamp, size, uploaded date
-- `POST /api/r2-backup/:namespaceId` - Start async backup to R2
-  - Query params: `format` (json|ndjson)
-  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
-- `POST /api/r2-restore/:namespaceId` - Start async restore from R2
-  - Body: `{ backupPath: string }`
-  - Returns: `job_id`, `status`, `ws_url` (ws_url provided for API compatibility, polling recommended)
+Modern, responsive design with dark/light theme support. Navigate between:
+- **Namespaces** - Browse and manage KV namespaces
+- **Search** - Cross-namespace key search
+- **Job History** - View bulk operations
+- **Audit Log** - Operation tracking
 
-### Job History
-- `GET /api/jobs` - Get paginated list of user's jobs
-  - Query params: 
-    - `limit`, `offset` - Pagination
-    - `status` - Filter by job status (completed, failed, cancelled, running, queued)
-    - `operation_type` - Filter by operation (export, import, bulk_copy, bulk_delete, bulk_ttl_update, bulk_tag, r2_backup, r2_restore)
-    - `namespace_id` - Filter by specific namespace
-    - `start_date`, `end_date` - Filter by date range (ISO timestamps)
-    - `job_id` - Search by job ID (partial match with LIKE)
-    - `min_errors` - Filter jobs with error_count >= threshold
-    - `sort_by` - Column to sort by (started_at, completed_at, total_keys, error_count, percentage)
-    - `sort_order` - Sort direction (asc or desc, default: desc)
-  - Returns: Job list with metadata, progress, and timestamps
-- `GET /api/jobs/:jobId/events` - Get lifecycle event history for a job
-  - Returns: Chronological list of events (started, progress_25, progress_50, progress_75, completed/failed/cancelled)
-  - Use case: Job history UI, debugging, event replay
+## 🔐 Security
 
-### Audit Logs
-- `GET /api/audit/:namespaceId` - Get audit log for a namespace
-  - Query params: `limit`, `offset`, `operation`
-- `GET /api/audit/user/:userEmail` - Get audit log for a specific user
-  - Query params: `limit`, `offset`, `operation`
-
-### Admin Utilities
-- `POST /api/admin/sync-keys/:namespaceId` - Sync all keys in a namespace to search index
-  - Creates metadata entries for keys that don't have them
-  - Useful for indexing keys created outside the UI (via API, CLI, etc.)
-  - Returns: Total keys found and number successfully synced
-
-## Database Schema
-
-The D1 database (`kv-manager-metadata`) stores:
-
-### Tables
-
-#### `key_metadata`
-- Stores tags and custom metadata for keys
-- JSON fields for flexible schema
-- Indexed by `namespace_id` and `key_name`
-
-#### `audit_log`
-- Tracks all operations (create, update, delete, bulk operations)
-- User attribution via email
-- Timestamp, operation type, and details
-- Indexed for efficient querying
-
-#### `job_audit_events`
-- Tracks lifecycle events for all bulk jobs (started, progress_25, progress_50, progress_75, completed, failed, cancelled)
-- Stores detailed JSON metadata for each event (processed counts, error counts, percentages)
-- Foreign key relationship to `bulk_jobs` table
-- Indexed by `job_id` and `user_email` for efficient querying
-- Foundation for job history and event replay functionality
-
-#### `bulk_jobs`
-- Tracks import/export and bulk operation progress
-- Status tracking (queued, running, completed, failed)
-- Progress counters (total, processed, errors)
-- Job metadata and timestamps
-
-#### `namespace_metadata`
-- First and last accessed timestamps
-- Namespace-level statistics
-
-See `worker/schema.sql` for the complete schema definition.
-
-## User Interface
-
-### Navigation
-- **Namespaces View**: Browse and manage KV namespaces
-- **Search View**: Cross-namespace key search with filters
-- **Job History View**: View all bulk operations with event timelines
-- **Audit Log View**: Operation history and tracking
-
-### Theme Support
-- **System** (default): Follows OS preference
-- **Light**: Light mode
-- **Dark**: Dark mode
-
-Theme preference is stored in localStorage and persists across sessions.
-
-## Security
-
-- Cloudflare Access JWT validation on all API requests
+- Cloudflare Access JWT validation on all production API requests
 - Auth bypassed for localhost development
-- All KV operations require valid auth token
-- Audit logging of all destructive operations
+- Comprehensive audit logging
 - Protected namespaces hidden from UI
 
-## Usage Guide
+**[Security Best Practices →](https://github.com/neverinfamous/kv-manager/wiki/Security-Best-Practices)**
 
-### Managing Namespaces
-1. View all namespaces on the main page
-2. Click **Create Namespace** to add a new one
-3. Use **Export** to download namespace data (JSON/NDJSON)
-4. Use **Import** to upload keys from a file
-5. Click **Browse Keys** to view namespace contents
-6. Use the three-dot menu for rename/delete operations
+## 🆘 Troubleshooting
 
-### Working with Keys
-1. Browse keys in a namespace with pagination
-2. Click **Add Key** to create a new key-value pair
-3. Select multiple keys using checkboxes for bulk operations
-4. Edit individual keys by clicking on them
-5. View and modify TTL (expiration) settings - **minimum 60 seconds**
-6. Add **KV Native Metadata** (1024 byte limit) and **D1 Custom Metadata** (unlimited) in the "Metadata & Tags" tab
-7. Apply tags for organization and searchability
+**Common issues:**
+- **Worker not starting** - Ensure Wrangler is installed, Node 18+
+- **Frontend connection issues** - Verify `VITE_WORKER_API` in `.env`
+- **D1 errors** - Reinitialize with `worker/schema.sql`
+- **Search not working** - Keys need D1 metadata (auto-indexed when created via UI)
 
-### Bulk Operations
-1. Select multiple keys using checkboxes
-2. Choose from available bulk actions:
-   - **Copy to Namespace**: Duplicate keys to another namespace
-   - **Update TTL**: Set expiration time on selected keys
-   - **Apply Tags**: Add, remove, or replace tags
-   - **Delete Selected**: Remove multiple keys at once
-3. Monitor progress with job status tracking via polling
+**[Complete Troubleshooting Guide →](https://github.com/neverinfamous/kv-manager/wiki/Troubleshooting)**
 
-### R2 Backup & Restore
-1. **Creating Backups**:
-   - Click **Backup to R2** on any namespace card
-   - Select format (JSON or NDJSON)
-   - Monitor progress via job tracking
-   - Backups are stored in R2 at `backups/{namespaceId}/{timestamp}.json`
+## 🤝 Contributing
 
-2. **Restoring from Backups**:
-   - Click **Restore from R2** on any namespace card
-   - View list of available backups with timestamps and sizes
-   - Select a backup to restore
-   - Monitor progress via job tracking
-   - All keys are restored with overwrite behavior (existing keys are replaced)
+Contributions are welcome! Please see **[CONTRIBUTING.md](./CONTRIBUTING.md)** for guidelines.
 
-3. **Notes**:
-   - Backups include all key-value pairs, metadata, tags, and TTLs
-   - Restores behave identically to Import operations
-   - No collision strategy options (always overwrites)
-   - Requires R2 bucket to be configured in `wrangler.toml`
+**[Contributing Guide →](https://github.com/neverinfamous/kv-manager/wiki/Contributing)**
 
-### Searching
-1. Click **Search** in the navigation bar
-2. Enter a key name pattern (supports partial matches)
-3. Filter by specific namespace (optional)
-4. Filter by tags (comma-separated, optional)
-5. Click any result to navigate to that key
+## 📄 License
 
-**Important Notes**:
-- **Key Name Search**: Searches the key NAME (not namespace names or values). Example: searching "meta" finds keys like "meta:test", "metadata:config", etc.
-- **Tag Search**: You can search by tags alone (leave key name empty) or combine with key name search
-- **Automatic Indexing**: All keys created or updated through the UI are automatically indexed for search
-- **External Keys**: Keys created outside the UI (via API, CLI, etc.) won't appear in search until they're viewed/edited in the UI or have metadata added
+MIT License - see [LICENSE](./LICENSE) for details
 
-### Job History
-1. Click **Job History** in the navigation bar
-2. View all your bulk operations (import, export, bulk delete, etc.)
-3. Use advanced filters to find specific jobs:
-   - **Status Filter**: Filter by completed, failed, cancelled, running, or queued
-   - **Operation Type**: Filter by export, import, bulk copy, bulk delete, bulk TTL, or bulk tag
-   - **Namespace Filter**: Filter jobs by specific namespace
-   - **Date Range**: Select preset ranges (Last 24h, Last 7 days, Last 30 days) or custom date range
-   - **Job ID Search**: Search for jobs by their ID (partial matches supported)
-   - **Min Errors**: Filter jobs with a minimum error count threshold
-4. Sort results by:
-   - Started At (default)
-   - Completed At
-   - Total Keys
-   - Error Count
-   - Progress Percentage
-5. Toggle sort order between ascending and descending
-6. Click **Clear All Filters** to reset all filters to defaults
-7. Click any job card to view detailed event timeline
-8. See milestone events: started → 25% → 50% → 75% → completed
-9. After any bulk operation completes, click **View History** in the progress dialog
+## 💬 Support
 
-### Audit Logs
-1. Click **Audit Log** in the navigation bar
-2. Select a namespace to view its operation history
-3. Filter by operation type (create, update, delete, etc.)
-4. Use pagination to browse historical entries
-5. Export logs to CSV for external analysis
+- **🐛 Issues:** [GitHub Issues](https://github.com/neverinfamous/kv-manager/issues)
+- **💭 Discussions:** [GitHub Discussions](https://github.com/neverinfamous/kv-manager/discussions)
+- **📧 Email:** admin@adamic.tech
 
-### Import/Export with Metadata
+## ⭐ Show Your Support
 
-When importing keys via JSON or NDJSON, you can include multiple types of metadata:
-
-```json
-[
-  {
-    "name": "example-key",
-    "value": "example-value",
-    "ttl": 600,
-    "metadata": {
-      "type": "example",
-      "source": "import"
-    },
-    "custom_metadata": {
-      "extended_info": "large data here",
-      "description": "detailed information"
-    },
-    "tags": ["production", "important"]
-  }
-]
-```
-
-**Field Descriptions:**
-- `name` (required): Key name
-- `value` (required): Key value
-- `ttl` (optional): Time-to-live in seconds (minimum 60). Alternative: `expiration_ttl`
-- `expiration` (optional): Unix timestamp for absolute expiration
-- `metadata` (optional): **KV Native Metadata** - Stored in Cloudflare KV (1024 byte limit)
-- `custom_metadata` (optional): **D1 Custom Metadata** - Stored in D1 database (no size limit, searchable)
-- `tags` (optional): Array of tags stored in D1 for organization and search
-
-**Important Notes:**
-- `metadata` field → Stored in Cloudflare KV as native metadata (fast access, size limited)
-- `custom_metadata` field → Stored in D1 database (searchable, no size limit)
-- Both metadata types can be used simultaneously
-- Export operations include both KV native metadata and D1 tags/custom metadata
-
-### Syncing Existing Keys for Search
-If you have keys created outside the UI (via API, CLI, etc.) that don't appear in search:
-
-1. Use the sync endpoint to index them:
-   ```bash
-   curl -X POST https://your-domain.com/api/admin/sync-keys/{namespaceId}
-   ```
-2. All keys in the namespace will be indexed for search
-3. Keys with existing metadata won't be affected
-4. Future keys created through the UI are automatically indexed
-
-## Troubleshooting
-
-### Worker not starting
-
-Ensure `wrangler` is installed:
-
-```bash
-npm install -g wrangler
-```
-
-Check Node.js version (18+ required):
-
-```bash
-node --version
-```
-
-Try clearing Wrangler cache:
-
-```bash
-rm -rf ~/.wrangler
-```
-
-### Frontend not connecting to worker
-- Verify `VITE_WORKER_API` in `.env` points to `http://localhost:8787`
-- Check CORS configuration in `worker/utils/cors.ts`
-- Ensure both dev servers are running
-
-### D1 database errors
-
-Reinitialize the schema:
-
-```bash
-npx wrangler d1 execute kv-manager-metadata-dev --local --file=worker/schema.sql
-```
-
-Check D1 binding in `wrangler.dev.toml`
-
-Verify database exists:
-
-```bash
-npx wrangler d1 list
-```
-
-### Mock data not appearing
-- Mock data is only returned when `ACCOUNT_ID` and `API_KEY` are not set
-- Check console logs for `[Auth] Localhost detected, skipping JWT validation`
-- Ensure worker is running with `--local` flag
-
-### Import/Export issues
-- Verify file format is valid JSON or NDJSON
-- Check file size (large imports may take time)
-- Monitor job status using the returned `job_id`
-- Check browser console for detailed error messages
-
-### Search not returning results
-- Ensure metadata exists in D1 database
-- Check that keys have been tagged (if filtering by tags)
-- Verify D1 database is properly initialized
-- Try searching without filters first
-
-### Progress tracking issues
-- All progress tracking uses HTTP polling (no WebSocket connections)
-- Jobs poll for status every second until completion
-- Check browser console for API errors if progress isn't updating
-- Verify D1 database has the required tables (see MIGRATION_GUIDE.md)
-- For development, ensure worker is running on expected port (default: 8787)
+If you find KV Manager useful, please consider giving it a star on GitHub!
 
 ---
 
-## License
-
-MIT
-
-## Contributing
-
-Contributions welcome! Please open an issue or PR.
+**Made with ❤️ for the Cloudflare community**
