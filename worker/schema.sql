@@ -48,7 +48,8 @@ CREATE TABLE bulk_jobs (
   percentage REAL DEFAULT 0, -- Progress percentage (0-100)
   started_at DATETIME,
   completed_at DATETIME,
-  user_email TEXT
+  user_email TEXT,
+  metadata TEXT -- JSON object for operation-specific data (e.g., namespace IDs for batch operations)
 );
 
 CREATE INDEX idx_bulk_jobs_status ON bulk_jobs(status, started_at DESC);

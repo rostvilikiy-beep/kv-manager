@@ -6,6 +6,28 @@
 
 ## 🆕 Unreleased Features
 
+### Batch R2 Backup & Restore
+Multi-namespace backup and restore operations to/from R2 for efficient bulk management:
+
+- **Batch Backup Selected to R2** - Back up multiple selected namespaces to R2 in a single operation
+- **Batch Restore Selected from R2** - Restore multiple namespaces from R2 backups simultaneously
+- **Namespace Selection Toolbar** - New action buttons appear when namespaces are selected:
+  - "Backup Selected to R2" button with format selection (JSON/NDJSON)
+  - "Restore Selected from R2" button with per-namespace backup selection
+  - "Deselect All" button to clear selection
+- **Progress Tracking** - Real-time progress showing namespace count and completion percentage
+- **Per-Namespace Processing** - Each namespace processed sequentially with individual audit logging
+- **Error Handling** - Partial failures allowed; job completes even if some namespaces fail
+- **Job History Integration** - Operations appear as `batch_r2_backup` and `batch_r2_restore` types
+
+**New API Endpoints:**
+- `POST /api/r2-backup/batch` - Start batch backup of multiple namespaces
+- `POST /api/r2-restore/batch` - Start batch restore of multiple namespaces with backup path mapping
+
+**Database Migration Required:**
+- Migration 003 adds `metadata` column to `bulk_jobs` table for storing batch operation details
+- See [MIGRATION_GUIDE.md](../MIGRATION_GUIDE.md) for instructions
+
 ### R2 Backup & Restore
 Complete R2 integration for secure namespace backups directly to Cloudflare R2 storage:
 

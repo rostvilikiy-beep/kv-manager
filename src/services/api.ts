@@ -619,6 +619,55 @@ class APIService {
   }
 
   /**
+   * Batch backup multiple namespaces to R2 (async with job tracking)
+   */
+  async batchBackupToR2(
+    namespaceIds: string[], 
+    format: 'json' | 'ndjson' = 'json'
+  ): Promise<BulkJobResponse> {
+    const response = await fetch(
+      `${WORKER_API}/api/r2-backup/batch?format=${format}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ namespace_ids: namespaceIds })
+      }
+    )
+    
+    await this.handleResponse(response);
+    
+    const data = await response.json()
+    return data.result
+  }
+
+  /**
+   * Batch restore multiple namespaces from R2 backups (async with job tracking)
+   */
+  async batchRestoreFromR2(
+    restoreMap: Record<string, string>
+  ): Promise<BulkJobResponse> {
+    const response = await fetch(
+      `${WORKER_API}/api/r2-restore/batch`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ restore_map: restoreMap })
+      }
+    )
+    
+    await this.handleResponse(response);
+    
+    const data = await response.json()
+    return data.result
+  }
+
+  /**
    * Get audit log for namespace
    */
   async getAuditLog(

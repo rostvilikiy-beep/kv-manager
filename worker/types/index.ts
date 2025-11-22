@@ -173,6 +173,17 @@ export interface R2RestoreParams {
   userEmail: string
 }
 
+export interface BatchR2BackupParams {
+  namespaceIds: string[]
+  format: 'json' | 'ndjson'
+  userEmail: string
+}
+
+export interface BatchR2RestoreParams {
+  restoreMap: Record<string, string> // namespace_id -> backup_path
+  userEmail: string
+}
+
 export interface R2BackupListItem {
   path: string
   timestamp: number

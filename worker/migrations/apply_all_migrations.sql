@@ -33,3 +33,11 @@ ALTER TABLE bulk_jobs ADD COLUMN current_key TEXT;
 -- Add percentage column (stores progress percentage 0-100)
 ALTER TABLE bulk_jobs ADD COLUMN percentage REAL DEFAULT 0;
 
+-- ============================================================================
+-- Migration 003: Add metadata column to bulk_jobs
+-- ============================================================================
+
+-- Add metadata column (stores job-specific metadata in JSON format)
+-- Used for batch operations to store array of namespace IDs and other operation-specific data
+ALTER TABLE bulk_jobs ADD COLUMN metadata TEXT;
+

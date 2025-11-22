@@ -95,6 +95,14 @@ export default function App() {
   const [selectedR2Backup, setSelectedR2Backup] = useState('')
   const [loadingR2Backups, setLoadingR2Backups] = useState(false)
 
+  // Batch R2 backup/restore state
+  const [showBatchR2BackupDialog, setShowBatchR2BackupDialog] = useState(false)
+  const [showBatchR2RestoreDialog, setShowBatchR2RestoreDialog] = useState(false)
+  const [batchR2BackupFormat, setBatchR2BackupFormat] = useState<'json' | 'ndjson'>('json')
+  const [batchR2RestoreNamespaceBackups, setBatchR2RestoreNamespaceBackups] = useState<Map<string, R2BackupListItem[]>>(new Map())
+  const [batchR2RestoreSelections, setBatchR2RestoreSelections] = useState<Map<string, string>>(new Map())
+  const [loadingBatchR2Backups, setLoadingBatchR2Backups] = useState(false)
+
   // Bulk operations state (copy, TTL, tags)
   const [showBulkCopyDialog, setShowBulkCopyDialog] = useState(false)
   const [showBulkTTLDialog, setShowBulkTTLDialog] = useState(false)
@@ -510,6 +518,82 @@ export default function App() {
     }
   }
 
+  // Batch R2 operations handlers
+  const handleBatchR2Backup = async () => {
+    if (selectedNamespaces.length === 0) return
+    
+    try {
+      setExporting(true)
+      setError('')
+      const result = await api.batchBackupToR2(selectedNamespaces, batchR2BackupFormat)
+      setShowBatchR2BackupDialog(false)
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Batch Backup to R2')
+      setProgressNamespace(`${selectedNamespaces.length} namespaces`)
+      setShowProgressDialog(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start batch R2 backup')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const openBatchR2RestoreDialog = async () => {
+    if (selectedNamespaces.length === 0) return
+    
+    setLoadingBatchR2Backups(true)
+    setShowBatchR2RestoreDialog(true)
+    
+    // Load backups for all selected namespaces
+    const backupsMap = new Map<string, R2BackupListItem[]>()
+    try {
+      await Promise.all(
+        selectedNamespaces.map(async (nsId) => {
+          const backups = await api.listR2Backups(nsId)
+          backupsMap.set(nsId, backups)
+        })
+      )
+      setBatchR2RestoreNamespaceBackups(backupsMap)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load backups')
+    } finally {
+      setLoadingBatchR2Backups(false)
+    }
+  }
+
+  const handleBatchR2Restore = async () => {
+    if (batchR2RestoreSelections.size === 0) return
+    
+    try {
+      setImporting(true)
+      setError('')
+      
+      // Build restore map from selections
+      const restoreMap: Record<string, string> = {}
+      batchR2RestoreSelections.forEach((backupPath, namespaceId) => {
+        restoreMap[namespaceId] = backupPath
+      })
+      
+      const result = await api.batchRestoreFromR2(restoreMap)
+      setShowBatchR2RestoreDialog(false)
+      setBatchR2RestoreSelections(new Map())
+      
+      // Open progress dialog
+      setProgressJobId(result.job_id)
+      setProgressWsUrl(result.ws_url)
+      setProgressOperationName('Batch Restore from R2')
+      setProgressNamespace(`${Object.keys(restoreMap).length} namespaces`)
+      setShowProgressDialog(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start batch R2 restore')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   // Bulk operations handlers
   const handleBulkCopy = async () => {
     if (!bulkTargetNamespace || selectedKeys.length === 0 || currentView.type !== 'namespace') return
@@ -730,18 +814,43 @@ export default function App() {
                     {selectedNamespaces.length} namespace{selectedNamespaces.length !== 1 ? 's' : ''} selected
                   </span>
                 </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleBulkDeleteNamespaces}
-                  disabled={deleting}
-                >
-                  {deleting ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Deleting...</>
-                  ) : (
-                    <><Trash2 className="h-4 w-4 mr-2" /> Delete Selected</>
-                  )}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowBatchR2BackupDialog(true)}
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    Backup Selected to R2
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={openBatchR2RestoreDialog}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Restore Selected from R2
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedNamespaces([])}
+                  >
+                    Deselect All
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDeleteNamespaces}
+                    disabled={deleting}
+                  >
+                    {deleting ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Deleting...</>
+                    ) : (
+                      <><Trash2 className="h-4 w-4 mr-2" /> Delete Selected</>
+                    )}
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -1462,6 +1571,121 @@ export default function App() {
             <Button onClick={handleR2Restore} disabled={importing || !selectedR2Backup}>
               {importing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Restore from R2
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Batch R2 Backup Dialog */}
+      <Dialog open={showBatchR2BackupDialog} onOpenChange={setShowBatchR2BackupDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Batch Backup to R2</DialogTitle>
+            <DialogDescription>
+              Create backups of {selectedNamespaces.length} selected namespace{selectedNamespaces.length !== 1 ? 's' : ''} in R2 storage.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Backup Format</Label>
+              <Select value={batchR2BackupFormat} onValueChange={(v) => setBatchR2BackupFormat(v as 'json' | 'ndjson')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="json">JSON (Array format)</SelectItem>
+                  <SelectItem value="ndjson">NDJSON (Line-delimited)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Selected namespaces:
+              <ul className="mt-2 space-y-1">
+                {selectedNamespaces.map(nsId => {
+                  const ns = namespaces.find(n => n.id === nsId)
+                  return <li key={nsId} className="font-mono text-xs">• {ns?.title || nsId}</li>
+                })}
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBatchR2BackupDialog(false)} disabled={exporting}>
+              Cancel
+            </Button>
+            <Button onClick={handleBatchR2Backup} disabled={exporting}>
+              {exporting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Backup {selectedNamespaces.length} Namespace{selectedNamespaces.length !== 1 ? 's' : ''}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Batch R2 Restore Dialog */}
+      <Dialog open={showBatchR2RestoreDialog} onOpenChange={setShowBatchR2RestoreDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Batch Restore from R2</DialogTitle>
+            <DialogDescription>
+              Select backups to restore for each namespace. This will overwrite existing keys.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {loadingBatchR2Backups ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {selectedNamespaces.map(nsId => {
+                  const ns = namespaces.find(n => n.id === nsId)
+                  const backups = batchR2RestoreNamespaceBackups.get(nsId) || []
+                  const selectedBackup = batchR2RestoreSelections.get(nsId)
+                  
+                  return (
+                    <div key={nsId} className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">{ns?.title || nsId}</h4>
+                      {backups.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No backups found</p>
+                      ) : (
+                        <Select 
+                          value={selectedBackup || ''} 
+                          onValueChange={(value) => {
+                            setBatchR2RestoreSelections(prev => {
+                              const newMap = new Map(prev)
+                              if (value) {
+                                newMap.set(nsId, value)
+                              } else {
+                                newMap.delete(nsId)
+                              }
+                              return newMap
+                            })
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a backup..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {backups.map(backup => (
+                              <SelectItem key={backup.path} value={backup.path}>
+                                {new Date(backup.uploaded).toLocaleString()} ({(backup.size / 1024).toFixed(2)} KB)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBatchR2RestoreDialog(false)} disabled={importing}>
+              Cancel
+            </Button>
+            <Button onClick={handleBatchR2Restore} disabled={importing || batchR2RestoreSelections.size === 0}>
+              {importing && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Restore {batchR2RestoreSelections.size} Namespace{batchR2RestoreSelections.size !== 1 ? 's' : ''}
             </Button>
           </DialogFooter>
         </DialogContent>

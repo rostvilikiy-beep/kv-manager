@@ -390,11 +390,11 @@ export async function handleKeyRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Keys] Starting bulk delete processing in DO for job:', jobId);
+
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Keys] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Keys] Bulk delete DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {
@@ -470,11 +470,11 @@ export async function handleKeyRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Keys] Starting bulk copy processing in DO for job:', jobId);
+
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Keys] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Keys] Bulk copy DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {
@@ -550,11 +550,11 @@ export async function handleKeyRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Keys] Starting bulk TTL processing in DO for job:', jobId);
+
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Keys] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Keys] Bulk TTL DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {

@@ -1,6 +1,6 @@
 # Cloudflare KV Manager
 
-*Last Updated: November 18, 2025*
+*Last Updated: November 21, 2025*
 
 A modern, full-featured web application for managing Cloudflare Workers KV namespaces and keys, with enterprise-grade authentication via Cloudflare Access Zero Trust.
 
@@ -47,6 +47,8 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 - **Bulk Copy**: Copy keys between namespaces
 - **Bulk TTL Update**: Set expiration on multiple keys
 - **Bulk Tag**: Apply tags to multiple keys
+- **Batch R2 Backup**: Back up multiple selected namespaces to R2 in a single operation
+- **Batch R2 Restore**: Restore multiple namespaces from R2 backups simultaneously
 - Progress tracking with job IDs and event history
 - Batch processing (10,000 keys per operation)
 
@@ -60,17 +62,22 @@ A modern, full-featured web application for managing Cloudflare Workers KV names
 ### R2 Backup & Restore
 - **Backup to R2**: Create full snapshots of namespaces directly to R2 storage
 - **Restore from R2**: Select and restore from available R2 backups
+- **Batch Backup to R2**: Back up multiple selected namespaces to R2 in a single operation
+- **Batch Restore from R2**: Restore multiple namespaces from R2 backups simultaneously
 - Organized storage: `backups/{namespaceId}/{timestamp}.json`
 - List all available backups with timestamps and sizes
 - Same format support as Import/Export (JSON/NDJSON)
 - Progress tracking identical to Import/Export operations
+- Multi-selection toolbar for batch operations with namespace checkboxes
 - No file downloads required - data stored securely in R2
 
 ### Job History
 - **Job History UI** - View complete history of all bulk operations
 - Timeline visualization showing job lifecycle events
 - Filter jobs by status (completed, failed, cancelled, running, queued)
-- Filter by operation type (export, import, bulk delete, bulk copy, bulk TTL, bulk tag, R2 backup, R2 restore)
+- Filter by operation type (export, import, bulk delete, bulk copy, bulk TTL, bulk tag, R2 backup, R2 restore, batch R2 backup, batch R2 restore)
+- Advanced filters: namespace, date range, job ID search, error threshold
+- Multi-column sorting with ascending/descending order
 - Job cards displaying operation details, namespace, timestamps, and progress
 - Click any job to view detailed event timeline with milestones
 - "View History" button in progress dialog for immediate access
@@ -637,12 +644,6 @@ npx wrangler d1 list
 - Check browser console for API errors if progress isn't updating
 - Verify D1 database has the required tables (see MIGRATION_GUIDE.md)
 - For development, ensure worker is running on expected port (default: 8787)
-
----
-
-### Future Enhancements:
-1. R2 backup integration
-2. Batch operations to R2
 
 ---
 

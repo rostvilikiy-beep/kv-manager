@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Batch R2 Backup & Restore**: Multi-namespace backup and restore operations to/from R2
+  - **Batch Backup Selected to R2**: Back up multiple selected namespaces to R2 in a single operation
+  - **Batch Restore Selected from R2**: Restore multiple namespaces from R2 backups simultaneously
+  - New batch action toolbar buttons when namespaces are selected
+  - Format selection (JSON/NDJSON) for batch backups
+  - Per-namespace backup selection in batch restore dialog
+  - Progress tracking for batch operations with namespace count
+  - Individual audit log entries for each namespace in batch
+  - Job history integration with `batch_r2_backup` and `batch_r2_restore` operation types
+  - Two new API endpoints:
+    - `POST /api/r2-backup/batch` - Start batch backup of multiple namespaces
+    - `POST /api/r2-restore/batch` - Start batch restore of multiple namespaces
+  - Batch processing with progress updates and error handling per namespace
+  - Metadata column added to `bulk_jobs` table for storing batch operation details
+
 - **R2 Backup & Restore**: Complete R2 integration for namespace backups
   - **Backup to R2**: Create full snapshots of namespaces directly to R2 storage
   - **Restore from R2**: Select and restore from available R2 backups via UI
@@ -80,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Database Schema**: Added missing columns to production databases
   - Created migrations for `job_audit_events` table
   - Created migrations for `current_key` and `percentage` columns in `bulk_jobs`
-  - Both migrations are idempotent and safe to run multiple times
+  - Created migration for `metadata` column in `bulk_jobs` (required for batch operations)
+  - All migrations are idempotent and safe to run multiple times
   - Migration guide provided at [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)
 
 ### Technical Improvements
@@ -247,6 +263,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cancel button component in `BulkProgressDialog` with appropriate disabled states and visual feedback
 
 ### Fixed
+- **Bulk Operations Job Completion**: Fixed bulk operations never completing due to Durable Object not being invoked
+  - Changed fire-and-forget pattern to `await stub.fetch(doRequest)` in all bulk operation routes
+  - Affects bulk delete, bulk copy, bulk TTL, and bulk tag operations
+  - Jobs now properly transition from "queued" to "running" to "completed"/"failed"
+  - Added logging for Durable Object invocation status
+
+- **CRITICAL**: HTTP polling rate limit errors causing 429 responses
+  - Implemented exponential backoff for polling intervals on 429 errors
+  - Increased base polling interval from 1s to 2s
+  - Dynamic interval adjustment: increases by 3s on rate limit (up to 10s max)
+  - Interval resets to 2s on successful polls
+  - Rate limit errors handled silently (no user-facing error messages)
+  - Fixed React hooks dependency loop causing multiple polling instances
+  - Used `useRef` for callbacks to prevent unnecessary effect re-runs
+  - Added guard to prevent multiple interval timers from being created
+
 - **CRITICAL**: WebSocket connection loop causing 429 rate limit errors
   - Added parameter validation in `useBulkJobProgress` hook to prevent connection attempts with empty jobId or wsUrl
   - Added conditional guard in `BulkProgressDialog` to only invoke hook when dialog is open and has valid parameters

@@ -174,7 +174,7 @@ export async function handleMetadataRoutes(
       const id = env.BULK_OPERATION_DO.idFromName(jobId);
       const stub = env.BULK_OPERATION_DO.get(id);
 
-      // Fire and forget - start processing in DO
+      // Start processing in DO
       const doRequest = new Request(`https://do/process/bulk-tag`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -188,11 +188,11 @@ export async function handleMetadataRoutes(
         })
       });
 
-      // Don't await - let it process in background
+      console.log('[Metadata] Starting bulk tag processing in DO for job:', jobId);
+
       // @ts-expect-error - Request types are compatible at runtime
-      stub.fetch(doRequest).catch(err => {
-        console.error('[Metadata] DO processing error:', err);
-      });
+      const doResponse = await stub.fetch(doRequest);
+      console.log('[Metadata] Bulk tag DO processing initiated, response status:', doResponse.status);
 
       // Return immediately with job info
       const response: APIResponse = {

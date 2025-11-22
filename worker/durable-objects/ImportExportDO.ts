@@ -1,5 +1,5 @@
 import type { DurableObjectState } from '@cloudflare/workers-types';
-import type { Env, JobProgress, ImportParams, ExportParams, R2BackupParams, R2RestoreParams } from '../types';
+import type { Env, JobProgress, ImportParams, ExportParams, R2BackupParams, R2RestoreParams, BatchR2BackupParams, BatchR2RestoreParams } from '../types';
 import { createCfApiRequest, getD1Binding, auditLog, logJobEvent } from '../utils/helpers';
 
 interface SessionAttachment {
@@ -70,6 +70,14 @@ export class ImportExportDO {
           case 'r2-restore':
             console.log('[ImportExportDO] Starting R2 restore process');
             await this.processR2Restore(body as R2RestoreParams & { jobId: string });
+            break;
+          case 'batch-r2-backup':
+            console.log('[ImportExportDO] Starting batch R2 backup process');
+            await this.processBatchR2Backup(body as BatchR2BackupParams & { jobId: string });
+            break;
+          case 'batch-r2-restore':
+            console.log('[ImportExportDO] Starting batch R2 restore process');
+            await this.processBatchR2Restore(body as BatchR2RestoreParams & { jobId: string });
             break;
           default:
             console.log('[ImportExportDO] Unknown job type:', jobType);
@@ -1362,5 +1370,357 @@ export class ImportExportDO {
         details: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })
       });
     }
+  }
+
+  /**
+   * Process batch R2 backup - backup multiple namespaces
+   */
+  private async processBatchR2Backup(params: BatchR2BackupParams & { jobId: string }): Promise<void> {
+    const { jobId, namespaceIds, format, userEmail } = params;
+    const db = getD1Binding(this.env);
+
+    console.log(`[ImportExportDO] Starting batch R2 backup job ${jobId} for ${namespaceIds.length} namespaces`);
+
+    // Update job status to running
+    if (db) {
+      await db.prepare(
+        'UPDATE bulk_jobs SET status = ?, processed_keys = 0, error_count = 0 WHERE job_id = ?'
+      ).bind('running', jobId).run();
+      
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({
+          total: namespaceIds.length,
+          namespaces: namespaceIds
+        })
+      });
+    }
+
+    let processed = 0;
+    let errors = 0;
+    const errorDetails: string[] = [];
+
+    // Process each namespace sequentially
+    for (const namespaceId of namespaceIds) {
+      if (this.cancelledJobs.has(jobId)) {
+        console.log(`[ImportExportDO] Job ${jobId} cancelled`);
+        break;
+      }
+
+      try {
+        console.log(`[ImportExportDO] Backing up namespace ${namespaceId} (${processed + 1}/${namespaceIds.length})`);
+        
+        // List all keys in the namespace
+        let allKeys: Array<{ name: string }> = [];
+        let cursor: string | undefined;
+        
+        do {
+          const url = cursor 
+            ? `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/keys?limit=1000&cursor=${cursor}`
+            : `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/keys?limit=1000`;
+          
+          const listRequest = createCfApiRequest(url, this.env);
+          const listResponse = await fetch(listRequest);
+          const listData = await listResponse.json() as { result: Array<{ name: string }>; result_info?: { cursor?: string } };
+          
+          allKeys = allKeys.concat(listData.result || []);
+          cursor = listData.result_info?.cursor;
+        } while (cursor);
+
+        console.log(`[ImportExportDO] Found ${allKeys.length} keys in namespace ${namespaceId}`);
+
+        // Fetch all key values
+        const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
+        
+        for (const key of allKeys) {
+          try {
+            const valueRequest = createCfApiRequest(
+              `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(key.name)}`,
+              this.env
+            );
+            const valueResponse = await fetch(valueRequest);
+            
+            if (valueResponse.ok) {
+              const value = await valueResponse.text();
+              exportData.push({
+                name: key.name,
+                value: value,
+                metadata: {}
+              });
+            } else {
+              console.error(`[ImportExportDO] Failed to fetch key ${key.name}: HTTP ${valueResponse.status}`);
+            }
+          } catch (err) {
+            console.error(`[ImportExportDO] Error fetching key ${key.name}:`, err);
+          }
+        }
+
+        // Store in R2
+        const timestamp = Date.now();
+        const backupPath = `backups/${namespaceId}/${timestamp}.${format === 'ndjson' ? 'ndjson' : 'json'}`;
+        const backupContent = format === 'ndjson'
+          ? exportData.map(item => JSON.stringify(item)).join('\n')
+          : JSON.stringify(exportData, null, 2);
+
+        if (!this.env.BACKUP_BUCKET) {
+          throw new Error('BACKUP_BUCKET is not configured');
+        }
+
+        await this.env.BACKUP_BUCKET.put(backupPath, backupContent, {
+          httpMetadata: {
+            contentType: format === 'ndjson' ? 'application/x-ndjson' : 'application/json'
+          }
+        });
+
+        console.log(`[ImportExportDO] Backed up namespace ${namespaceId} to ${backupPath}`);
+        
+        // Log audit event for this namespace
+        if (db) {
+          await auditLog(db, {
+            namespace_id: namespaceId,
+            user_email: userEmail,
+            operation: 'batch_r2_backup',
+            key_name: undefined,
+            details: JSON.stringify({ 
+              job_id: jobId,
+              backup_path: backupPath,
+              key_count: allKeys.length 
+            })
+          });
+        }
+
+        processed++;
+        
+        // Update progress
+        const percentage = Math.round((processed / namespaceIds.length) * 100);
+        if (db) {
+          await db.prepare(
+            'UPDATE bulk_jobs SET processed_keys = ?, percentage = ? WHERE job_id = ?'
+          ).bind(processed, percentage, jobId).run();
+          
+          // Log milestone events
+          if (percentage === 25 || percentage === 50 || percentage === 75) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${percentage}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({
+                processed,
+                total: namespaceIds.length,
+                percentage
+              })
+            });
+          }
+        }
+        
+      } catch (err) {
+        errors++;
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        errorDetails.push(`Namespace ${namespaceId}: ${errorMsg}`);
+        console.error(`[ImportExportDO] Error backing up namespace ${namespaceId}:`, err);
+      }
+    }
+
+    // Mark job as completed or failed
+    const finalStatus = this.cancelledJobs.has(jobId) ? 'cancelled' : (errors === namespaceIds.length ? 'failed' : 'completed');
+    
+    if (db) {
+      await db.prepare(`
+        UPDATE bulk_jobs 
+        SET status = ?, processed_keys = ?, error_count = ?, percentage = 100, completed_at = CURRENT_TIMESTAMP
+        WHERE job_id = ?
+      `).bind(finalStatus, processed, errors, jobId).run();
+      
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: finalStatus as 'completed' | 'failed' | 'cancelled',
+        user_email: userEmail,
+        details: JSON.stringify({
+          processed,
+          errors,
+          total: namespaceIds.length,
+          percentage: 100,
+          error_details: errorDetails.length > 0 ? errorDetails : undefined
+        })
+      });
+    }
+
+    console.log(`[ImportExportDO] Batch R2 backup job ${jobId} ${finalStatus}. Processed: ${processed}, Errors: ${errors}`);
+  }
+
+  /**
+   * Process batch R2 restore - restore multiple namespaces from backups
+   */
+  private async processBatchR2Restore(params: BatchR2RestoreParams & { jobId: string }): Promise<void> {
+    const { jobId, restoreMap, userEmail } = params;
+    const db = getD1Binding(this.env);
+    const namespaceIds = Object.keys(restoreMap);
+
+    console.log(`[ImportExportDO] Starting batch R2 restore job ${jobId} for ${namespaceIds.length} namespaces`);
+
+    // Update job status to running
+    if (db) {
+      await db.prepare(
+        'UPDATE bulk_jobs SET status = ?, processed_keys = 0, error_count = 0 WHERE job_id = ?'
+      ).bind('running', jobId).run();
+      
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: 'started',
+        user_email: userEmail,
+        details: JSON.stringify({
+          total: namespaceIds.length,
+          namespaces: namespaceIds
+        })
+      });
+    }
+
+    let processed = 0;
+    let errors = 0;
+    const errorDetails: string[] = [];
+
+    // Process each namespace sequentially
+    for (const namespaceId of namespaceIds) {
+      if (this.cancelledJobs.has(jobId)) {
+        console.log(`[ImportExportDO] Job ${jobId} cancelled`);
+        break;
+      }
+
+      const backupPath = restoreMap[namespaceId];
+      
+      try {
+        console.log(`[ImportExportDO] Restoring namespace ${namespaceId} from ${backupPath} (${processed + 1}/${namespaceIds.length})`);
+        
+        // Retrieve backup from R2
+        const backupObject = await this.env.BACKUP_BUCKET?.get(backupPath);
+        if (!backupObject) {
+          throw new Error(`Backup not found: ${backupPath}`);
+        }
+
+        const backupContent = await backupObject.text();
+        
+        // Parse backup data (auto-detect format)
+        let importData: Array<{ name: string; value: string; metadata?: unknown; expiration?: number; expiration_ttl?: number }>;
+        try {
+          importData = JSON.parse(backupContent);
+          if (!Array.isArray(importData)) {
+            throw new Error('Expected array');
+          }
+        } catch {
+          // Try NDJSON
+          importData = backupContent.split('\n')
+            .filter(line => line.trim())
+            .map(line => JSON.parse(line));
+        }
+
+        console.log(`[ImportExportDO] Parsed ${importData.length} items from backup`);
+
+        // Restore keys to namespace
+        let keyErrors = 0;
+        for (const item of importData) {
+          try {
+            const putRequest = createCfApiRequest(
+              `/accounts/${this.env.ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(item.name)}`,
+              this.env,
+              {
+                method: 'PUT',
+                body: item.value,
+                headers: { 'Content-Type': 'text/plain' }
+              }
+            );
+
+            const putResponse = await fetch(putRequest);
+            if (!putResponse.ok) {
+              keyErrors++;
+            }
+          } catch (err) {
+            keyErrors++;
+            console.error(`[ImportExportDO] Error restoring key ${item.name}:`, err);
+          }
+        }
+
+        console.log(`[ImportExportDO] Restored namespace ${namespaceId}. Keys: ${importData.length}, Errors: ${keyErrors}`);
+        
+        // Log audit event
+        if (db) {
+          await auditLog(db, {
+            namespace_id: namespaceId,
+            user_email: userEmail,
+            operation: 'batch_r2_restore',
+            key_name: undefined,
+            details: JSON.stringify({ 
+              job_id: jobId,
+              backup_path: backupPath,
+              key_count: importData.length,
+              key_errors: keyErrors
+            })
+          });
+        }
+
+        if (keyErrors > 0) {
+          errors++;
+          errorDetails.push(`Namespace ${namespaceId}: ${keyErrors} key errors`);
+        }
+
+        processed++;
+        
+        // Update progress
+        const percentage = Math.round((processed / namespaceIds.length) * 100);
+        if (db) {
+          await db.prepare(
+            'UPDATE bulk_jobs SET processed_keys = ?, error_count = ?, percentage = ? WHERE job_id = ?'
+          ).bind(processed, errors, percentage, jobId).run();
+          
+          // Log milestone events
+          if (percentage === 25 || percentage === 50 || percentage === 75) {
+            await logJobEvent(db, {
+              job_id: jobId,
+              event_type: `progress_${percentage}` as 'progress_25' | 'progress_50' | 'progress_75',
+              user_email: userEmail,
+              details: JSON.stringify({
+                processed,
+                errors,
+                total: namespaceIds.length,
+                percentage
+              })
+            });
+          }
+        }
+        
+      } catch (err) {
+        errors++;
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        errorDetails.push(`Namespace ${namespaceId}: ${errorMsg}`);
+        console.error(`[ImportExportDO] Error restoring namespace ${namespaceId}:`, err);
+      }
+    }
+
+    // Mark job as completed or failed
+    const finalStatus = this.cancelledJobs.has(jobId) ? 'cancelled' : (errors === namespaceIds.length ? 'failed' : 'completed');
+    
+    if (db) {
+      await db.prepare(`
+        UPDATE bulk_jobs 
+        SET status = ?, processed_keys = ?, error_count = ?, percentage = 100, completed_at = CURRENT_TIMESTAMP
+        WHERE job_id = ?
+      `).bind(finalStatus, processed, errors, jobId).run();
+      
+      await logJobEvent(db, {
+        job_id: jobId,
+        event_type: finalStatus as 'completed' | 'failed' | 'cancelled',
+        user_email: userEmail,
+        details: JSON.stringify({
+          processed,
+          errors,
+          total: namespaceIds.length,
+          percentage: 100,
+          error_details: errorDetails.length > 0 ? errorDetails : undefined
+        })
+      });
+    }
+
+    console.log(`[ImportExportDO] Batch R2 restore job ${jobId} ${finalStatus}. Processed: ${processed}, Errors: ${errors}`);
   }
 }
