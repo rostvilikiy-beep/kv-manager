@@ -6,7 +6,7 @@
 ![Version](https://img.shields.io/badge/version-v1.0.0-green)
 ![Status](https://img.shields.io/badge/status-Production%2FStable-brightgreen)
 
-*Version 1.0.0 | Last Updated: November 22, 2025*
+*Version 1.0.0 | Last Updated: November 24, 2025*
 
 A full-featured management platform for Cloudflare Workers KV, designed for engineering teams and large-scale workloads. Browse namespaces, run bulk operations, search across your entire KV footprint, manage metadata and tags, automate backups to R2, and secure everything with Cloudflare Access Zero Trust.
 
