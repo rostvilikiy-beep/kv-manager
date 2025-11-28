@@ -1,3 +1,5 @@
+import { apiLogger } from '../lib/logger'
+
 const WORKER_API = import.meta.env.VITE_WORKER_API || window.location.origin
 
 // KV Namespace types
@@ -145,7 +147,7 @@ class APIService {
    */
   private async handleResponse(response: Response): Promise<Response> {
     if (response.status === 401 || response.status === 403) {
-      console.error('[API] Authentication error:', response.status);
+      apiLogger.error('Authentication error', undefined, { status: response.status });
       localStorage.clear();
       sessionStorage.clear();
       throw new Error(`Authentication error: ${response.status}`);
@@ -673,7 +675,7 @@ class APIService {
   async getAuditLog(
     namespaceId: string,
     options?: { limit?: number; offset?: number; operation?: string }
-  ): Promise<Array<Record<string, unknown>>> {
+  ): Promise<Record<string, unknown>[]> {
     const params = new URLSearchParams()
     if (options?.limit) params.set('limit', options.limit.toString())
     if (options?.offset) params.set('offset', options.offset.toString())
@@ -696,7 +698,7 @@ class APIService {
   async getUserAuditLog(
     userEmail: string,
     options?: { limit?: number; offset?: number; operation?: string }
-  ): Promise<Array<Record<string, unknown>>> {
+  ): Promise<Record<string, unknown>[]> {
     const params = new URLSearchParams()
     if (options?.limit) params.set('limit', options.limit.toString())
     if (options?.offset) params.set('offset', options.offset.toString())

@@ -1,7 +1,13 @@
 import { useContext } from 'react'
-import { ThemeContext } from '../contexts/ThemeContext'
+import { ThemeContext, type ThemeMode, type ResolvedTheme } from '../contexts/ThemeContext'
 
-export function useTheme() {
+interface UseThemeReturn {
+  theme: ThemeMode
+  resolvedTheme: ResolvedTheme
+  setTheme: (theme: ThemeMode) => void
+}
+
+export function useTheme(): UseThemeReturn {
   const context = useContext(ThemeContext)
   if (!context) {
     throw new Error('useTheme must be used within ThemeProvider')

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -7,6 +7,7 @@ import { Badge } from './ui/badge'
 import { X } from 'lucide-react'
 import { api } from '../services/api'
 import { isValidJSON } from '../lib/utils'
+import { logger } from '../lib/logger'
 
 interface MetadataEditorProps {
   namespaceId: string
@@ -14,7 +15,7 @@ interface MetadataEditorProps {
   onSave?: () => void
 }
 
-export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorProps) {
+export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorProps): React.JSX.Element {
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
   const [customMetadata, setCustomMetadata] = useState('')
@@ -28,7 +29,7 @@ export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [namespaceId, keyName])
 
-  const loadMetadata = async () => {
+  const loadMetadata = async (): Promise<void> => {
     try {
       setLoading(true)
       setError('')
@@ -36,14 +37,14 @@ export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorP
       setTags(data.tags || [])
       setCustomMetadata(data.custom_metadata ? JSON.stringify(data.custom_metadata, null, 2) : '')
     } catch (err) {
-      console.error('Failed to load metadata:', err)
+      logger.error('Failed to load metadata', err)
       setError(err instanceof Error ? err.message : 'Failed to load metadata')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleAddTag = () => {
+  const handleAddTag = (): void => {
     const tag = newTag.trim()
     if (tag && !tags.includes(tag)) {
       setTags([...tags, tag])
@@ -51,11 +52,11 @@ export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorP
     }
   }
 
-  const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveTag = (tagToRemove: string): void => {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     try {
       setSaving(true)
       setError('')
@@ -78,7 +79,7 @@ export function MetadataEditor({ namespaceId, keyName, onSave }: MetadataEditorP
 
       onSave?.()
     } catch (err) {
-      console.error('Failed to save metadata:', err)
+      logger.error('Failed to save metadata', err)
       setError(err instanceof Error ? err.message : 'Failed to save metadata')
     } finally {
       setSaving(false)

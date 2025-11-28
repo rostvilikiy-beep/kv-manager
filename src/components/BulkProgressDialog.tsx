@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ export function BulkProgressDialog({
   namespaceName,
   onClose,
   onComplete,
-}: BulkProgressDialogProps) {
+}: BulkProgressDialogProps): React.JSX.Element {
   const [autoCloseTimer, setAutoCloseTimer] = useState<number | null>(null);
   const [canClose, setCanClose] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -64,14 +64,14 @@ export function BulkProgressDialog({
   });
 
   useEffect(() => {
-    return () => {
+    return (): void => {
       if (autoCloseTimer) {
         clearTimeout(autoCloseTimer);
       }
     };
   }, [autoCloseTimer]);
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (autoCloseTimer) {
       clearTimeout(autoCloseTimer);
       setAutoCloseTimer(null);
@@ -79,7 +79,7 @@ export function BulkProgressDialog({
     onClose();
   };
 
-  const getStatusIcon = () => {
+  const getStatusIcon = (): React.JSX.Element => {
     if (!progress) {
       return <Loader2 className="h-5 w-5 animate-spin text-blue-500" />;
     }
@@ -98,7 +98,7 @@ export function BulkProgressDialog({
     }
   };
 
-  const getStatusText = () => {
+  const getStatusText = (): string => {
     if (!progress) {
       return 'Initializing...';
     }

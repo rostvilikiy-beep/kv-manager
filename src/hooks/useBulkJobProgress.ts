@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { JobProgress } from '../services/api';
 import { api } from '../services/api';
+import { bulkJobLogger } from '../lib/logger';
 
 interface UseBulkJobProgressOptions {
   jobId: string;
@@ -52,13 +53,10 @@ export function useBulkJobProgress({
   const startPolling = useCallback(() => {
     // Don't start if already polling
     if (pollingIntervalRef.current) {
-      console.log('[useBulkJobProgress] Already polling, skipping');
       return;
     }
-    
-    console.log('[useBulkJobProgress] Starting polling for job:', jobId, 'interval:', currentIntervalRef.current);
 
-    const poll = async () => {
+    const poll = async (): Promise<void> => {
       if (!isMountedRef.current || hasCompletedRef.current) {
         return;
       }
@@ -69,7 +67,6 @@ export function useBulkJobProgress({
         // Reset consecutive errors and interval on success
         consecutiveErrorsRef.current = 0;
         if (currentIntervalRef.current !== POLLING_INTERVAL) {
-          console.log('[useBulkJobProgress] Polling recovered, resetting interval to:', POLLING_INTERVAL);
           currentIntervalRef.current = POLLING_INTERVAL;
           // Restart polling with normal interval
           if (pollingIntervalRef.current) {
@@ -126,7 +123,7 @@ export function useBulkJobProgress({
             currentIntervalRef.current + RATE_LIMIT_BACKOFF,
             MAX_POLLING_INTERVAL
           );
-          console.log('[useBulkJobProgress] Rate limited (429), slowing polling to:', currentIntervalRef.current, 'ms');
+          bulkJobLogger.warn('Rate limited, slowing polling', { interval: currentIntervalRef.current });
           
           // Restart polling with new interval
           if (pollingIntervalRef.current) {
@@ -139,12 +136,12 @@ export function useBulkJobProgress({
         }
         
         // For non-rate-limit errors, log and handle normally
-        console.error('[useBulkJobProgress] Polling error:', err);
+        bulkJobLogger.error('Polling error', err);
         consecutiveErrorsRef.current++;
         
         // Stop polling after 10 consecutive non-rate-limit errors
         if (consecutiveErrorsRef.current >= 10) {
-          console.error('[useBulkJobProgress] Too many consecutive errors, stopping polling');
+          bulkJobLogger.error('Too many consecutive errors, stopping polling');
           stopPolling();
           setError('Connection error - polling stopped');
           if (onError) {
@@ -157,10 +154,8 @@ export function useBulkJobProgress({
     };
 
     // Poll immediately, then on interval
-    console.log('[useBulkJobProgress] Setting up polling with interval:', currentIntervalRef.current, 'ms');
     poll();
     pollingIntervalRef.current = window.setInterval(poll, currentIntervalRef.current);
-    console.log('[useBulkJobProgress] Interval created:', pollingIntervalRef.current);
   }, [jobId, onComplete, onError, stopPolling]);
 
   // Start polling on mount, stop on unmount
@@ -170,12 +165,10 @@ export function useBulkJobProgress({
     
     // Only start polling if we have a jobId
     if (jobId) {
-      console.log('[useBulkJobProgress] Effect triggered for jobId:', jobId);
       startPolling();
     }
 
-    return () => {
-      console.log('[useBulkJobProgress] Cleanup: stopping polling for jobId:', jobId);
+    return (): void => {
       isMountedRef.current = false;
       stopPolling();
     };

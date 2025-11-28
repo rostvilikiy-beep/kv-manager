@@ -95,7 +95,7 @@ export async function handleImportExportRoutes(
       console.log('[Import] Importing to namespace:', namespaceId, 'collision:', collisionHandling);
 
       // Parse import data (auto-detect JSON vs NDJSON)
-      let importData: Array<{ name: string; value: string; metadata?: Record<string, unknown>; expiration_ttl?: number }>;
+      let importData: { name: string; value: string; metadata?: Record<string, unknown>; expiration_ttl?: number }[];
       
       try {
         // Try JSON array first

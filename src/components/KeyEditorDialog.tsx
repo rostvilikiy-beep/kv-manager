@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { api } from '../services/api'
 import { formatBytes, isValidJSON, formatJSON } from '../lib/utils'
 import { Loader2, Save, RotateCcw } from 'lucide-react'
@@ -31,7 +31,7 @@ export function KeyEditorDialog({
   namespaceId,
   keyName,
   onSaved,
-}: KeyEditorDialogProps) {
+}: KeyEditorDialogProps): React.JSX.Element {
   const [loading, setLoading] = useState(true)
   const [value, setValue] = useState('')
   const [originalValue, setOriginalValue] = useState('')
@@ -111,7 +111,7 @@ export function KeyEditorDialog({
     setIsJSON(validJSON)
   }, [value])
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     // Validate metadata if provided
     if (metadata.trim()) {
       if (!isValidJSON(metadata)) {
@@ -167,7 +167,7 @@ export function KeyEditorDialog({
     }
   }
 
-  const handleRestore = async () => {
+  const handleRestore = async (): Promise<void> => {
     if (!confirm('Are you sure you want to restore the previous version? Current changes will be lost.')) {
       return
     }
@@ -190,14 +190,14 @@ export function KeyEditorDialog({
     }
   }
 
-  const getDisplayValue = () => {
+  const getDisplayValue = (): string => {
     if (showFormatted && isJSON) {
       return formatJSON(value)
     }
     return value
   }
 
-  const toggleFormatting = () => {
+  const toggleFormatting = (): void => {
     if (isJSON) {
       setShowFormatted(!showFormatted)
     }

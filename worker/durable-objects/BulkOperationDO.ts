@@ -77,7 +77,7 @@ export class BulkOperationDO {
   /**
    * Broadcast progress (no-op: WebSocket support removed, progress tracked via D1 polling)
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   private broadcastProgress(_progress: JobProgress): void {
     // No-op: Frontend uses HTTP polling instead of WebSockets
     // This method is kept to avoid refactoring all process methods
@@ -163,7 +163,7 @@ export class BulkOperationDO {
         details: JSON.stringify({ total: keys.length, source: sourceNamespaceId, target: targetNamespaceId })
       });
 
-      const copyData: Array<{ key: string; value: string }> = [];
+      const copyData: { key: string; value: string }[] = [];
       let errorCount = 0;
       let lastMilestone = 0;
 

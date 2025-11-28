@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Download } from 'lucide-react'
 import { api, type KVNamespace } from '../services/api'
+import { logger } from '../lib/logger'
 
 interface AuditLogProps {
   namespaces: KVNamespace[]
@@ -20,7 +21,7 @@ interface AuditEntry {
   details: string | null
 }
 
-export function AuditLog({ namespaces, selectedNamespaceId }: AuditLogProps) {
+export function AuditLog({ namespaces, selectedNamespaceId }: AuditLogProps): React.JSX.Element {
   const [viewMode, setViewMode] = useState<'namespace' | 'user'>('namespace')
   const [selectedNamespace, setSelectedNamespace] = useState<string>(selectedNamespaceId || '')
   const [operationFilter, setOperationFilter] = useState<string>('all')
@@ -45,7 +46,7 @@ export function AuditLog({ namespaces, selectedNamespaceId }: AuditLogProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode, selectedNamespace, operationFilter])
 
-  const loadLogs = async (reset = false) => {
+  const loadLogs = async (reset = false): Promise<void> => {
     if (viewMode === 'namespace' && !selectedNamespace) return
 
     try {
@@ -74,18 +75,18 @@ export function AuditLog({ namespaces, selectedNamespaceId }: AuditLogProps) {
 
       setHasMore(data.length === limit)
     } catch (err) {
-      console.error('Failed to load audit log:', err)
+      logger.error('Failed to load audit log', err)
       setError(err instanceof Error ? err.message : 'Failed to load audit log')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleLoadMore = () => {
+  const handleLoadMore = (): void => {
     loadLogs(false)
   }
 
-  const formatTimestamp = (timestamp: string) => {
+  const formatTimestamp = (timestamp: string): string => {
     const date = new Date(timestamp)
     const now = new Date()
     const diffMs = now.getTime() - date.getTime()
@@ -101,7 +102,7 @@ export function AuditLog({ namespaces, selectedNamespaceId }: AuditLogProps) {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
   }
 
-  const handleExportCSV = () => {
+  const handleExportCSV = (): void => {
     const headers = ['Timestamp', 'User', 'Operation', 'Key Name', 'Namespace', 'Details']
     const rows = logs.map(log => [
       log.timestamp,

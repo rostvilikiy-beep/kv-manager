@@ -1,3 +1,5 @@
+import { authLogger } from '../lib/logger'
+
 /**
  * AuthService - Minimal implementation for Cloudflare Zero Trust
  * 
@@ -23,7 +25,7 @@ class AuthService {
       window.location.replace('/cdn-cgi/access/logout');
       
     } catch (error) {
-      console.error('Logout failed:', error);
+      authLogger.error('Logout failed', error);
       // Clear storage and force redirect anyway
       localStorage.clear();
       sessionStorage.clear();
@@ -43,7 +45,6 @@ class AuthService {
 
   initialize(): void {
     // No initialization needed - Cloudflare Access handles everything
-    console.log('[Auth] Cloudflare Access authentication initialized');
   }
 }
 

@@ -47,7 +47,7 @@ export async function handleAdminRoutes(
         throw new Error(`Cloudflare API error: ${cfResponse.status} - ${errorText}`);
       }
 
-      const data = await cfResponse.json() as { result: Array<{ name: string }> };
+      const data = await cfResponse.json() as { result: { name: string }[] };
       const keys = data.result || [];
 
       console.log('[Admin] Found', keys.length, 'keys to sync');

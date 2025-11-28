@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -6,13 +6,14 @@ import { Badge } from './ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Search, ExternalLink } from 'lucide-react'
 import { api, type SearchResult, type KVNamespace } from '../services/api'
+import { logger } from '../lib/logger'
 
 interface SearchKeysProps {
   namespaces: KVNamespace[]
   onNavigateToKey?: (namespaceId: string, keyName: string) => void
 }
 
-export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
+export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps): React.JSX.Element {
   const [query, setQuery] = useState('')
   const [selectedNamespace, setSelectedNamespace] = useState<string>('all')
   const [tagFilter, setTagFilter] = useState('')
@@ -29,15 +30,15 @@ export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
       return
     }
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout((): void => {
       performSearch()
     }, 300)
 
-    return () => clearTimeout(timer)
+    return (): void => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, selectedNamespace, tagFilter])
 
-  const performSearch = async () => {
+  const performSearch = async (): Promise<void> => {
     try {
       setLoading(true)
       setError('')
@@ -56,14 +57,14 @@ export function SearchKeys({ namespaces, onNavigateToKey }: SearchKeysProps) {
       const data = await api.searchKeys(searchOptions)
       setResults(data)
     } catch (err) {
-      console.error('Search failed:', err)
+      logger.error('Search failed', err)
       setError(err instanceof Error ? err.message : 'Search failed')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleNavigate = (result: SearchResult) => {
+  const handleNavigate = (result: SearchResult): void => {
     onNavigateToKey?.(result.namespace_id, result.key_name)
   }
 

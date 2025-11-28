@@ -141,7 +141,7 @@ export interface BulkDeleteParams {
 
 export interface ImportParams {
   namespaceId: string
-  importData: Array<{ 
+  importData: { 
     name: string; 
     value: string; 
     metadata?: Record<string, unknown>;  // KV native metadata (1024 byte limit)
@@ -150,7 +150,7 @@ export interface ImportParams {
     expiration_ttl?: number;  // TTL in seconds
     ttl?: number;  // Alternative TTL field name
     expiration?: number;  // Unix timestamp expiration
-  }>
+  }[]
   collision: 'skip' | 'overwrite' | 'fail'
   userEmail: string
 }

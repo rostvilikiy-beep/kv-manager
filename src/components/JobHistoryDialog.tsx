@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ interface JobHistoryDialogProps {
   onClose: () => void;
 }
 
-export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps) {
+export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps): React.JSX.Element {
   const [events, setEvents] = useState<JobEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, jobId]);
 
-  const loadEvents = async () => {
+  const loadEvents = async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -41,7 +41,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
     }
   };
 
-  const getEventIcon = (eventType: string) => {
+  const getEventIcon = (eventType: string): React.JSX.Element => {
     switch (eventType) {
       case 'started':
         return <Circle className="h-4 w-4 text-blue-500 fill-blue-500" />;
@@ -58,7 +58,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
     }
   };
 
-  const getEventLabel = (eventType: string) => {
+  const getEventLabel = (eventType: string): string => {
     switch (eventType) {
       case 'started':
         return 'Started';
@@ -77,7 +77,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
     }
   };
 
-  const formatTimestamp = (timestamp: string) => {
+  const formatTimestamp = (timestamp: string): { relative: string; absolute: string } => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -105,7 +105,7 @@ export function JobHistoryDialog({ open, jobId, onClose }: JobHistoryDialogProps
     }
   };
 
-  const renderEventDetails = (event: JobEvent) => {
+  const renderEventDetails = (event: JobEvent): string | null => {
     const details = parseDetails(event.details);
     const items: string[] = [];
 

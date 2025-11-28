@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -11,12 +11,13 @@ import { api, type JobListItem, type KVNamespace } from '../services/api';
 import { Loader2, CheckCircle2, XCircle, AlertCircle, FileText, Download, Upload, Copy, Clock, Tag, Trash2, Search, Calendar as CalendarIcon, ArrowUp, ArrowDown, X, Database, RefreshCw } from 'lucide-react';
 import { JobHistoryDialog } from './JobHistoryDialog';
 import { format } from 'date-fns';
+import { logger } from '../lib/logger';
 
 interface JobHistoryProps {
   namespaces: KVNamespace[];
 }
 
-export function JobHistory({ namespaces }: JobHistoryProps) {
+export function JobHistory({ namespaces }: JobHistoryProps): React.JSX.Element {
   const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,13 +38,13 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
 
   // Debounce job ID search
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout((): void => {
       setJobIdSearch(jobIdInput);
     }, 500);
-    return () => clearTimeout(timer);
+    return (): void => clearTimeout(timer);
   }, [jobIdInput]);
 
-  const loadJobs = async (reset = false) => {
+  const loadJobs = async (reset = false): Promise<void> => {
     try {
       setLoading(true);
       setError('');
@@ -133,7 +134,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
 
       setTotal(data.total);
     } catch (err) {
-      console.error('Failed to load job history:', err);
+      logger.error('Failed to load job history', err);
       setError(err instanceof Error ? err.message : 'Failed to load job history');
     } finally {
       setLoading(false);
@@ -145,11 +146,11 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, operationFilter, namespaceFilter, datePreset, dateRange.from, dateRange.to, jobIdSearch, minErrors, sortBy, sortOrder]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = (): void => {
     loadJobs(false);
   };
 
-  const handleResetFilters = () => {
+  const handleResetFilters = (): void => {
     setStatusFilter('all');
     setOperationFilter('all');
     setNamespaceFilter('all');
@@ -162,18 +163,18 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     setSortOrder('desc');
   };
 
-  const handleDatePresetChange = (value: string) => {
+  const handleDatePresetChange = (value: string): void => {
     setDatePreset(value);
     if (value !== 'custom') {
       setDateRange({ from: undefined, to: undefined });
     }
   };
 
-  const toggleSortOrder = () => {
+  const toggleSortOrder = (): void => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  const getDateRangeDisplay = () => {
+  const getDateRangeDisplay = (): string => {
     if (datePreset === 'all') return 'All Time';
     if (datePreset === '24h') return 'Last 24 Hours';
     if (datePreset === '7d') return 'Last 7 Days';
@@ -193,7 +194,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     return 'All Time';
   };
 
-  const formatTimestamp = (timestamp: string) => {
+  const formatTimestamp = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -209,7 +210,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string): React.JSX.Element => {
     switch (status) {
       case 'completed':
         return (
@@ -244,7 +245,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     }
   };
 
-  const getOperationIcon = (operationType: string) => {
+  const getOperationIcon = (operationType: string): React.JSX.Element => {
     switch (operationType) {
       case 'export':
         return <Download className="h-4 w-4" />;
@@ -267,7 +268,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     }
   };
 
-  const getOperationLabel = (operationType: string) => {
+  const getOperationLabel = (operationType: string): string => {
     switch (operationType) {
       case 'export':
         return 'Export';
@@ -290,7 +291,7 @@ export function JobHistory({ namespaces }: JobHistoryProps) {
     }
   };
 
-  const getNamespaceTitle = (namespaceId: string) => {
+  const getNamespaceTitle = (namespaceId: string): string => {
     const namespace = namespaces.find((ns) => ns.id === namespaceId);
     return namespace?.title || namespaceId;
   };

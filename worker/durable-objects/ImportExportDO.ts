@@ -120,7 +120,7 @@ export class ImportExportDO {
   /**
    * Broadcast progress (no-op: WebSocket support removed, progress tracked via D1 polling)
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   private broadcastProgress(_progress: JobProgress): void {
     // No-op: Frontend uses HTTP polling instead of WebSockets
     // This method is kept to avoid refactoring all process methods
@@ -484,7 +484,7 @@ export class ImportExportDO {
       });
 
       // List all keys in namespace
-      let allKeys: Array<{ name: string }> = [];
+      let allKeys: { name: string }[] = [];
       let cursor: string | undefined;
       
       do {
@@ -503,7 +503,7 @@ export class ImportExportDO {
         }
 
         const listData = await listResponse.json() as { 
-          result: Array<{ name: string }>;
+          result: { name: string }[];
           result_info: { cursor?: string };
         };
         
@@ -541,7 +541,7 @@ export class ImportExportDO {
       });
 
       // Fetch all key values
-      const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
+      const exportData: { name: string; value: string; metadata: Record<string, unknown> }[] = [];
       let errorCount = 0;
       let lastMilestone = 0;
 
@@ -710,7 +710,7 @@ export class ImportExportDO {
       });
 
       // List all keys in namespace (same as export)
-      let allKeys: Array<{ name: string }> = [];
+      let allKeys: { name: string }[] = [];
       let cursor: string | undefined;
       
       do {
@@ -729,7 +729,7 @@ export class ImportExportDO {
         }
 
         const listData = await listResponse.json() as { 
-          result: Array<{ name: string }>;
+          result: { name: string }[];
           result_info: { cursor?: string };
         };
         
@@ -767,7 +767,7 @@ export class ImportExportDO {
       });
 
       // Fetch all key values (same as export)
-      const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
+      const exportData: { name: string; value: string; metadata: Record<string, unknown> }[] = [];
       let errorCount = 0;
       let lastMilestone = 0;
 
@@ -951,7 +951,7 @@ export class ImportExportDO {
       console.log('[ImportExportDO] Backup data fetched, size:', backupData.length);
 
       // Parse import data (auto-detect JSON vs NDJSON)
-      let importData: Array<{ 
+      let importData: { 
         name: string; 
         value: string; 
         metadata?: Record<string, unknown>;
@@ -960,7 +960,7 @@ export class ImportExportDO {
         expiration_ttl?: number;
         ttl?: number;
         expiration?: number;
-      }>;
+      }[];
       
       try {
         // Try JSON array first
@@ -1223,7 +1223,7 @@ export class ImportExportDO {
         console.log(`[ImportExportDO] Backing up namespace ${namespaceId} (${processed + 1}/${namespaceIds.length})`);
         
         // List all keys in the namespace
-        let allKeys: Array<{ name: string }> = [];
+        let allKeys: { name: string }[] = [];
         let cursor: string | undefined;
         
         do {
@@ -1233,7 +1233,7 @@ export class ImportExportDO {
           
           const listRequest = createCfApiRequest(url, this.env);
           const listResponse = await fetch(listRequest);
-          const listData = await listResponse.json() as { result: Array<{ name: string }>; result_info?: { cursor?: string } };
+          const listData = await listResponse.json() as { result: { name: string }[]; result_info?: { cursor?: string } };
           
           allKeys = allKeys.concat(listData.result || []);
           cursor = listData.result_info?.cursor;
@@ -1242,7 +1242,7 @@ export class ImportExportDO {
         console.log(`[ImportExportDO] Found ${allKeys.length} keys in namespace ${namespaceId}`);
 
         // Fetch all key values
-        const exportData: Array<{ name: string; value: string; metadata: Record<string, unknown> }> = [];
+        const exportData: { name: string; value: string; metadata: Record<string, unknown> }[] = [];
         
         for (const key of allKeys) {
           try {
@@ -1407,7 +1407,7 @@ export class ImportExportDO {
         const backupContent = await backupObject.text();
         
         // Parse backup data (auto-detect format)
-        let importData: Array<{ name: string; value: string; metadata?: unknown; expiration?: number; expiration_ttl?: number }>;
+        let importData: { name: string; value: string; metadata?: unknown; expiration?: number; expiration_ttl?: number }[];
         try {
           importData = JSON.parse(backupContent);
           if (!Array.isArray(importData)) {

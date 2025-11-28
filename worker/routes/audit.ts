@@ -7,7 +7,7 @@ export async function handleAuditRoutes(
   url: URL,
   corsHeaders: HeadersInit,
   isLocalDev: boolean,
-  _userEmail: string // eslint-disable-line @typescript-eslint/no-unused-vars
+  _userEmail: string  
 ): Promise<Response> {
   const db = getD1Binding(env);
 

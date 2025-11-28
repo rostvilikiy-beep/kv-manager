@@ -204,7 +204,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ${{ env.IMAGE_NAME }}
         readme-filepath: ./DOCKER_README.md
-        short-description: "Manage Cloudflare Workers KV — audit logs, bulk operations, R2 backups, search, tags, GitHub SSO."
+        short-description: "Manage Cloudflare KV - Audit Logs, Bulk Operations, GitHub SSO, R2 backups, Search, Tags."
     
     - name: Deployment Summary
       if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { api, type KVNamespace, type KVKey, type JobProgress, type R2BackupListItem } from './services/api'
 import { auth } from './services/auth'
 import { useTheme } from './hooks/useTheme'
@@ -37,7 +37,7 @@ type View =
   | { type: 'audit'; namespaceId?: string }
   | { type: 'job-history' }
 
-export default function App() {
+export default function App(): React.JSX.Element {
   const [namespaces, setNamespaces] = useState<KVNamespace[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
@@ -124,7 +124,7 @@ export default function App() {
     loadNamespaces()
   }, [])
 
-  const loadNamespaces = async () => {
+  const loadNamespaces = async (): Promise<void> => {
     try {
       setLoading(true)
       setError('')
@@ -137,7 +137,7 @@ export default function App() {
     }
   }
 
-  const handleCreateNamespace = async () => {
+  const handleCreateNamespace = async (): Promise<void> => {
     if (!newNamespaceTitle.trim()) return
 
     try {
@@ -153,7 +153,7 @@ export default function App() {
     }
   }
 
-  const handleDeleteNamespace = async (namespaceId: string) => {
+  const handleDeleteNamespace = async (namespaceId: string): Promise<void> => {
     if (!confirm('Are you sure you want to delete this namespace? This action cannot be undone.')) {
       return
     }
@@ -166,7 +166,7 @@ export default function App() {
     }
   }
 
-  const handleSyncNamespace = async (namespaceId: string, namespaceTitle: string) => {
+  const handleSyncNamespace = async (namespaceId: string, namespaceTitle: string): Promise<void> => {
     try {
       setError('')
       const result = await api.syncNamespaceKeys(namespaceId)
@@ -178,7 +178,7 @@ export default function App() {
     }
   }
 
-  const handleRenameNamespace = async () => {
+  const handleRenameNamespace = async (): Promise<void> => {
     if (!renameTitle.trim()) return
 
     try {
@@ -195,26 +195,26 @@ export default function App() {
     }
   }
 
-  const openRenameDialog = (namespaceId: string, currentTitle: string) => {
+  const openRenameDialog = (namespaceId: string, currentTitle: string): void => {
     setRenameNamespaceId(namespaceId)
     setRenameTitle(currentTitle)
     setShowRenameDialog(true)
   }
 
-  const cycleTheme = () => {
-    const modes: Array<typeof theme> = ['system', 'light', 'dark']
+  const cycleTheme = (): void => {
+    const modes: typeof theme[] = ['system', 'light', 'dark']
     const currentIndex = modes.indexOf(theme)
     const nextIndex = (currentIndex + 1) % modes.length
     setTheme(modes[nextIndex])
   }
 
-  const getThemeIcon = () => {
+  const getThemeIcon = (): React.JSX.Element => {
     if (theme === 'system') return <Monitor className="h-5 w-5" />
     if (theme === 'light') return <Sun className="h-5 w-5" />
     return <Moon className="h-5 w-5" />
   }
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string): string => {
     if (!dateString) return 'Unknown'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -223,7 +223,7 @@ export default function App() {
     })
   }
 
-  const toggleNamespaceSelection = (uuid: string) => {
+  const toggleNamespaceSelection = (uuid: string): void => {
     setSelectedNamespaces(prev => {
       if (prev.includes(uuid)) {
         return prev.filter(id => id !== uuid)
@@ -233,7 +233,7 @@ export default function App() {
     })
   }
 
-  const handleBulkDeleteNamespaces = async () => {
+  const handleBulkDeleteNamespaces = async (): Promise<void> => {
     if (selectedNamespaces.length === 0) return
     
     if (!confirm(`Are you sure you want to delete ${selectedNamespaces.length} namespace(s)? This action cannot be undone.`)) {
@@ -270,11 +270,11 @@ export default function App() {
     }
   }, [keyPrefix])
 
-  const loadMoreKeys = async (namespaceId: string) => {
+  const loadMoreKeys = async (namespaceId: string): Promise<void> => {
     await loadKeys(namespaceId, true, keysCursor)
   }
 
-  const handleCreateKey = async () => {
+  const handleCreateKey = async (): Promise<void> => {
     if (!newKeyName.trim() || currentView.type !== 'namespace') return
 
     // Validate metadata if provided
@@ -336,7 +336,7 @@ export default function App() {
     }
   }
 
-  const toggleKeySelection = (keyName: string) => {
+  const toggleKeySelection = (keyName: string): void => {
     setSelectedKeys(prev => {
       if (prev.includes(keyName)) {
         return prev.filter(name => name !== keyName)
@@ -346,7 +346,7 @@ export default function App() {
     })
   }
 
-  const handleBulkDeleteKeys = async (namespaceId: string) => {
+  const handleBulkDeleteKeys = async (namespaceId: string): Promise<void> => {
     if (selectedKeys.length === 0) return
     
     if (!confirm(`Are you sure you want to delete ${selectedKeys.length} key(s)? This action cannot be undone.`)) {
@@ -371,7 +371,7 @@ export default function App() {
   }
 
   // Handle progress dialog completion
-  const handleProgressComplete = async (result: JobProgress) => {
+  const handleProgressComplete = async (result: JobProgress): Promise<void> => {
     // Refresh keys if still viewing the same namespace
     if (currentView.type === 'namespace' && result.status === 'completed') {
       setSelectedKeys([])
@@ -397,7 +397,7 @@ export default function App() {
   }, [currentView, keyPrefix, loadKeys])
 
   // Import/Export handlers
-  const handleExport = async () => {
+  const handleExport = async (): Promise<void> => {
     try {
       setExporting(true)
       setError('')
@@ -418,7 +418,7 @@ export default function App() {
     }
   }
 
-  const handleExportComplete = async (result: JobProgress) => {
+  const handleExportComplete = async (result: JobProgress): Promise<void> => {
     // Download the exported file
     if (result.status === 'completed' && result.result?.downloadUrl) {
       const filename = `${exportNamespaceId}-export.${result.result.format || 'json'}`
@@ -430,7 +430,7 @@ export default function App() {
     }
   }
 
-  const handleImport = async () => {
+  const handleImport = async (): Promise<void> => {
     if (!importData.trim()) return
 
     try {
@@ -455,12 +455,12 @@ export default function App() {
   }
 
   // R2 Backup/Restore handlers
-  const openR2BackupDialog = (namespaceId: string) => {
+  const openR2BackupDialog = (namespaceId: string): void => {
     setR2NamespaceId(namespaceId)
     setShowR2BackupDialog(true)
   }
 
-  const openR2RestoreDialog = async (namespaceId: string) => {
+  const openR2RestoreDialog = async (namespaceId: string): Promise<void> => {
     setR2NamespaceId(namespaceId)
     setLoadingR2Backups(true)
     setShowR2RestoreDialog(true)
@@ -474,7 +474,7 @@ export default function App() {
     }
   }
 
-  const handleR2Backup = async () => {
+  const handleR2Backup = async (): Promise<void> => {
     try {
       setExporting(true)
       setError('')
@@ -495,7 +495,7 @@ export default function App() {
     }
   }
 
-  const handleR2Restore = async () => {
+  const handleR2Restore = async (): Promise<void> => {
     if (!selectedR2Backup) return
     
     try {
@@ -519,7 +519,7 @@ export default function App() {
   }
 
   // Batch R2 operations handlers
-  const handleBatchR2Backup = async () => {
+  const handleBatchR2Backup = async (): Promise<void> => {
     if (selectedNamespaces.length === 0) return
     
     try {
@@ -541,7 +541,7 @@ export default function App() {
     }
   }
 
-  const openBatchR2RestoreDialog = async () => {
+  const openBatchR2RestoreDialog = async (): Promise<void> => {
     if (selectedNamespaces.length === 0) return
     
     setLoadingBatchR2Backups(true)
@@ -564,7 +564,7 @@ export default function App() {
     }
   }
 
-  const handleBatchR2Restore = async () => {
+  const handleBatchR2Restore = async (): Promise<void> => {
     if (batchR2RestoreSelections.size === 0) return
     
     try {
@@ -595,7 +595,7 @@ export default function App() {
   }
 
   // Bulk operations handlers
-  const handleBulkCopy = async () => {
+  const handleBulkCopy = async (): Promise<void> => {
     if (!bulkTargetNamespace || selectedKeys.length === 0 || currentView.type !== 'namespace') return
 
     try {
@@ -618,7 +618,7 @@ export default function App() {
     }
   }
 
-  const handleBulkTTL = async () => {
+  const handleBulkTTL = async (): Promise<void> => {
     if (!bulkTTL || selectedKeys.length === 0 || currentView.type !== 'namespace') return
 
     const ttl = parseInt(bulkTTL)
@@ -647,7 +647,7 @@ export default function App() {
     }
   }
 
-  const handleBulkTag = async () => {
+  const handleBulkTag = async (): Promise<void> => {
     if (!bulkTags.trim() || selectedKeys.length === 0 || currentView.type !== 'namespace') return
 
     try {
@@ -671,12 +671,12 @@ export default function App() {
     }
   }
 
-  const openExportDialog = (namespaceId: string) => {
+  const openExportDialog = (namespaceId: string): void => {
     setExportNamespaceId(namespaceId)
     setShowExportDialog(true)
   }
 
-  const openImportDialog = (namespaceId: string) => {
+  const openImportDialog = (namespaceId: string): void => {
     setImportNamespaceId(namespaceId)
     setShowImportDialog(true)
   }
