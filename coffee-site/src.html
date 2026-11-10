@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мідь — кав'ярня</title>
+  <meta name="description" content="Демо-сайт кав'ярні з 3D-туркою, яка наливає каву під час прокручування.">
+  <meta name="theme-color" content="#15100d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prata&family=Manrope:wght@400;500;600;700&display=swap">
+  <style>
+    /* Layout: a fixed 3D still life (cezve over a cup) behind the page; content floats on blurred panels at the left. */
+    :root {
+      color-scheme: dark;
+      --bg: #15100d;
+      --surface: #201813;
+      --ink: #f4ece4;
+      --muted: #bcaa9b;
+      --line: #3a2e26;
+      --copper: #e0915a;
+      --copper-ink: #1b120c;
+      --error: #ff9a8a;
+      --font-display: "Prata", Georgia, "Times New Roman", serif;
+      --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --header-h: 64px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.65 var(--font-body); -webkit-font-smoothing: antialiased; }
+    body::after { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(60% 70% at 72% 42%, rgb(224 145 90 / 14%), transparent 70%); }
+    a, button, input, select, summary { touch-action: manipulation; }
+    a { color: inherit; }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.12; letter-spacing: -0.01em; margin: 0 0 0.5em; text-wrap: balance; }
+    h1 { font-size: clamp(2.3rem, 5.6vw, 4.2rem); }
+    h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); }
+    h3 { font-size: 1.2rem; }
+    p { margin: 0 0 1em; text-wrap: pretty; }
+    :focus-visible { outline: 3px solid var(--copper); outline-offset: 3px; border-radius: 6px; }
+
+    #scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
+    .page { position: relative; z-index: 1; }
+
+    .skip { position: absolute; left: 16px; top: -4rem; z-index: 100; background: var(--ink); color: var(--bg); padding: 0.6rem 1rem; border-radius: 8px; }
+    .skip:focus { top: 16px; }
+    .wrap { width: 100%; max-width: 1200px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+    .site-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+    .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
+    .logo { font-family: var(--font-display); font-size: 1.35rem; text-decoration: none; display: inline-flex; gap: 0.5rem; align-items: center; }
+    .logo i { width: 10px; height: 10px; border-radius: 50%; background: var(--copper); box-shadow: 0 0 14px var(--copper); }
+    .nav { display: flex; gap: 0.2rem; overflow-x: auto; scrollbar-width: none; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 0.5rem 0.8rem; border-radius: 999px; white-space: nowrap; transition: color 150ms ease, background-color 150ms ease; }
+    @media (hover: hover) and (pointer: fine) { .nav a:hover { color: var(--ink); background: color-mix(in srgb, var(--copper) 16%, transparent); } }
+    @media (max-width: 720px) {
+      :root { --header-h: 104px; }
+      .site-header .wrap { flex-direction: column; align-items: flex-start; gap: 0; padding-block: 0.6rem 0.4rem; }
+      .nav { width: 100%; margin-left: -0.8rem; }
+    }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.75rem 1.5rem; border-radius: 999px; border: 1px solid transparent; background: var(--copper); color: var(--copper-ink); font: 700 1rem/1 var(--font-body); text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), box-shadow 200ms ease; }
+    .btn:active { transform: scale(0.97); }
+    .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { box-shadow: 0 8px 26px rgb(224 145 90 / 35%); }
+      .btn-ghost:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); box-shadow: none; }
+    }
+
+    section { padding-block: clamp(3rem, 9vw, 7rem); }
+    .col { max-width: 560px; }
+    .panel { background: color-mix(in srgb, var(--surface) 78%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 22px; padding: clamp(1.25rem, 3vw, 2rem); }
+    .eyebrow { display: inline-block; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--copper); margin-bottom: 1rem; }
+    .lead { font-size: 1.2rem; color: var(--muted); }
+    .muted { color: var(--muted); }
+
+    .hero { min-height: calc(100svh - var(--header-h)); display: flex; align-items: center; }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.75rem; }
+    .scroll-cue { margin-top: 2.5rem; display: inline-flex; align-items: center; gap: 0.6rem; color: var(--muted); font-size: 0.9rem; }
+    .scroll-cue span { width: 22px; height: 34px; border: 2px solid var(--line); border-radius: 12px; position: relative; }
+    .scroll-cue span::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--copper); animation: cue 1.6s var(--ease-out) infinite; }
+    @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(12px); opacity: 0; } 100% { opacity: 0; } }
+    @media (max-width: 720px) {
+      .hero { align-items: flex-end; padding-top: 46svh; }
+    }
+
+    /* Menu */
+    .menu-group + .menu-group { margin-top: 1.75rem; }
+    .menu-group h3 { color: var(--copper); }
+    .menu { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+    .menu li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1rem; }
+    .menu .name { font-weight: 600; display: flex; align-items: baseline; gap: 0.6rem; min-width: 0; }
+    .menu .name::after { content: ""; flex: 1; border-bottom: 1px dotted var(--line); transform: translateY(-4px); min-width: 1rem; }
+    .menu .price { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .menu .desc { grid-column: 1 / -1; color: var(--muted); font-size: 0.95rem; }
+
+    /* Steps */
+    .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; counter-reset: s; }
+    .steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; }
+    .steps li::before { counter-increment: s; content: counter(s); font-family: var(--font-display); font-size: 1.4rem; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--copper); color: var(--copper); }
+    .steps b { display: block; }
+    .metric { font-variant-numeric: tabular-nums; color: var(--copper); font-weight: 700; }
+
+    /* Beans */
+    .beans { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+    .bean { display: grid; gap: 0.2rem; padding: 1rem 1.1rem; border-radius: 14px; background: color-mix(in srgb, var(--bg) 60%, transparent); border: 1px solid var(--line); }
+    .bean small { color: var(--muted); }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.3rem; }
+    .tags span { font-size: 0.82rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: color-mix(in srgb, var(--copper) 16%, transparent); color: var(--ink); }
+
+    /* Visit + form */
+    .hours { list-style: none; padding: 0; margin: 0 0 1.25rem; display: grid; gap: 0.3rem; }
+    .hours li { display: flex; justify-content: space-between; gap: 1rem; font-variant-numeric: tabular-nums; border-bottom: 1px solid var(--line); padding-block: 0.35rem; }
+    .form { display: grid; gap: 0.9rem; }
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
+    @media (max-width: 480px) { .row { grid-template-columns: minmax(0, 1fr); } }
+    .field { display: grid; gap: 0.35rem; min-width: 0; }
+    .field label { font-weight: 600; font-size: 0.95rem; }
+    .field input, .field select { width: 100%; min-height: 48px; padding: 0.6rem 0.9rem; font: inherit; color: var(--ink); background-color: var(--bg); border: 1px solid var(--line); border-radius: 12px; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .field input:focus-visible, .field select:focus-visible { outline: none; border-color: var(--copper); box-shadow: 0 0 0 3px rgb(224 145 90 / 30%); }
+    .field input[aria-invalid="true"] { border-color: var(--error); }
+    .error { color: var(--error); font-size: 0.9rem; min-height: 1.2em; margin: 0; }
+    .status { font-weight: 600; min-height: 1.5em; margin: 0; }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--line); padding-block: 2rem; color: var(--muted); font-size: 0.95rem; background: var(--bg); }
+    footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+
+    .reveal { animation: rise 600ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 80ms); }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { animation: fade 200ms ease both; }
+      @keyframes fade { from { opacity: 0; } }
+      .scroll-cue span::after { animation: none; }
+      .btn:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="page">
+    <a class="skip" href="#main">Перейти до змісту</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="logo" href="#top" translate="no"><i aria-hidden="true"></i>Мідь</a>
+        <nav class="nav" aria-label="Розділи">
+          <a href="#menu">Меню</a>
+          <a href="#brew">Як варимо</a>
+          <a href="#beans">Зерно</a>
+          <a href="#visit">Бронювання</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="wrap">
+          <div class="col">
+            <span class="eyebrow reveal" style="--i:0">Кав'ярня · кава на піску</span>
+            <h1 class="reveal" style="--i:1">Кава, зварена в мідній турці</h1>
+            <p class="lead reveal" style="--i:2">Варимо повільно на гарячому піску, до щільної шапки каймаку. Гортайте сторінку, і турка наллє вам чашку.</p>
+            <div class="hero-actions reveal" style="--i:3">
+              <a class="btn" href="#visit">Забронювати столик</a>
+              <a class="btn btn-ghost" href="#menu">Меню</a>
+            </div>
+            <div class="scroll-cue reveal" style="--i:4" aria-hidden="true"><span></span>Гортайте вниз</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="menu" aria-labelledby="menu-title">
+        <div class="wrap">
+          <div class="col panel">
+            <span class="eyebrow">Меню</span>
+            <h2 id="menu-title">Що варимо сьогодні</h2>
+            <div class="menu-group">
+              <h3>Кава в турці</h3>
+              <ul class="menu">
+                <li><span class="name">По-східному</span><span class="price">65&nbsp;₴</span><span class="desc">Класика на піску, 70&nbsp;мл, з каймаком.</span></li>
+                <li><span class="name">З кардамоном</span><span class="price">75&nbsp;₴</span><span class="desc">Свіжомелений кардамон додаємо разом із зерном.</span></li>
+                <li><span class="name">З халвою</span><span class="price">85&nbsp;₴</span><span class="desc">Подаємо з шматочком соняшникової халви.</span></li>
+              </ul>
+            </div>
+            <div class="menu-group">
+              <h3>Еспресо-бар</h3>
+              <ul class="menu">
+                <li><span class="name">Еспресо</span><span class="price">50&nbsp;₴</span><span class="desc">18&nbsp;г зерна, 36&nbsp;мл у чашці.</span></li>
+                <li><span class="name">Капучино</span><span class="price">70&nbsp;₴</span><span class="desc">Подвійне еспресо та молоко 60&nbsp;°C.</span></li>
+                <li><span class="name">Раф ваніль</span><span class="price">85&nbsp;₴</span><span class="desc">Вершки, ванільний цукор, еспресо.</span></li>
+              </ul>
+            </div>
+            <div class="menu-group">
+              <h3>До кави</h3>
+              <ul class="menu">
+                <li><span class="name">Пахлава</span><span class="price">90&nbsp;₴</span><span class="desc">З волоським горіхом і медом.</span></li>
+                <li><span class="name">Рахат-лукум</span><span class="price">60&nbsp;₴</span><span class="desc">Трояндовий, 3&nbsp;шматочки.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="brew" aria-labelledby="brew-title">
+        <div class="wrap">
+          <div class="col panel">
+            <span class="eyebrow">Як варимо</span>
+            <h2 id="brew-title">Чотири кроки до каймаку</h2>
+            <ol class="steps">
+              <li><div><b>Помел у пудру</b><span class="muted">Мелемо дрібніше, ніж для еспресо: близько <span class="metric">100&nbsp;мкм</span>. Тільки перед варінням.</span></div></li>
+              <li><div><b>Холодна вода</b><span class="muted">Пропорція <span class="metric">1&nbsp;:&nbsp;10</span>: 7&nbsp;г кави на 70&nbsp;мл води. Цукор, якщо просите, кладемо одразу.</span></div></li>
+              <li><div><b>Гарячий пісок</b><span class="muted">Пісок розігрітий до <span class="metric">220&nbsp;°C</span>. Турка ходить по колу, щоб кава грілась рівномірно.</span></div></li>
+              <li><div><b>Не доводимо до кипіння</b><span class="muted">Знімаємо при <span class="metric">96&nbsp;°C</span>, коли піднімається каймак. Наливаємо одразу.</span></div></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="beans" aria-labelledby="beans-title">
+        <div class="wrap">
+          <div class="col panel">
+            <span class="eyebrow">Зерно</span>
+            <h2 id="beans-title">Обсмажуємо щотижня</h2>
+            <ul class="beans">
+              <li class="bean"><b>Ефіопія, Іргачеффе</b><small>Мита обробка · 1&nbsp;900&nbsp;м</small><div class="tags"><span>бергамот</span><span>жасмин</span><span>лимон</span></div></li>
+              <li class="bean"><b>Бразилія, Серрадо</b><small>Натуральна обробка · 1&nbsp;100&nbsp;м</small><div class="tags"><span>горіх</span><span>какао</span><span>карамель</span></div></li>
+              <li class="bean"><b>Колумбія, Уїла</b><small>Мита обробка · 1&nbsp;700&nbsp;м</small><div class="tags"><span>вишня</span><span>тростинний цукор</span></div></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="visit" aria-labelledby="visit-title">
+        <div class="wrap">
+          <div class="col panel">
+            <span class="eyebrow">Бронювання</span>
+            <h2 id="visit-title">Чекаємо в гості</h2>
+            <p class="muted">вул. Прикладна, 12 (демо-адреса)</p>
+            <ul class="hours">
+              <li><span>Пн–Пт</span><span>08:00–21:00</span></li>
+              <li><span>Сб–Нд</span><span>09:00–22:00</span></li>
+            </ul>
+            <form class="form" id="book" novalidate>
+              <div class="field">
+                <label for="b-name">Ім'я</label>
+                <input id="b-name" name="name" autocomplete="name" placeholder="Олена…" aria-describedby="b-name-error">
+                <p class="error" id="b-name-error"></p>
+              </div>
+              <div class="field">
+                <label for="b-phone">Телефон</label>
+                <input id="b-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+380 67 123 45 67" aria-describedby="b-phone-error">
+                <p class="error" id="b-phone-error"></p>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="b-date">Дата</label>
+                  <input id="b-date" name="date" type="date" aria-describedby="b-date-error">
+                  <p class="error" id="b-date-error"></p>
+                </div>
+                <div class="field">
+                  <label for="b-guests">Гостей</label>
+                  <select id="b-guests" name="guests">
+                    <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5–6</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn" type="submit">Забронювати</button>
+              <p class="status" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>© Мідь, кав'ярня (демо)</span>
+        <span>hello@example.com</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>/*THREE*/</script>
+  <script>
+  (() => {
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+    const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+    // ---------- In-page links (also inside embedded previews) ----------
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const el = document.getElementById(a.getAttribute("href").slice(1));
+      if (!el) return;
+      e.preventDefault();
+      el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      if (a.classList.contains("skip")) { el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); }
+    });
+
+    // ---------- Booking form ----------
+    const form = document.getElementById("book");
+    const status = form.querySelector(".status");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    form.date.min = today.toISOString().slice(0, 10);
+    const rules = {
+      name: (v) => (v.trim().length >= 2 ? "" : "Вкажіть ім'я: щонайменше 2 літери."),
+      phone: (v) => (v.replace(/\D/g, "").length >= 10 ? "" : "Перевірте номер: наприклад, +380 67 123 45 67."),
+      date: (v) => (v && new Date(v) >= today ? "" : "Оберіть дату: сьогодні або пізніше."),
+    };
+    const fields = [...form.querySelectorAll("input")];
+    const check = (input) => {
+      const msg = rules[input.name](input.value);
+      input.setAttribute("aria-invalid", msg ? "true" : "false");
+      document.getElementById(`${input.id}-error`).textContent = msg;
+      return !msg;
+    };
+    fields.forEach((f) => {
+      f.addEventListener("blur", () => f.value && check(f));
+      f.addEventListener("input", () => f.getAttribute("aria-invalid") === "true" && check(f));
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ok = fields.map(check);
+      if (ok.includes(false)) { fields[ok.indexOf(false)].focus(); status.textContent = ""; return; }
+      const date = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long" }).format(new Date(form.date.value));
+      status.textContent = `Дякуємо! Столик на ${date} заброньовано (демо, дані нікуди не надіслано).`;
+      form.reset();
+    });
+
+    // ---------- 3D scene ----------
+    const canvas = document.getElementById("scene");
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); }
+    catch (e) { canvas.hidden = true; return; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+
+    // Studio environment for realistic reflections (warm softboxes in a dark room).
+    (function environment() {
+      const env = new THREE.Scene();
+      env.add(new THREE.Mesh(new THREE.BoxGeometry(14, 14, 14), new THREE.MeshBasicMaterial({ color: 0x1c1512, side: THREE.BackSide })));
+      const box = (w, h, color, k, x, y, z) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide }));
+        m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
+      };
+      box(5, 2.2, 0xfff0dc, 7, -3, 4.5, 3);
+      box(2, 5, 0xffd6b0, 3.5, 5.5, 1, 1);
+      box(6, 1, 0xbfd2ff, 1.6, 0, -1, -6);
+      box(3, 3, 0xffe8cc, 2.2, 0, 6, -2);
+      const pm = new THREE.PMREMGenerator(renderer);
+      scene.environment = pm.fromScene(env, 0.035).texture;
+      pm.dispose();
+    })();
+
+    const key = new THREE.DirectionalLight(0xfff1e2, 2.2);
+    key.position.set(-2.5, 6, 3.5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    Object.assign(key.shadow.camera, { left: -2.5, right: 2.5, top: 3.5, bottom: -1.5, near: 1, far: 15 });
+    key.shadow.bias = -0.0004;
+    key.shadow.radius = 5;
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xffb27a, 1.4);
+    rim.position.set(3.5, 2, -3);
+    scene.add(rim);
+
+    // ---------- Procedural textures ----------
+    function canvasTex(w, h, draw, srgb = true) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      draw(c.getContext("2d"), w, h);
+      const t = new THREE.CanvasTexture(c);
+      if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = 4;
+      return t;
+    }
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+    const hammered = canvasTex(512, 256, (g, w, h) => {
+      g.fillStyle = "rgb(128,128,128)"; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 1400; i++) {
+        const x = rnd() * w, y = rnd() * h, r = 5 + rnd() * 9;
+        const grd = g.createRadialGradient(x, y, 0, x, y, r);
+        grd.addColorStop(0, "rgba(70,70,70,0.55)"); grd.addColorStop(0.75, "rgba(150,150,150,0.25)"); grd.addColorStop(1, "rgba(128,128,128,0)");
+        g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+      }
+    }, false);
+    hammered.wrapS = hammered.wrapT = THREE.RepeatWrapping;
+    hammered.repeat.set(3, 1);
+
+    const wood = canvasTex(128, 512, (g, w, h) => {
+      g.fillStyle = "#5a3621"; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 90; i++) {
+        const x = rnd() * w, a = 0.05 + rnd() * 0.14, light = rnd() > 0.5;
+        g.strokeStyle = light ? `rgba(160,105,65,${a})` : `rgba(25,12,6,${a + 0.05})`;
+        g.lineWidth = 0.6 + rnd() * 2.2;
+        g.beginPath();
+        for (let y = 0; y <= h; y += 16) g.lineTo(x + Math.sin(y * 0.02 + i) * 3, y);
+        g.stroke();
+      }
+    });
+
+    const crema = canvasTex(512, 512, (g, w, h) => {
+      const c = w / 2;
+      const grd = g.createRadialGradient(c, c, 0, c, c, c);
+      grd.addColorStop(0, "#3d2214"); grd.addColorStop(0.45, "#6b3f22"); grd.addColorStop(0.8, "#a86f3e"); grd.addColorStop(0.94, "#c48a50"); grd.addColorStop(1, "#7a4625");
+      g.fillStyle = grd; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 2600; i++) {
+        const a = rnd() * Math.PI * 2, d = Math.sqrt(rnd()) * c * 0.98, r = 0.6 + rnd() * 2.6;
+        g.fillStyle = `rgba(${d > c * 0.55 ? "235,190,140" : "150,95,55"},${0.08 + rnd() * 0.22})`;
+        g.beginPath(); g.arc(c + Math.cos(a) * d, c + Math.sin(a) * d, r, 0, Math.PI * 2); g.fill();
+      }
+      g.strokeStyle = "rgba(230,180,120,0.18)"; g.lineWidth = 3;
+      g.beginPath();
+      for (let t = 0; t < 14; t += 0.05) { const r = t * 15; g.lineTo(c + Math.cos(t * 1.6) * r, c + Math.sin(t * 1.6) * r); }
+      g.stroke();
+    });
+
+    const steamTex = canvasTex(128, 128, (g, w) => {
+      const grd = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+      grd.addColorStop(0, "rgba(255,255,255,0.7)"); grd.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = grd; g.fillRect(0, 0, w, w);
+    });
+
+    // ---------- Materials ----------
+    const porcelain = new THREE.MeshPhysicalMaterial({ color: 0xf3efe8, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.06, sheen: 0.3, sheenColor: 0xffffff });
+    const copper = new THREE.MeshPhysicalMaterial({ color: 0xc9733f, metalness: 1, roughness: 0.3, bumpMap: hammered, bumpScale: 2.5, clearcoat: 0.4, clearcoatRoughness: 0.2, side: THREE.DoubleSide });
+    const tin = new THREE.MeshStandardMaterial({ color: 0xcfcac2, metalness: 1, roughness: 0.35, side: THREE.BackSide });
+    const brass = new THREE.MeshStandardMaterial({ color: 0xd2a650, metalness: 1, roughness: 0.25 });
+    const woodMat = new THREE.MeshPhysicalMaterial({ map: wood, roughness: 0.5, clearcoat: 0.6, clearcoatRoughness: 0.35 });
+    const coffeeMat = new THREE.MeshStandardMaterial({ map: crema, roughness: 0.42, envMapIntensity: 0.6 });
+    const streamMat = new THREE.MeshPhysicalMaterial({ color: 0x2a160b, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.03, transmission: 0, specularIntensity: 1 });
+
+    const lathe = (pts, seg = 128) => new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), seg);
+    const shadowy = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
+
+    // ---------- Saucer + cup ----------
+    const stillLife = new THREE.Group();
+    scene.add(stillLife);
+
+    const saucerPts = [[0, 0.004], [0.36, 0.004], [0.39, 0.012], [0.4, 0.03], [0.55, 0.045], [0.7, 0.07], [0.8, 0.1], [0.84, 0.118], [0.845, 0.128], [0.832, 0.132], [0.79, 0.115], [0.66, 0.085], [0.5, 0.062], [0.36, 0.052], [0.3, 0.05], [0, 0.05]];
+    stillLife.add(shadowy(new THREE.Mesh(lathe(saucerPts), porcelain)));
+
+    const cup = new THREE.Group();
+    cup.position.y = 0.05;
+    stillLife.add(cup);
+    const CUP = { foot: 0.05, floor: 0.1, top: 0.78, wall: 0.026 };
+    const outerR = (y) => { const t = clamp((y - CUP.foot) / (CUP.top - CUP.foot), 0, 1); return 0.29 + 0.21 * Math.pow(Math.sin(t * Math.PI / 2), 0.85); };
+    const innerR = (y) => outerR(y) - CUP.wall;
+    const cupPts = [[0, 0.0], [0.24, 0.0], [0.27, 0.006], [0.285, 0.03], [0.275, CUP.foot]];
+    for (let i = 0; i <= 40; i++) { const y = CUP.foot + (CUP.top - CUP.foot) * (i / 40); cupPts.push([outerR(y), y]); }
+    const lip = outerR(CUP.top);
+    cupPts.push([lip + 0.004, CUP.top + 0.008], [lip - CUP.wall / 2, CUP.top + 0.016], [lip - CUP.wall - 0.002, CUP.top + 0.006]);
+    for (let i = 40; i >= 0; i--) { const y = CUP.floor + (CUP.top - CUP.floor) * (i / 40); cupPts.push([innerR(y), y]); }
+    cupPts.push([0, CUP.floor]);
+    cup.add(shadowy(new THREE.Mesh(lathe(cupPts), porcelain)));
+
+    const handleCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(outerR(0.66) - 0.02, 0.66, 0), new THREE.Vector3(0.66, 0.66, 0), new THREE.Vector3(0.73, 0.5, 0),
+      new THREE.Vector3(0.66, 0.32, 0), new THREE.Vector3(outerR(0.26) - 0.02, 0.26, 0),
+    ]);
+    const handle = shadowy(new THREE.Mesh(new THREE.TubeGeometry(handleCurve, 80, 0.038, 20), porcelain));
+    handle.scale.z = 0.7;
+    handle.rotation.y = -0.5;
+    cup.add(handle);
+
+    const coffee = new THREE.Mesh(new THREE.CircleGeometry(1, 96), coffeeMat);
+    coffee.rotation.x = -Math.PI / 2;
+    coffee.receiveShadow = true;
+    cup.add(coffee);
+
+    const ripples = [0, 1, 2].map(() => {
+      const m = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 64), new THREE.MeshBasicMaterial({ color: 0xd9a46d, transparent: true, opacity: 0, depthWrite: false }));
+      m.rotation.x = -Math.PI / 2; cup.add(m); return m;
+    });
+
+    const steam = [0, 1, 2, 3, 4].map(() => {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: steamTex, color: 0xfff5ea, transparent: true, opacity: 0, depthWrite: false }));
+      cup.add(s); return s;
+    });
+
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.ShadowMaterial({ opacity: 0.45 }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    stillLife.add(ground);
+
+    // ---------- Cezve (turka) ----------
+    const T = { s: 0.88 };
+    const turkaBody = [[0, 0], [0.3, 0], [0.36, 0.008], [0.395, 0.035], [0.41, 0.1], [0.415, 0.2], [0.4, 0.3], [0.37, 0.4], [0.33, 0.5], [0.315, 0.56], [0.32, 0.62], [0.345, 0.68], [0.37, 0.71], [0.378, 0.722], [0.37, 0.728], [0.355, 0.715]];
+    for (let i = turkaBody.length - 4; i >= 1; i--) { const [x, y] = turkaBody[i]; turkaBody.push([x - 0.014, Math.max(y, 0.014)]); }
+    turkaBody.push([0, 0.014]);
+    const turkaGeo = lathe(turkaBody, 160);
+    // Pull out a pouring spout at +X near the rim.
+    {
+      const p = turkaGeo.attributes.position, v = new THREE.Vector3();
+      for (let i = 0; i < p.count; i++) {
+        v.fromBufferAttribute(p, i);
+        const phi = Math.atan2(v.x, v.z);
+        let d = phi - Math.PI / 2; d = Math.atan2(Math.sin(d), Math.cos(d));
+        const w = Math.exp(-((d / 0.32) ** 2)) * Math.pow(clamp((v.y - 0.56) / 0.17, 0, 1), 2);
+        const k = 1 + 0.42 * w;
+        v.x *= k; v.z *= k; v.y += 0.045 * w;
+        p.setXYZ(i, v.x, v.y, v.z);
+      }
+      turkaGeo.computeVertexNormals();
+    }
+    const SPOUT = new THREE.Vector3(0.378 * 1.42 + 0.005, 0.722 + 0.045, 0);
+
+    const turka = new THREE.Group();
+    turka.scale.setScalar(T.s);
+    turka.add(shadowy(new THREE.Mesh(turkaGeo, copper)));
+    const lining = new THREE.Mesh(turkaGeo, tin);
+    lining.scale.setScalar(0.995);
+    turka.add(lining);
+
+    // Handle: copper bracket, brass ferrule, long wooden grip.
+    const dir = new THREE.Vector3(-Math.cos(0.38), Math.sin(0.38), 0);
+    const attach = new THREE.Vector3(-0.37, 0.42, 0);
+    const bracketLen = 0.22;
+    const bracket = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.045, bracketLen, 24), copper));
+    bracket.position.copy(attach).addScaledVector(dir, bracketLen / 2 - 0.02);
+    bracket.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    turka.add(bracket);
+    const ferrule = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 32), brass));
+    ferrule.position.copy(attach).addScaledVector(dir, bracketLen + 0.03);
+    ferrule.quaternion.copy(bracket.quaternion);
+    turka.add(ferrule);
+    const gripLen = 1.15;
+    const grip = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.044, gripLen, 32, 1), woodMat));
+    grip.position.copy(attach).addScaledVector(dir, bracketLen + 0.08 + gripLen / 2);
+    grip.quaternion.copy(bracket.quaternion);
+    turka.add(grip);
+    const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(0.058, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), woodMat));
+    cap.position.copy(attach).addScaledVector(dir, bracketLen + 0.08 + gripLen);
+    cap.quaternion.copy(bracket.quaternion);
+    turka.add(cap);
+    [0.12, 0.2].forEach((o) => {
+      const rivet = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 8), brass);
+      rivet.position.copy(attach).addScaledVector(dir, o); rivet.position.z = 0.04;
+      turka.add(rivet);
+    });
+
+    // Pivot at the spout tip so pouring keeps the stream origin steady.
+    const pivot = new THREE.Group();
+    const PIVOT_BASE = new THREE.Vector3(0.06, 1.66, 0);
+    pivot.position.copy(PIVOT_BASE);
+    turka.position.copy(SPOUT).multiplyScalar(-T.s);
+    pivot.add(turka);
+    stillLife.add(pivot);
+
+    // ---------- Stream ----------
+    const stream = new THREE.Mesh(new THREE.BufferGeometry(), streamMat);
+    stream.castShadow = true;
+    stillLife.add(stream);
+    const tip = new THREE.Vector3();
+
+    // ---------- Layout ----------
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      const wide = w / h > 1.05;
+      camera.userData.dist = Math.max(6.4, 5.6 / Math.min(1, camera.aspect));
+      if (wide) camera.setViewOffset(w, h, -w * 0.21, 0, w, h);
+      else camera.setViewOffset(w, h, 0, h * 0.2, w, h);
+      camera.updateProjectionMatrix();
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    // ---------- Animation ----------
+    const MAX_TILT = 1.02;
+    let shown = 0, last = performance.now(), running = false;
+    const progress = () => { const max = document.documentElement.scrollHeight - innerHeight; return max > 0 ? clamp(scrollY / max, 0, 1) : 0; };
+
+    function frame(now) {
+      running = false;
+      const dt = Math.min((now - last) / 1000, 0.05); last = now;
+      const target = progress();
+      shown += (target - shown) * (1 - Math.exp(-dt * 5));
+      const p = shown, time = now / 1000;
+
+      // Pour timeline: tilt in, pour, tilt back.
+      const tilt = MAX_TILT * smooth(0.04, 0.2, p) * (1 - smooth(0.86, 0.97, p));
+      const pouring = smooth(0.16, 0.22, p) * (1 - smooth(0.84, 0.9, p));
+      const fill = smooth(0.2, 0.86, p);
+      const bob = reduceMotion ? 0 : Math.sin(time * 1.1) * 0.025 * (1 - pouring);
+      pivot.position.set(PIVOT_BASE.x, PIVOT_BASE.y + bob, 0);
+      pivot.rotation.z = -tilt;
+      pivot.rotation.x = reduceMotion ? 0 : Math.sin(time * 0.7) * 0.03 * (1 - pouring);
+
+      // Coffee level.
+      const level = CUP.floor + 0.004 + fill * (CUP.top - CUP.floor - 0.11);
+      coffee.visible = fill > 0.002;
+      coffee.position.y = level;
+      coffee.scale.setScalar(innerR(level) - 0.002);
+      coffee.rotation.z = reduceMotion ? 0 : time * 0.15 * pouring;
+
+      // Stream from spout to surface.
+      stillLife.updateMatrixWorld(true);
+      tip.copy(SPOUT).applyMatrix4(turka.children[0].matrixWorld);
+      stillLife.worldToLocal(tip);
+      const surfaceY = cup.position.y + level;
+      const head = smooth(0.16, 0.23, p), tail = smooth(0.84, 0.9, p);
+      if (head - tail > 0.01) {
+        const fall = tip.y - surfaceY;
+        const impactX = tip.x + 0.12;
+        const full = new THREE.CatmullRomCurve3([
+          tip.clone(), new THREE.Vector3(tip.x + 0.07, tip.y - 0.02, 0), new THREE.Vector3(tip.x + 0.11, tip.y - fall * 0.25, 0),
+          new THREE.Vector3(impactX, tip.y - fall * 0.65, 0), new THREE.Vector3(impactX, surfaceY - 0.01, 0),
+        ]);
+        const pts = [];
+        for (let i = 0; i <= 30; i++) {
+          const u = tail + (head - tail) * (i / 30);
+          const pt = full.getPoint(u);
+          if (!reduceMotion) pt.x += Math.sin(time * 9 + u * 18) * 0.003 * u;
+          pts.push(pt);
+        }
+        stream.geometry.dispose();
+        stream.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.019 + 0.004 * pouring, 12);
+        stream.visible = true;
+
+        ripples.forEach((r, i) => {
+          const ph = ((reduceMotion ? 0.4 : time * 1.3) + i / 3) % 1;
+          r.position.set(impactX, level + 0.003, 0);
+          r.scale.setScalar(0.03 + ph * 0.16);
+          r.material.opacity = (1 - ph) * 0.55 * pouring * (head > 0.98 ? 1 : 0);
+        });
+      } else {
+        stream.visible = false;
+        ripples.forEach((r) => (r.material.opacity = 0));
+      }
+
+      // Steam once the cup is full enough.
+      const steamAmt = smooth(0.45, 0.85, fill);
+      steam.forEach((s, i) => {
+        const ph = ((reduceMotion ? 0.3 : time * 0.18) + i / steam.length) % 1;
+        s.position.set(Math.sin(time * 0.8 + i * 2) * 0.08 * ph + (i - 2) * 0.05, CUP.top + 0.05 + ph * 0.9, Math.cos(i * 1.7) * 0.08);
+        s.scale.setScalar(0.25 + ph * 0.55);
+        s.material.opacity = Math.sin(ph * Math.PI) * 0.14 * steamAmt;
+      });
+
+      // Camera: gentle orbit with scroll for depth.
+      const az = -0.35 + p * 0.7;
+      const d = camera.userData.dist;
+      camera.position.set(Math.sin(az) * d, 2.75 + (1 - p) * 0.25, Math.cos(az) * d);
+      camera.lookAt(0, 1.12, 0);
+
+      renderer.render(scene, camera);
+      const settling = Math.abs(target - shown) > 0.0005;
+      if (!document.hidden && (settling || !reduceMotion)) { running = true; requestAnimationFrame(frame); }
+    }
+    const start = () => { if (!running && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(frame); } };
+    addEventListener("scroll", start, { passive: true });
+    addEventListener("resize", start);
+    document.addEventListener("visibilitychange", start);
+    start();
+  })();
+  </script>
+</body>
+</html>
