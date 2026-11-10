@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Обжиг — студия керамики</title>
+  <meta name="description" content="Демо-сайт студии керамики с 3D-моделями ваз.">
+  <meta name="theme-color" content="#eceeea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111513" media="(prefers-color-scheme: dark)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap">
+  <style>
+    /* Layout: split hero with a live 3D stage; a sticky 3D stage narrates the process on scroll. */
+    :root {
+      color-scheme: light;
+      --bg: #eceeea;
+      --surface: #f7f8f5;
+      --ink: #17201d;
+      --muted: #59645f;
+      --line: #d5dad3;
+      --accent: #2a49c7;
+      --accent-ink: #ffffff;
+      --accent-soft: #dfe4f7;
+      --error: #b3261e;
+      --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+      --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --radius: 16px;
+      --header-h: 64px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #111513; --surface: #181d1b; --ink: #e8ece8; --muted: #9ba59f;
+        --line: #2a312e; --accent: #8fa2ff; --accent-ink: #0d1330; --accent-soft: #1f2846; --error: #ff8a80;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #111513; --surface: #181d1b; --ink: #e8ece8; --muted: #9ba59f;
+      --line: #2a312e; --accent: #8fa2ff; --accent-ink: #0d1330; --accent-soft: #1f2846; --error: #ff8a80;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+    a, button, input, select, summary, canvas { touch-action: manipulation; }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 0.5em; text-wrap: balance; }
+    h1 { font-size: clamp(2.1rem, 5.2vw, 3.9rem); }
+    h2 { font-size: clamp(1.6rem, 3.4vw, 2.5rem); }
+    h3 { font-size: 1.1rem; }
+    p { margin: 0 0 1em; text-wrap: pretty; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    .wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    section { padding-block: clamp(3rem, 8vw, 6rem); }
+    .eyebrow { display: inline-block; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .lead { font-size: 1.2rem; color: var(--muted); max-width: 52ch; }
+    .muted { color: var(--muted); }
+    .num { font-variant-numeric: tabular-nums; }
+
+    .skip { position: absolute; left: 16px; top: -4rem; z-index: 100; background: var(--ink); color: var(--bg); padding: 0.6rem 1rem; border-radius: 8px; }
+    .skip:focus { top: 16px; }
+
+    /* Header */
+    .site-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); }
+    .logo { color: var(--ink); font-family: var(--font-display); font-weight: 600; text-decoration: none; font-size: 1.15rem; display: inline-flex; align-items: center; gap: 0.55rem; }
+    .logo svg { width: 22px; height: 22px; }
+    .nav { display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 0.5rem 0.8rem; border-radius: 999px; white-space: nowrap; transition: color 150ms ease, background-color 150ms ease; }
+    @media (hover: hover) and (pointer: fine) { .nav a:hover { color: var(--ink); background: var(--accent-soft); } }
+    @media (max-width: 720px) {
+      :root { --header-h: 104px; }
+      .site-header .wrap { flex-direction: column; align-items: flex-start; gap: 0; padding-block: 0.6rem 0.4rem; }
+      .nav { width: 100%; margin-left: -0.8rem; }
+    }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; padding: 0.75rem 1.4rem; border-radius: 999px; border: 1px solid transparent; background: var(--accent); color: var(--accent-ink); font: 600 1rem/1 var(--font-body); text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), box-shadow 200ms ease, background-color 150ms ease; }
+    .btn:active { transform: scale(0.97); }
+    .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 35%, transparent); }
+      .btn-ghost:hover { background: var(--surface); box-shadow: none; }
+    }
+
+    /* Hero */
+    .hero { padding-top: clamp(2rem, 5vw, 4rem); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.75rem; }
+    @media (max-width: 880px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } }
+
+    .stage { position: relative; aspect-ratio: 1 / 1; max-width: 100%; border-radius: 28px; background: radial-gradient(120% 90% at 50% 20%, var(--surface), var(--bg)); border: 1px solid var(--line); overflow: hidden; }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; outline-offset: -3px; }
+    .stage canvas:active { cursor: grabbing; }
+    .stage-hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font-size: 0.85rem; color: var(--muted); background: color-mix(in srgb, var(--surface) 80%, transparent); padding: 0.3rem 0.8rem; border-radius: 999px; white-space: nowrap; pointer-events: none; }
+    .stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 2rem; text-align: center; color: var(--muted); }
+
+    .picker { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+    .chip { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 0.95rem/1 var(--font-body); cursor: pointer; transition: transform 160ms var(--ease-out), border-color 150ms ease, background-color 150ms ease; }
+    .chip:active { transform: scale(0.97); }
+    .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent); }
+
+    .specs { margin-top: 1rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; padding: 0; list-style: none; transition: filter 200ms ease, opacity 200ms ease, transform 200ms var(--ease-out); }
+    .specs.swap { filter: blur(4px); opacity: 0; transform: translateY(4px); }
+    .specs li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0.7rem 0.8rem; min-width: 0; }
+    .specs b { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .specs span { font-weight: 700; font-variant-numeric: tabular-nums; }
+    @media (max-width: 520px) { .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* Process: sticky 3D stage + scrolling steps */
+    .process-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; }
+    .process-stage { position: sticky; top: calc(var(--header-h) + 24px); }
+    .steps { list-style: none; margin: 0; padding: 0; }
+    .step { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; opacity: 0.35; transition: opacity 300ms ease; }
+    .step.is-active { opacity: 1; }
+    .step .temp { font-family: var(--font-display); font-size: 0.95rem; color: var(--accent); font-variant-numeric: tabular-nums; margin-bottom: 0.5rem; }
+    @media (max-width: 880px) {
+      .process-grid { grid-template-columns: minmax(0, 1fr); }
+      .process-stage { top: calc(var(--header-h) + 8px); z-index: 2; background: var(--bg); padding-bottom: 0.5rem; }
+      .process-stage .stage { aspect-ratio: auto; height: 36vh; }
+      .step { min-height: 55vh; }
+    }
+
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; list-style: none; margin: 0; padding: 0; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
+    .card .price { font-family: var(--font-display); font-size: 1.4rem; margin-top: auto; padding-top: 0.75rem; font-variant-numeric: tabular-nums; }
+    .band { background: var(--surface); border-block: 1px solid var(--line); }
+    .band .card { background: var(--bg); }
+
+    /* FAQ */
+    .faq { display: grid; gap: 0.6rem; max-width: 760px; }
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+    .faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 52px; padding: 0.9rem 1.2rem; font-weight: 600; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--accent); transition: transform 200ms var(--ease-out); }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { padding: 0 1.2rem 1rem; margin: 0; color: var(--muted); }
+
+    /* Form */
+    .order-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+    @media (max-width: 880px) { .order-grid { grid-template-columns: minmax(0, 1fr); } }
+    .form { display: grid; gap: 0.9rem; }
+    .field { display: grid; gap: 0.35rem; }
+    .field label { font-weight: 600; font-size: 0.95rem; }
+    .field input, .field select { min-height: 48px; padding: 0.6rem 0.9rem; font: inherit; color: var(--ink); background-color: var(--surface); border: 1px solid var(--line); border-radius: 12px; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    .field input:focus-visible, .field select:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+    .field input[aria-invalid="true"] { border-color: var(--error); }
+    .error { color: var(--error); font-size: 0.9rem; min-height: 1.2em; margin: 0; }
+    .status { font-weight: 600; min-height: 1.5em; margin: 0; }
+
+    footer { border-top: 1px solid var(--line); padding-block: 2rem; color: var(--muted); font-size: 0.95rem; }
+    footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+
+    /* Entrance: short, ease-out, staggered; transform + opacity only. */
+    .reveal { animation: rise 520ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { animation: fade 200ms ease both; }
+      @keyframes fade { from { opacity: 0; } }
+      .btn:active, .chip:active { transform: none; }
+      .specs.swap { filter: none; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Перейти к содержанию</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="#top" translate="no">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v2c0 1.5 3 3.5 3 8a7 7 0 0 1-14 0c0-4.5 3-6.5 3-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        Обжиг
+      </a>
+      <nav class="nav" aria-label="Разделы">
+        <a href="#collection">Коллекция</a>
+        <a href="#process">Как мы делаем</a>
+        <a href="#classes">Мастерская</a>
+        <a href="#order">Заказ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid" id="collection">
+        <div>
+          <span class="eyebrow reveal" style="--i:0">Студия керамики · ручная работа</span>
+          <h1 class="reveal" style="--i:1">Вазы, которые хочется взять в руки</h1>
+          <p class="lead reveal" style="--i:2">Небольшие тиражи, два обжига, глазури собственного состава. Каждую форму можно повернуть прямо здесь.</p>
+
+          <div class="reveal" style="--i:3">
+            <div class="picker" role="group" aria-label="Модель вазы">
+              <button class="chip" type="button" data-model="0" aria-pressed="true"><span class="swatch" style="background:#2c47b8" aria-hidden="true"></span>Амфора</button>
+              <button class="chip" type="button" data-model="1" aria-pressed="false"><span class="swatch" style="background:#9fc1ab" aria-hidden="true"></span>Луна</button>
+              <button class="chip" type="button" data-model="2" aria-pressed="false"><span class="swatch" style="background:#6e2f20" aria-hidden="true"></span>Колонна</button>
+            </div>
+            <ul class="specs" aria-live="polite">
+              <li><b>Высота</b><span data-spec="height"></span></li>
+              <li><b>Объём</b><span data-spec="volume"></span></li>
+              <li><b>Глазурь</b><span data-spec="glaze"></span></li>
+              <li><b>Цена</b><span data-spec="price"></span></li>
+            </ul>
+          </div>
+
+          <div class="hero-actions reveal" style="--i:4">
+            <a class="btn" href="#order">Заказать вазу</a>
+            <a class="btn btn-ghost" href="#process">Как мы делаем</a>
+          </div>
+        </div>
+
+        <div class="stage reveal" style="--i:2">
+          <canvas id="hero-canvas" tabindex="0" role="img" aria-label="3D-модель вазы «Амфора». Перетащите или нажимайте стрелки, чтобы повернуть."></canvas>
+          <span class="stage-hint">Потяните, чтобы повернуть</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="process" aria-labelledby="process-title">
+      <div class="wrap">
+        <span class="eyebrow">Процесс</span>
+        <h2 id="process-title">От кома глины до вазы</h2>
+        <p class="lead">Листайте вниз: модель слева проходит те же этапы, что и настоящая ваза в мастерской.</p>
+        <div class="process-grid">
+          <div class="process-stage">
+            <div class="stage">
+              <canvas id="process-canvas" tabindex="0" role="img" aria-label="3D-модель: этап «Подготовка глины»."></canvas>
+            </div>
+          </div>
+          <ol class="steps">
+            <li class="step is-active" data-stage="0">
+              <span class="temp">Этап 1 · 20&nbsp;°C</span>
+              <h3>Подготовка глины</h3>
+              <p class="muted">Разминаем ком, чтобы убрать пузырьки воздуха. Глина влажная, тяжёлая и пока без формы.</p>
+            </li>
+            <li class="step" data-stage="1">
+              <span class="temp">Этап 2 · на круге</span>
+              <h3>Вытягивание стенок</h3>
+              <p class="muted">Центруем ком на гончарном круге и поднимаем стенки. Пальцы оставляют едва заметные кольца.</p>
+            </li>
+            <li class="step" data-stage="2">
+              <span class="temp">Этап 3 · 900&nbsp;°C</span>
+              <h3>Утильный обжиг</h3>
+              <p class="muted">Высушенная форма получает финальный силуэт и первый обжиг. Глина светлеет и становится твёрдой, как камень.</p>
+            </li>
+            <li class="step" data-stage="3">
+              <span class="temp">Этап 4 · 1&nbsp;240&nbsp;°C</span>
+              <h3>Глазурь и второй обжиг</h3>
+              <p class="muted">Окунаем в глазурь и обжигаем повторно. Глазурь плавится в стекло и даёт глубокий блеск.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="classes" aria-labelledby="classes-title">
+      <div class="wrap">
+        <span class="eyebrow">Мастерская</span>
+        <h2 id="classes-title">Попробуйте сами</h2>
+        <ul class="grid">
+          <li class="card"><h3>Пробное занятие</h3><p class="muted">2 часа за гончарным кругом. Глина, глазурь и обжиг включены.</p><span class="price">900&nbsp;₴</span></li>
+          <li class="card"><h3>Курс на круге</h3><p class="muted">8 занятий в группе до 6 человек. От центровки до собственной вазы.</p><span class="price">6&nbsp;400&nbsp;₴</span></li>
+          <li class="card"><h3>Подарочный сертификат</h3><p class="muted">На занятие или любую вазу из коллекции. Действует 6 месяцев.</p><span class="price">от 900&nbsp;₴</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="faq-title">
+      <div class="wrap">
+        <h2 id="faq-title">Частые вопросы</h2>
+        <div class="faq">
+          <details><summary>Сколько ждать заказ?</summary><p>2–3 недели: вазе нужно высохнуть и пройти два обжига.</p></details>
+          <details><summary>Можно ли наливать воду?</summary><p>Да. Все вазы покрыты глазурью изнутри и не пропускают воду.</p></details>
+          <details><summary>Что если ваза разобьётся при доставке?</summary><p>Пришлите фото, и мы сделаем новую бесплатно.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="order" aria-labelledby="order-title">
+      <div class="wrap order-grid">
+        <div>
+          <span class="eyebrow">Заказ</span>
+          <h2 id="order-title">Оставьте заявку</h2>
+          <p class="lead">Мы ответим в течение дня и уточним цвет глазури и сроки.</p>
+          <p class="muted">Это демо-сайт: заявка никуда не отправляется.</p>
+        </div>
+        <form class="form" id="order-form" novalidate>
+          <div class="field">
+            <label for="f-name">Имя</label>
+            <input id="f-name" name="name" autocomplete="name" placeholder="Анна…" aria-describedby="f-name-error">
+            <p class="error" id="f-name-error"></p>
+          </div>
+          <div class="field">
+            <label for="f-email">Электронная почта</label>
+            <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" placeholder="anna@example.com" aria-describedby="f-email-error">
+            <p class="error" id="f-email-error"></p>
+          </div>
+          <div class="field">
+            <label for="f-model">Модель</label>
+            <select id="f-model" name="model">
+              <option value="0">Амфора · 3 200 ₴</option>
+              <option value="1">Луна · 2 800 ₴</option>
+              <option value="2">Колонна · 2 600 ₴</option>
+            </select>
+          </div>
+          <button class="btn" type="submit">Отправить заявку</button>
+          <p class="status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© Обжиг, студия керамики (демо)</span>
+      <span>hello@example.com</span>
+    </div>
+  </footer>
+
+  <script>/*THREE*/</script>
+  <script>
+  (() => {
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // ---------- Vase geometry: a lathe profile with a fixed point count so shapes can morph ----------
+    const PTS = 44;
+    function radiusAt(r, t) {
+      const n = r.length - 1, x = t * n, i = Math.min(Math.floor(x), n - 1), f = x - i;
+      const p0 = r[Math.max(i - 1, 0)], p1 = r[i], p2 = r[i + 1], p3 = r[Math.min(i + 2, n)];
+      return 0.5 * (2 * p1 + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f * f + (-p0 + 3 * p1 - 3 * p2 + p3) * f * f * f);
+    }
+    function profile(d) {
+      const out = [0, 0];
+      const rings = d.rings ?? 0.0022;
+      for (let i = 0; i <= PTS; i++) {
+        const t = i / PTS;
+        out.push(Math.max(0.01, radiusAt(d.radii, t) + rings * Math.sin(t * 48)), t * d.h);
+      }
+      const top = Math.max(0.01, radiusAt(d.radii, 1));
+      const inTop = Math.max(0, top - d.wall);
+      out.push((top + inTop) / 2, d.h + Math.min(d.wall, 0.06) * 0.4);
+      const floor = Math.min(d.wall, d.h * 0.5);
+      for (let i = PTS; i >= 0; i--) {
+        const t = i / PTS;
+        out.push(Math.max(0, radiusAt(d.radii, t) - d.wall), Math.max(t * d.h, floor));
+      }
+      out.push(0, floor);
+      return out;
+    }
+
+    const MODELS = [
+      { name: "Амфора", h: 1.6, radii: [0.22, 0.48, 0.6, 0.52, 0.3, 0.18, 0.24], wall: 0.05, color: "#2c47b8", rough: 0.22, coat: 1,
+        specs: { height: "38 см", volume: "2,4 л", glaze: "Кобальт", price: "3 200 ₴" } },
+      { name: "Луна", h: 1.15, radii: [0.3, 0.6, 0.72, 0.68, 0.48, 0.3, 0.32], wall: 0.05, color: "#9fc1ab", rough: 0.18, coat: 1,
+        specs: { height: "24 см", volume: "3,1 л", glaze: "Селадон", price: "2 800 ₴" } },
+      { name: "Колонна", h: 1.5, radii: [0.36, 0.41, 0.4, 0.39, 0.38, 0.38, 0.41], wall: 0.05, color: "#6e2f20", rough: 0.3, coat: 0.8,
+        specs: { height: "32 см", volume: "2,0 л", glaze: "Тэммоку", price: "2 600 ₴" } },
+    ];
+    const STAGES = [
+      { name: "Подготовка глины", h: 0.75, radii: [0.5, 0.62, 0.6, 0.52, 0.38, 0.2, 0.03], wall: 2, rings: 0.008, color: "#8b6a55", rough: 0.55, coat: 0.35 },
+      { name: "Вытягивание стенок", h: 1.0, radii: [0.42, 0.44, 0.43, 0.42, 0.4, 0.39, 0.4], wall: 0.08, rings: 0.006, color: "#8b6a55", rough: 0.5, coat: 0.4 },
+      { name: "Утильный обжиг", h: 1.15, radii: MODELS[1].radii, wall: 0.05, color: "#e4d6c5", rough: 0.95, coat: 0 },
+      { name: "Глазурь и второй обжиг", h: 1.15, radii: MODELS[1].radii, wall: 0.05, color: "#9fc1ab", rough: 0.18, coat: 1 },
+    ];
+
+    const easeInOut = (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
+
+    // ---------- A reusable 3D view ----------
+    function createView(canvas, start) {
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      } catch (e) {
+        canvas.insertAdjacentHTML("afterend", '<p class="stage-fallback">3D недоступно в этом браузере.</p>');
+        return { morphTo() {} };
+      }
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x8a96a8, 1.3));
+      const key = new THREE.DirectionalLight(0xffffff, 2.4);
+      key.position.set(3, 5, 4);
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      Object.assign(key.shadow.camera, { left: -2, right: 2, top: 2, bottom: -2 });
+      key.shadow.radius = 6;
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0xa9bbff, 1.1);
+      rim.position.set(-4, 2.5, -3);
+      scene.add(rim);
+
+      const BASE = -0.8;
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.ShadowMaterial({ opacity: 0.16 }));
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = BASE;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      const material = new THREE.MeshPhysicalMaterial({ color: start.color, roughness: start.rough, clearcoat: start.coat, clearcoatRoughness: 0.12, side: THREE.DoubleSide });
+      let current = profile(start), currentH = start.h;
+      const mesh = new THREE.Mesh(build(current), material);
+      mesh.castShadow = true;
+      mesh.position.y = BASE;
+      scene.add(mesh);
+
+      function build(arr) {
+        const pts = [];
+        for (let i = 0; i < arr.length; i += 2) pts.push(new THREE.Vector2(arr[i], arr[i + 1]));
+        return new THREE.LatheGeometry(pts, 96);
+      }
+
+      // Morph state
+      let morph = null;
+      function morphTo(d) {
+        const to = profile(d);
+        if (reduceMotion) {
+          setShape(to, d.h); material.color.set(d.color); material.roughness = d.rough; material.clearcoat = d.coat;
+          return;
+        }
+        morph = { from: current.slice(), to, fromH: currentH, toH: d.h,
+          fromColor: material.color.clone(), toColor: new THREE.Color(d.color),
+          fromRough: material.roughness, toRough: d.rough, fromCoat: material.clearcoat, toCoat: d.coat,
+          t0: performance.now(), dur: 750 };
+        kick();
+      }
+      function setShape(arr, h) {
+        current = arr; currentH = h;
+        mesh.geometry.dispose();
+        mesh.geometry = build(arr);
+      }
+
+      // Rotation: slow idle spin, drag with inertia, arrow keys.
+      let rot = 0.6, vel = 0, dragging = false, lastX = 0;
+      canvas.addEventListener("pointerdown", (e) => { dragging = true; lastX = e.clientX; vel = 0; canvas.setPointerCapture(e.pointerId); kick(); });
+      canvas.addEventListener("pointermove", (e) => { if (!dragging) return; const dx = e.clientX - lastX; lastX = e.clientX; rot += dx * 0.012; vel = dx * 0.012; kick(); });
+      const endDrag = () => { dragging = false; };
+      canvas.addEventListener("pointerup", endDrag);
+      canvas.addEventListener("pointercancel", endDrag);
+      canvas.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); rot += e.key === "ArrowLeft" ? -0.3 : 0.3; kick(); }
+      });
+
+      // Size
+      const resize = () => {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        kick();
+      };
+      new ResizeObserver(resize).observe(canvas);
+
+      // Render only while visible.
+      let visible = false, raf = 0, last = performance.now();
+      new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; kick(); }).observe(canvas);
+      document.addEventListener("visibilitychange", kick);
+      function kick() { if (!raf && visible && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+
+      function frame(now) {
+        raf = 0;
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+
+        if (morph) {
+          const k = Math.min((now - morph.t0) / morph.dur, 1), e = easeInOut(k);
+          const arr = morph.from.map((v, i) => v + (morph.to[i] - v) * e);
+          setShape(arr, morph.fromH + (morph.toH - morph.fromH) * e);
+          material.color.lerpColors(morph.fromColor, morph.toColor, e);
+          material.roughness = morph.fromRough + (morph.toRough - morph.fromRough) * e;
+          material.clearcoat = morph.fromCoat + (morph.toCoat - morph.fromCoat) * e;
+          if (k === 1) morph = null;
+        }
+
+        if (!dragging) {
+          vel *= Math.pow(0.04, dt);
+          rot += vel;
+          if (!reduceMotion) rot += dt * 0.35;
+        }
+        mesh.rotation.y = rot;
+
+        // Camera frames the current height and drifts slightly with page scroll.
+        const rect = canvas.getBoundingClientRect();
+        const progress = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - innerHeight / 2) / innerHeight));
+        const targetY = BASE + currentH / 2;
+        const dist = 3.2 + currentH * 1.6;
+        camera.position.set(0, targetY + 0.55 + (reduceMotion ? 0 : progress * 0.5), dist);
+        camera.lookAt(0, targetY, 0);
+
+        renderer.render(scene, camera);
+        const animating = morph || dragging || Math.abs(vel) > 1e-4 || !reduceMotion;
+        if (animating) kick();
+      }
+      addEventListener("scroll", kick, { passive: true });
+
+      return { morphTo };
+    }
+
+    // ---------- Hero: collection picker ----------
+    const heroCanvas = document.getElementById("hero-canvas");
+    const hero = createView(heroCanvas, MODELS[0]);
+    const chips = [...document.querySelectorAll("[data-model]")];
+    const specs = document.querySelector(".specs");
+    const fill = (m) => Object.entries(m.specs).forEach(([k, v]) => (specs.querySelector(`[data-spec="${k}"]`).textContent = v));
+    fill(MODELS[0]);
+    let active = 0;
+    function select(i) {
+      if (i === active) return;
+      active = i;
+      const m = MODELS[i];
+      chips.forEach((c, j) => c.setAttribute("aria-pressed", String(j === i)));
+      hero.morphTo(m);
+      heroCanvas.setAttribute("aria-label", `3D-модель вазы «${m.name}». Перетащите или нажимайте стрелки, чтобы повернуть.`);
+      document.getElementById("f-model").value = String(i);
+      if (reduceMotion) { fill(m); return; }
+      specs.classList.add("swap");
+      setTimeout(() => { fill(m); specs.classList.remove("swap"); }, 180);
+    }
+    chips.forEach((c, i) => c.addEventListener("click", () => select(i)));
+
+    // ---------- Process: scroll-driven stages ----------
+    const procCanvas = document.getElementById("process-canvas");
+    const proc = createView(procCanvas, STAGES[0]);
+    const steps = [...document.querySelectorAll(".step")];
+    let stage = 0;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const i = Number(entry.target.dataset.stage);
+        if (i === stage) return;
+        stage = i;
+        steps.forEach((s, j) => s.classList.toggle("is-active", j === i));
+        proc.morphTo(STAGES[i]);
+        procCanvas.setAttribute("aria-label", `3D-модель: этап «${STAGES[i].name}».`);
+      });
+    }, { rootMargin: "-45% 0px -45% 0px" });
+    steps.forEach((s) => io.observe(s));
+
+    // ---------- Order form ----------
+    const form = document.getElementById("order-form");
+    const status = form.querySelector(".status");
+    const rules = {
+      name: (v) => (v.trim().length >= 2 ? "" : "Введите имя: минимум 2 буквы."),
+      email: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : "Проверьте почту: например, anna@example.com."),
+    };
+    const check = (input) => {
+      const msg = rules[input.name](input.value);
+      input.setAttribute("aria-invalid", msg ? "true" : "false");
+      document.getElementById(`${input.id}-error`).textContent = msg;
+      return !msg;
+    };
+    const inputs = [...form.querySelectorAll("input")];
+    inputs.forEach((input) => {
+      input.addEventListener("blur", () => input.value && check(input));
+      input.addEventListener("input", () => input.getAttribute("aria-invalid") === "true" && check(input));
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ok = inputs.map(check);
+      if (ok.includes(false)) { inputs[ok.indexOf(false)].focus(); status.textContent = ""; return; }
+      const model = MODELS[Number(form.model.value)].name;
+      status.textContent = `Спасибо! Заявка на «${model}» принята (демо, никуда не отправлена).`;
+      form.reset();
+    });
+
+    // In-page links: scroll ourselves so navigation also works inside embedded previews.
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const el = document.getElementById(a.getAttribute("href").slice(1));
+      if (!el) return;
+      e.preventDefault();
+      el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      if (a.classList.contains("skip")) { el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); }
+    });
+  })();
+  </script>
+</body>
+</html>
