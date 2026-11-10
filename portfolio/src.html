@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ростислав — веб-дизайнер</title>
+  <meta name="description" content="Портфолио веб-дизайнера: проектирование и дизайн сайтов, баннеры, карточки товаров.">
+  <meta name="theme-color" content="#0b0b0c">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+  <style>
+    /* Layout: full-screen slide deck; a 3D laptop lives on a fixed canvas to the right, slide text on the left. */
+    :root {
+      --bg: #f6f6f3; --surface: #ffffff; --ink: #111114; --muted: #5d5d66; --line: #e2e2de;
+      --accent: #2f45ff; --accent-ink: #ffffff; --glow: rgb(47 69 255 / 22%);
+      --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+      --font-body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --header-h: 72px;
+      color-scheme: light;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0b0b0c; --surface: #161618; --ink: #f3f3f4; --muted: #a2a2aa; --line: #27272b;
+      --accent: #ff2d3f; --accent-ink: #ffffff; --glow: rgb(255 45 63 / 26%);
+      color-scheme: dark;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--font-body); -webkit-font-smoothing: antialiased; transition: background-color 400ms ease, color 400ms ease; }
+    body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(55% 65% at 70% 48%, var(--glow), transparent 70%); transition: background 400ms ease; }
+    a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    button { font: inherit; color: inherit; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 0.45em; text-wrap: balance; }
+    h1 { font-size: clamp(2rem, 4.6vw, 3.9rem); }
+    h2 { font-size: clamp(1.7rem, 3.6vw, 3rem); }
+    h3 { font-size: 1rem; margin: 0 0 0.2em; }
+    p { margin: 0 0 1em; text-wrap: pretty; }
+    .accent { color: var(--accent); }
+    .muted { color: var(--muted); }
+
+    #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
+    .sky { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+
+    /* Header */
+    .site-header { position: fixed; inset: 0 0 auto; z-index: 20; padding-top: env(safe-area-inset-top, 0px); }
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: var(--header-h); padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+    .logo { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.6rem; background: none; border: 0; padding: 0; cursor: pointer; }
+    .logo i { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 16px var(--accent); }
+    .nav { display: flex; gap: 0.2rem; }
+    .nav button { background: none; border: 0; padding: 0.5rem 0.85rem; border-radius: 999px; color: var(--muted); cursor: pointer; transition: color 150ms ease, background-color 150ms ease; }
+    .nav button[aria-current="true"] { color: var(--ink); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+    @media (hover: hover) and (pointer: fine) { .nav button:hover { color: var(--ink); } }
+    .tools { display: flex; align-items: center; gap: 0.5rem; }
+    .seg { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--surface) 70%, transparent); backdrop-filter: blur(10px); }
+    .seg button { min-width: 40px; min-height: 36px; padding: 0 0.6rem; border: 0; border-radius: 999px; background: none; cursor: pointer; font: 500 0.8rem/1 var(--font-mono); color: var(--muted); transition: background-color 200ms ease, color 200ms ease; }
+    .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: color-mix(in srgb, var(--surface) 70%, transparent); backdrop-filter: blur(10px); cursor: pointer; transition: transform 160ms var(--ease-out); }
+    .icon-btn:active { transform: scale(0.94); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    :root[data-theme="dark"] .sun, :root:not([data-theme="dark"]) .moon { display: none; }
+    @media (max-width: 960px) { .nav { display: none; } }
+
+    /* Deck */
+    .deck { position: fixed; inset: 0; z-index: 2; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; padding: calc(var(--header-h) + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) 72px max(24px, env(safe-area-inset-left, 0px)); visibility: hidden; outline: none; }
+    .slide.is-active, .slide.is-leaving { visibility: visible; }
+    .content { width: min(560px, 46vw); margin-left: clamp(0px, 4vw, 72px); }
+    .reveal { opacity: 0; transform: translateY(26px); filter: blur(6px); transition: opacity 420ms ease, transform 640ms var(--ease-out), filter 420ms ease; transition-delay: 0ms; }
+    .is-active .reveal { opacity: 1; transform: none; filter: none; transition-delay: calc(180ms + var(--i, 0) * 70ms); }
+    .is-leaving .reveal { opacity: 0; transform: translateY(calc(var(--dir, 1) * -26px)); filter: blur(6px); transition-duration: 260ms, 320ms, 260ms; }
+    .deck[data-dir="-1"] .slide:not(.is-active):not(.is-leaving) .reveal { transform: translateY(-26px); }
+
+    .eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font: 500 0.8rem/1 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .eyebrow::before { content: ""; width: 22px; height: 2px; background: var(--accent); }
+    .lead { font-size: 1.15rem; color: var(--muted); max-width: 46ch; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.6rem; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 50px; padding: 0.8rem 1.4rem; border-radius: 999px; border: 1px solid transparent; background: var(--accent); color: var(--accent-ink); font: 600 1rem/1 var(--font-body); text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), box-shadow 200ms ease, background-color 200ms ease; }
+    .btn:active { transform: scale(0.97); }
+    .btn-ghost { background: color-mix(in srgb, var(--surface) 60%, transparent); color: var(--ink); border-color: var(--line); backdrop-filter: blur(10px); }
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { box-shadow: 0 10px 30px var(--glow); }
+      .btn-ghost:hover { box-shadow: none; border-color: var(--ink); }
+    }
+    .btn svg { width: 18px; height: 18px; }
+
+    .services { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .services li { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--surface) 72%, transparent); backdrop-filter: blur(12px); min-width: 0; }
+    .services b { display: block; font: 500 0.75rem/1 var(--font-mono); color: var(--accent); margin-bottom: 0.6rem; }
+    .services p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.2rem; padding: 0; list-style: none; }
+    .chips li { font: 500 0.8rem/1 var(--font-mono); padding: 0.45rem 0.7rem; border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 60%, transparent); }
+    .num-big { font: 500 0.85rem/1 var(--font-mono); color: var(--accent); }
+
+    .steps { list-style: none; padding: 0; margin: 1.2rem 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1.2rem; }
+    .steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: start; }
+    .steps span { font: 500 0.8rem/1 var(--font-mono); color: var(--accent); padding-top: 0.3rem; font-variant-numeric: tabular-nums; }
+    .steps p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .contact-list { display: grid; gap: 0.7rem; margin-top: 1.4rem; }
+    .contact { display: flex; align-items: center; gap: 0.9rem; padding: 0.9rem 1rem; border-radius: 18px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 72%, transparent); backdrop-filter: blur(12px); text-decoration: none; min-width: 0; transition: border-color 200ms ease, transform 160ms var(--ease-out); }
+    .contact:active { transform: scale(0.98); }
+    @media (hover: hover) and (pointer: fine) { .contact:hover { border-color: var(--accent); } }
+    .contact .ic { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--accent); color: var(--accent-ink); }
+    .contact .ic svg { width: 22px; height: 22px; }
+    .contact small { display: block; color: var(--muted); font-size: 0.8rem; }
+    .contact strong { display: block; font-weight: 600; overflow-wrap: anywhere; }
+    .contact .grow { flex: 1; min-width: 0; }
+    .copy { flex: none; min-height: 40px; padding: 0 0.9rem; border-radius: 999px; border: 1px solid var(--line); background: none; cursor: pointer; font-size: 0.85rem; }
+    .copy-status { min-height: 1.4em; margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--muted); }
+
+    /* Dots + counter */
+    .dots { position: fixed; z-index: 21; right: max(18px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 4px; }
+    .dots button { width: 32px; height: 32px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; padding: 0; }
+    .dots button::before { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--muted); opacity: 0.5; transition: height 300ms var(--ease-out), background-color 200ms ease, opacity 200ms ease; }
+    .dots button[aria-current="true"]::before { height: 22px; background: var(--accent); opacity: 1; }
+    .counter { position: fixed; z-index: 21; left: max(24px, env(safe-area-inset-left, 0px)); bottom: max(22px, env(safe-area-inset-bottom, 0px)); font: 500 0.85rem/1 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+    .counter b { color: var(--ink); font-weight: 500; }
+    .hint { position: fixed; z-index: 21; left: 50%; bottom: max(22px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; color: var(--muted); transition: opacity 300ms ease; }
+    .hint i { width: 20px; height: 32px; border: 2px solid var(--line); border-radius: 12px; position: relative; }
+    .hint i::after { content: ""; position: absolute; left: 50%; top: 5px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--accent); animation: wheel 1.6s var(--ease-out) infinite; }
+    @keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(11px); opacity: 0; } 100% { opacity: 0; } }
+    .hint.is-hidden { opacity: 0; }
+
+    /* Flying technology tags */
+    .tag { position: absolute; left: 0; top: 0; will-change: transform, opacity; transition: transform 1000ms var(--ease-out), opacity 500ms ease, filter 600ms ease; }
+    .tag > span { display: inline-block; font: 500 clamp(0.8rem, 1.1vw, 1rem)/1 var(--font-mono); padding: 0.55rem 0.85rem; border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 75%, transparent); backdrop-filter: blur(8px); color: var(--ink); white-space: nowrap; animation: float 5s ease-in-out infinite alternate; animation-delay: var(--fd, 0s); box-shadow: 0 6px 20px rgb(0 0 0 / 12%); }
+    .tag.hot > span { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: 0 8px 26px var(--glow); }
+    @keyframes float { from { transform: translateY(-6px) rotate(-2deg); } to { transform: translateY(6px) rotate(2deg); } }
+
+    @media (max-width: 760px) {
+      :root { --header-h: 64px; }
+      .bar { padding-inline: 16px; }
+      .logo span { display: none; }
+      .slide { align-items: flex-end; padding: calc(var(--header-h) + env(safe-area-inset-top, 0px)) 52px max(56px, calc(env(safe-area-inset-bottom, 0px) + 48px)) 16px; }
+      .content { width: 100%; margin: 0; max-height: 56svh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+      h1 { font-size: 1.85rem; } h2 { font-size: 1.6rem; }
+      .lead { font-size: 1rem; }
+      .services { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+      .services li { padding: 0.7rem 0.9rem; }
+      .steps { grid-template-columns: minmax(0, 1fr); }
+      .dots { right: 8px; }
+      .hint { display: none; }
+      .btn { min-height: 46px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .is-active .reveal, .is-leaving .reveal { transform: none !important; filter: none !important; transition: opacity 200ms ease; transition-delay: 0ms; }
+      .tag { transition: opacity 300ms ease; }
+      .tag > span, .hint i::after { animation: none; }
+      .btn:active, .icon-btn:active, .contact:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="sky" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="bar">
+      <button class="logo" type="button" data-go="0" translate="no"><i aria-hidden="true"></i><span data-i18n="name">Ростислав</span></button>
+      <nav class="nav" aria-label="Разделы" data-i18n-aria="navLabel">
+        <button type="button" data-go="1" data-i18n="navServices">Услуги</button>
+        <button type="button" data-go="2" data-i18n="navWork">Работы</button>
+        <button type="button" data-go="6" data-i18n="navPrice">Цена</button>
+        <button type="button" data-go="7" data-i18n="navContact">Контакты</button>
+      </nav>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="Язык" data-i18n-aria="langLabel">
+          <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+          <button type="button" data-lang="uk" aria-pressed="false">UA</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="icon-btn" type="button" id="theme" aria-label="Светлая тема">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="deck" id="main" data-dir="1">
+    <section class="slide" tabindex="-1" aria-labelledby="s0-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0" data-i18n="introEyebrow">Веб-дизайнер · работаю удалённо</span>
+        <h1 class="reveal" style="--i:1" id="s0-title" data-i18n-html="introTitle">Проектирую и рисую сайты, которые <span class="accent">хочется листать</span></h1>
+        <p class="lead reveal" style="--i:2" data-i18n="introLead">Сайты под ключ, баннеры и карточки товаров. От структуры и прототипа до финального дизайна.</p>
+        <div class="actions reveal" style="--i:3">
+          <button class="btn" type="button" data-go="2" data-i18n="introWork">Смотреть работы</button>
+          <button class="btn btn-ghost" type="button" data-go="7" data-i18n="introContact">Написать мне</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s1-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0" data-i18n="servicesEyebrow">Услуги</span>
+        <h2 class="reveal" style="--i:1" id="s1-title" data-i18n="servicesTitle">Что я делаю</h2>
+        <ul class="services">
+          <li class="reveal" style="--i:2"><b>01</b><h3 data-i18n="sv1">Проектирование</h3><p data-i18n="sv1d">Структура, прототипы и путь пользователя до заявки.</p></li>
+          <li class="reveal" style="--i:3"><b>02</b><h3 data-i18n="sv2">Дизайн сайтов</h3><p data-i18n="sv2d">Лендинги и многостраничные сайты под все экраны.</p></li>
+          <li class="reveal" style="--i:4"><b>03</b><h3 data-i18n="sv3">Баннеры</h3><p data-i18n="sv3d">Реклама и посты для соцсетей, которые замечают.</p></li>
+          <li class="reveal" style="--i:5"><b>04</b><h3 data-i18n="sv4">Карточки товаров</h3><p data-i18n="sv4d">Инфографика для маркетплейсов, чтобы товар продавал сам.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s2-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">01</span>&nbsp;<span data-i18n="p1Eyebrow">Детейлинг-студия</span></span>
+        <h2 class="reveal" style="--i:1" id="s2-title" translate="no">Halo Detail Studio</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="p1Lead">Тёмный сайт для студии детейлинга. Слайдер «до / после» показывает краску до и после полировки.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagProto">Прототип</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s3-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">02</span>&nbsp;<span data-i18n="p2Eyebrow">Сайт для бизнеса</span></span>
+        <h2 class="reveal" style="--i:1" id="s3-title" translate="no">Barbertio</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="p2Lead">Сайт для клиента из Польши. Его можно открыть и посмотреть вживую.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagDev">Сайт под ключ</li></ul>
+        <div class="actions reveal" style="--i:4">
+          <a class="btn" href="https://barbertio.pl" target="_blank" rel="noopener"><span data-i18n="openSite">Открыть сайт</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s4-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
+        <h2 class="reveal" style="--i:1" id="s4-title" data-i18n="p3Title">Кофейня «Мідь»</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="p3Lead">3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagMotion">Анимация</li></ul>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s5-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
+        <h2 class="reveal" style="--i:1" id="s5-title" data-i18n="p4Title">Керамика «Обжиг»</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="p4Lead">3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagInteractive">Интерактив</li></ul>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s6-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0" data-i18n="priceEyebrow">Цена и этапы</span>
+        <h2 class="reveal" style="--i:1" id="s6-title" data-i18n-html="priceTitle">Цена — <span class="accent">под вашу задачу</span></h2>
+        <p class="lead reveal" style="--i:2" data-i18n="priceLead">Стоимость зависит от ТЗ и бюджета. Расскажите о проекте, и я предложу варианты под ваш бюджет.</p>
+        <ol class="steps reveal" style="--i:3">
+          <li><span>01</span><div><h3 data-i18n="st1">Бриф</h3><p data-i18n="st1d">Обсуждаем задачу, аудиторию и бюджет.</p></div></li>
+          <li><span>02</span><div><h3 data-i18n="st2">Прототип</h3><p data-i18n="st2d">Собираю структуру и логику страниц.</p></div></li>
+          <li><span>03</span><div><h3 data-i18n="st3">Дизайн</h3><p data-i18n="st3d">Рисую макеты для всех экранов.</p></div></li>
+          <li><span>04</span><div><h3 data-i18n="st4">Запуск</h3><p data-i18n="st4d">Передаю макеты или готовый сайт.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="s7-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0" data-i18n="contactEyebrow">Контакты</span>
+        <h2 class="reveal" style="--i:1" id="s7-title" data-i18n-html="contactTitle">Обсудим <span class="accent">ваш проект?</span></h2>
+        <p class="lead reveal" style="--i:2" data-i18n="contactLead">Пишите в Telegram или на почту. Отвечаю в течение дня.</p>
+        <div class="contact-list reveal" style="--i:3">
+          <a class="contact" href="https://t.me/rostyslavvill" target="_blank" rel="noopener">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.5 4.3 18.4 19c-.2 1-.8 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.8 8.8-7.9c.4-.3-.1-.5-.6-.2L6.4 13 1.7 11.5c-1-.3-1-1 .2-1.5l18.3-7c.9-.3 1.6.2 1.3 1.3z"/></svg></span>
+            <span class="grow"><small>Telegram</small><strong translate="no">@rostyslavvill</strong></span>
+          </a>
+          <div class="contact">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+            <a class="grow" href="mailto:rostvilikiy@gmail.com" style="text-decoration:none"><small data-i18n="emailLabel">Почта</small><strong translate="no" id="email">rostvilikiy@gmail.com</strong></a>
+            <button class="copy" type="button" id="copy" data-i18n="copy">Скопировать</button>
+          </div>
+        </div>
+        <p class="copy-status" role="status" aria-live="polite" id="copy-status"></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="dots" aria-label="Слайды" data-i18n-aria="dotsLabel"></nav>
+  <div class="counter" aria-live="polite"><b id="cur">01</b> / <span id="total">08</span></div>
+  <div class="hint" id="hint"><i aria-hidden="true"></i><span data-i18n="hint">Листайте вниз</span></div>
+
+  <script>/*THREE*/</script>
+  <script>
+  (() => {
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
+    const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+    // ---------------- i18n ----------------
+    const T = {
+      ru: {
+        name: "Ростислав", navLabel: "Разделы", navServices: "Услуги", navWork: "Работы", navPrice: "Цена", navContact: "Контакты",
+        langLabel: "Язык", dotsLabel: "Слайды", hint: "Листайте вниз", themeLight: "Светлая тема", themeDark: "Тёмная тема",
+        introEyebrow: "Веб-дизайнер · работаю удалённо",
+        introTitle: 'Проектирую и рисую сайты, которые <span class="accent">хочется листать</span>',
+        introLead: "Сайты под ключ, баннеры и карточки товаров. От структуры и прототипа до финального дизайна.",
+        introWork: "Смотреть работы", introContact: "Написать мне",
+        servicesEyebrow: "Услуги", servicesTitle: "Что я делаю",
+        sv1: "Проектирование", sv1d: "Структура, прототипы и путь пользователя до заявки.",
+        sv2: "Дизайн сайтов", sv2d: "Лендинги и многостраничные сайты под все экраны.",
+        sv3: "Баннеры", sv3d: "Реклама и посты для соцсетей, которые замечают.",
+        sv4: "Карточки товаров", sv4d: "Инфографика для маркетплейсов, чтобы товар продавал сам.",
+        p1Eyebrow: "Детейлинг-студия", p1Lead: "Тёмный сайт для студии детейлинга. Слайдер «до / после» показывает краску до и после полировки.",
+        p2Eyebrow: "Сайт для бизнеса", p2Lead: "Сайт для клиента из Польши. Его можно открыть и посмотреть вживую.", openSite: "Открыть сайт",
+        p3Eyebrow: "Кофейня · концепт", p3Title: "Кофейня «Мідь»", p3Lead: "3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.",
+        p4Eyebrow: "Студия керамики · концепт", p4Title: "Керамика «Обжиг»", p4Lead: "3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.",
+        tagDesign: "Дизайн сайта", tagProto: "Прототип", tagAdaptive: "Адаптив", tagDev: "Сайт под ключ", tagMotion: "Анимация", tagInteractive: "Интерактив",
+        priceEyebrow: "Цена и этапы", priceTitle: 'Цена — <span class="accent">под вашу задачу</span>',
+        priceLead: "Стоимость зависит от ТЗ и бюджета. Расскажите о проекте, и я предложу варианты под ваш бюджет.",
+        st1: "Бриф", st1d: "Обсуждаем задачу, аудиторию и бюджет.", st2: "Прототип", st2d: "Собираю структуру и логику страниц.",
+        st3: "Дизайн", st3d: "Рисую макеты для всех экранов.", st4: "Запуск", st4d: "Передаю макеты или готовый сайт.",
+        contactEyebrow: "Контакты", contactTitle: 'Обсудим <span class="accent">ваш проект?</span>', contactLead: "Пишите в Telegram или на почту. Отвечаю в течение дня.",
+        emailLabel: "Почта", copy: "Скопировать", copied: "Почта скопирована.", copyFail: "Не удалось скопировать: выделите адрес вручную.",
+        slides: ["Знакомство", "Услуги", "Halo Detail Studio", "Barbertio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
+        title: "Ростислав — веб-дизайнер",
+      },
+      uk: {
+        name: "Ростислав", navLabel: "Розділи", navServices: "Послуги", navWork: "Роботи", navPrice: "Ціна", navContact: "Контакти",
+        langLabel: "Мова", dotsLabel: "Слайди", hint: "Гортайте вниз", themeLight: "Світла тема", themeDark: "Темна тема",
+        introEyebrow: "Веб-дизайнер · працюю віддалено",
+        introTitle: 'Проєктую та малюю сайти, які <span class="accent">хочеться гортати</span>',
+        introLead: "Сайти під ключ, банери та картки товарів. Від структури й прототипу до фінального дизайну.",
+        introWork: "Дивитися роботи", introContact: "Написати мені",
+        servicesEyebrow: "Послуги", servicesTitle: "Що я роблю",
+        sv1: "Проєктування", sv1d: "Структура, прототипи й шлях користувача до заявки.",
+        sv2: "Дизайн сайтів", sv2d: "Лендинги та багатосторінкові сайти під усі екрани.",
+        sv3: "Банери", sv3d: "Реклама й пости для соцмереж, які помічають.",
+        sv4: "Картки товарів", sv4d: "Інфографіка для маркетплейсів, щоб товар продавав сам.",
+        p1Eyebrow: "Детейлінг-студія", p1Lead: "Темний сайт для студії детейлінгу. Слайдер «до / після» показує фарбу до та після полірування.",
+        p2Eyebrow: "Сайт для бізнесу", p2Lead: "Сайт для клієнта з Польщі. Його можна відкрити й подивитися наживо.", openSite: "Відкрити сайт",
+        p3Eyebrow: "Кав'ярня · концепт", p3Title: "Кав'ярня «Мідь»", p3Lead: "3D-сцена на фоні: під час гортання мідна турка наливає каву в чашку.",
+        p4Eyebrow: "Студія кераміки · концепт", p4Title: "Кераміка «Обжиг»", p4Lead: "3D-вази, які можна обертати. Під час вибору моделі одна форма плавно перетікає в іншу.",
+        tagDesign: "Дизайн сайту", tagProto: "Прототип", tagAdaptive: "Адаптив", tagDev: "Сайт під ключ", tagMotion: "Анімація", tagInteractive: "Інтерактив",
+        priceEyebrow: "Ціна та етапи", priceTitle: 'Ціна — <span class="accent">під ваше завдання</span>',
+        priceLead: "Вартість залежить від ТЗ і бюджету. Розкажіть про проєкт, і я запропоную варіанти під ваш бюджет.",
+        st1: "Бриф", st1d: "Обговорюємо завдання, аудиторію та бюджет.", st2: "Прототип", st2d: "Збираю структуру й логіку сторінок.",
+        st3: "Дизайн", st3d: "Малюю макети для всіх екранів.", st4: "Запуск", st4d: "Передаю макети або готовий сайт.",
+        contactEyebrow: "Контакти", contactTitle: 'Обговоримо <span class="accent">ваш проєкт?</span>', contactLead: "Пишіть у Telegram або на пошту. Відповідаю протягом дня.",
+        emailLabel: "Пошта", copy: "Скопіювати", copied: "Пошту скопійовано.", copyFail: "Не вдалося скопіювати: виділіть адресу вручну.",
+        slides: ["Знайомство", "Послуги", "Halo Detail Studio", "Barbertio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
+        title: "Ростислав — веб-дизайнер",
+      },
+      en: {
+        name: "Rostyslav", navLabel: "Sections", navServices: "Services", navWork: "Work", navPrice: "Pricing", navContact: "Contact",
+        langLabel: "Language", dotsLabel: "Slides", hint: "Scroll down", themeLight: "Light theme", themeDark: "Dark theme",
+        introEyebrow: "Web designer · working remotely",
+        introTitle: 'I plan and design websites people <span class="accent">want to scroll</span>',
+        introLead: "Complete websites, banners and product cards. From structure and prototype to final design.",
+        introWork: "See my work", introContact: "Get in touch",
+        servicesEyebrow: "Services", servicesTitle: "What I do",
+        sv1: "UX & structure", sv1d: "Site structure, prototypes and the path to a lead.",
+        sv2: "Web design", sv2d: "Landing pages and multi-page sites for every screen.",
+        sv3: "Banners", sv3d: "Ads and social posts that get noticed.",
+        sv4: "Product cards", sv4d: "Marketplace infographics that help the product sell itself.",
+        p1Eyebrow: "Detailing studio", p1Lead: "A dark website for a detailing studio. A before / after slider shows paint before and after correction.",
+        p2Eyebrow: "Business website", p2Lead: "A website for a client in Poland. You can open it and see it live.", openSite: "Open website",
+        p3Eyebrow: "Coffee shop · concept", p3Title: "Mid Coffee", p3Lead: "A 3D scene behind the page: as you scroll, a copper cezve pours coffee into a cup.",
+        p4Eyebrow: "Ceramics studio · concept", p4Title: "Obzhig Ceramics", p4Lead: "3D vases you can spin. Picking a model morphs one shape smoothly into another.",
+        tagDesign: "Web design", tagProto: "Prototype", tagAdaptive: "Responsive", tagDev: "Full website", tagMotion: "Motion", tagInteractive: "Interactive",
+        priceEyebrow: "Pricing & process", priceTitle: 'Pricing that <span class="accent">fits your task</span>',
+        priceLead: "The cost depends on the brief and your budget. Tell me about the project and I'll suggest options that fit.",
+        st1: "Brief", st1d: "We discuss the task, audience and budget.", st2: "Prototype", st2d: "I build the structure and page logic.",
+        st3: "Design", st3d: "I design layouts for every screen.", st4: "Launch", st4d: "You get the layouts or a finished site.",
+        contactEyebrow: "Contact", contactTitle: 'Let\'s discuss <span class="accent">your project</span>', contactLead: "Message me on Telegram or by email. I reply within a day.",
+        emailLabel: "Email", copy: "Copy", copied: "Email copied.", copyFail: "Couldn't copy: please select the address manually.",
+        slides: ["Intro", "Services", "Halo Detail Studio", "Barbertio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
+        title: "Rostyslav — web designer",
+      },
+    };
+    let lang = T[store.get("lang")] ? store.get("lang") : "ru";
+    function applyLang(l) {
+      lang = l; const t = T[l];
+      root.lang = l === "uk" ? "uk" : l;
+      document.title = t.title;
+      document.querySelectorAll("[data-i18n]").forEach((el) => { const v = t[el.dataset.i18n]; if (v) el.textContent = v; });
+      document.querySelectorAll("[data-i18n-html]").forEach((el) => { const v = t[el.dataset.i18nHtml]; if (v) el.innerHTML = v; });
+      document.querySelectorAll("[data-i18n-aria]").forEach((el) => { const v = t[el.dataset.i18nAria]; if (v) el.setAttribute("aria-label", v); });
+      document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+      dots.forEach((d, i) => d.setAttribute("aria-label", `${i + 1}. ${t.slides[i]}`));
+      themeBtn.setAttribute("aria-label", root.dataset.theme === "dark" ? t.themeLight : t.themeDark);
+      store.set("lang", l);
+    }
+
+    // ---------------- Theme ----------------
+    const themeBtn = document.getElementById("theme");
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    function applyTheme(th) {
+      root.dataset.theme = th;
+      metaTheme.content = th === "dark" ? "#0b0b0c" : "#f6f6f3";
+      themeBtn.setAttribute("aria-label", th === "dark" ? T[lang].themeLight : T[lang].themeDark);
+      store.set("theme", th);
+      if (window.__laptop) window.__laptop.setTheme(th);
+    }
+    applyTheme(store.get("theme") === "light" ? "light" : "dark");
+    themeBtn.addEventListener("click", () => applyTheme(root.dataset.theme === "dark" ? "light" : "dark"));
+
+    // ---------------- Deck ----------------
+    const deck = document.querySelector(".deck");
+    const slides = [...document.querySelectorAll(".slide")];
+    const dotsNav = document.querySelector(".dots");
+    const dots = slides.map((_, i) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.dataset.go = String(i);
+      dotsNav.appendChild(b); return b;
+    });
+    const navBtns = [...document.querySelectorAll(".nav [data-go]")];
+    const cur = document.getElementById("cur");
+    document.getElementById("total").textContent = String(slides.length).padStart(2, "0");
+    const hint = document.getElementById("hint");
+    let index = 0, leaveTimer = 0;
+
+    slides.forEach((s, i) => { if (i !== 0) { s.inert = true; s.setAttribute("aria-hidden", "true"); } });
+
+    function go(i, { focus = false } = {}) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      if (i === index) return;
+      const dir = i > index ? 1 : -1;
+      deck.dataset.dir = String(dir);
+      deck.style.setProperty("--dir", dir);
+      const prev = slides[index];
+      prev.classList.remove("is-active"); prev.classList.add("is-leaving");
+      prev.inert = true; prev.setAttribute("aria-hidden", "true");
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(() => slides.forEach((s) => s.classList.remove("is-leaving")), 400);
+      index = i;
+      const next = slides[i];
+      next.inert = false; next.removeAttribute("aria-hidden");
+      next.classList.remove("is-leaving");
+      void next.offsetWidth;
+      next.classList.add("is-active");
+      const c = next.querySelector(".content"); if (c) c.scrollTop = 0;
+      if (focus) next.focus({ preventScroll: true });
+      sync();
+      hint.classList.add("is-hidden");
+      spawnTags(i);
+      if (window.__laptop) window.__laptop.pose(i);
+    }
+    function sync() {
+      cur.textContent = String(index + 1).padStart(2, "0");
+      dots.forEach((d, i) => d.setAttribute("aria-current", String(i === index)));
+      const group = index >= 2 && index <= 5 ? 2 : index;
+      navBtns.forEach((b) => b.setAttribute("aria-current", String(Number(b.dataset.go) === group)));
+    }
+
+    document.addEventListener("click", (e) => {
+      const g = e.target.closest("[data-go]");
+      if (g) { go(Number(g.dataset.go), { focus: true }); return; }
+      const l = e.target.closest("[data-lang]");
+      if (l) applyLang(l.dataset.lang);
+    });
+
+    // Wheel: one gesture = one slide; trackpad inertia is swallowed.
+    let acc = 0, lockUntil = 0, lastWheel = 0;
+    function scrollableInside(target, dy) {
+      const c = target.closest && target.closest(".content");
+      if (!c || c.scrollHeight <= c.clientHeight + 2) return false;
+      return dy > 0 ? c.scrollTop + c.clientHeight < c.scrollHeight - 2 : c.scrollTop > 2;
+    }
+    addEventListener("wheel", (e) => {
+      if (scrollableInside(e.target, e.deltaY)) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now < lockUntil) { lockUntil = Math.max(lockUntil, now + 220); return; }
+      if (now - lastWheel > 250) acc = 0;
+      lastWheel = now;
+      acc += e.deltaY;
+      if (Math.abs(acc) > 40) { go(index + (acc > 0 ? 1 : -1)); acc = 0; lockUntil = now + 900; }
+    }, { passive: false });
+
+    let touchY = null, touchTarget = null;
+    addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; touchTarget = e.target; }, { passive: true });
+    addEventListener("touchend", (e) => {
+      if (touchY === null) return;
+      const dy = touchY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50 && !scrollableInside(touchTarget, dy)) go(index + (dy > 0 ? 1 : -1));
+      touchY = null;
+    }, { passive: true });
+
+    addEventListener("keydown", (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const k = e.key;
+      if (["ArrowDown", "PageDown"].includes(k) || (k === " " && !e.target.closest("button, a"))) { e.preventDefault(); go(index + 1); }
+      else if (["ArrowUp", "PageUp"].includes(k)) { e.preventDefault(); go(index - 1); }
+      else if (k === "Home") { e.preventDefault(); go(0); }
+      else if (k === "End") { e.preventDefault(); go(slides.length - 1); }
+    });
+
+    // Copy email
+    const copyStatus = document.getElementById("copy-status");
+    document.getElementById("copy").addEventListener("click", () => {
+      const text = document.getElementById("email").textContent;
+      const done = () => (copyStatus.textContent = T[lang].copied);
+      const fail = () => {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById("email"));
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        copyStatus.textContent = T[lang].copyFail;
+      };
+      try { navigator.clipboard.writeText(text).then(done, fail); } catch (e) { fail(); }
+    });
+
+    // ---------------- Flying tech tags ----------------
+    const sky = document.querySelector(".sky");
+    const TECH = ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Python", "C++", "Figma", "Tailwind", "Node.js", "Three.js", "PHP", "SQL", "Git", "Vue", "C#", "Next.js", "Webflow", "WordPress", "GSAP", "Sass", "Go", "Swift", "Kotlin"];
+    const SLOTS_WIDE = [[0.55, 0.14], [0.86, 0.1], [0.52, 0.8], [0.84, 0.86], [0.69, 0.92], [0.7, 0.06], [0.92, 0.7]];
+    const SLOTS_NARROW = [[0.05, 0.12], [0.6, 0.11], [0.04, 0.36], [0.62, 0.38], [0.32, 0.1]];
+    function spawnTags(i) {
+      [...sky.children].forEach((el) => {
+        el.style.opacity = "0";
+        el.style.transform = el.style.transform.replace(/translate3d\(([^,]+),([^,]+),/, (m, x, y) => `translate3d(${x},calc(${y} - 60px),`);
+        setTimeout(() => el.remove(), 600);
+      });
+      const narrow = innerWidth < 760;
+      const slots = narrow ? SLOTS_NARROW : SLOTS_WIDE;
+      const count = narrow ? 4 : 6;
+      for (let k = 0; k < count; k++) {
+        const name = TECH[(i * 5 + k * 3) % TECH.length];
+        const [sx, sy] = slots[(k + i) % slots.length];
+        const el = document.createElement("div");
+        el.className = "tag" + (k === 0 ? " hot" : "");
+        const span = document.createElement("span");
+        span.textContent = name;
+        span.style.setProperty("--fd", `${-k * 0.8}s`);
+        el.appendChild(span);
+        const x = Math.round(sx * innerWidth - (narrow ? 0 : 40)), y = Math.round(sy * innerHeight);
+        el.style.opacity = "0";
+        el.style.transform = reduceMotion ? `translate3d(${x}px,${y}px,0)` : `translate3d(${x}px,${y - innerHeight * 0.55}px,0) scale(0.9)`;
+        el.style.filter = reduceMotion ? "none" : "blur(6px)";
+        sky.appendChild(el);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          el.style.transitionDelay = reduceMotion ? "0ms" : `${120 + k * 90}ms`;
+          el.style.opacity = "1";
+          el.style.filter = "none";
+          el.style.transform = `translate3d(${x}px,${y}px,0)`;
+        }));
+      }
+    }
+
+    applyLang(lang);
+    sync();
+    spawnTags(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => slides[0].classList.add("is-active")));
+
+    // ---------------- 3D laptop ----------------
+    const canvas = document.getElementById("scene");
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); }
+    catch (e) { canvas.hidden = true; return; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 80);
+
+    (function environment() {
+      const env = new THREE.Scene();
+      env.add(new THREE.Mesh(new THREE.BoxGeometry(16, 16, 16), new THREE.MeshBasicMaterial({ color: 0x202024, side: THREE.BackSide })));
+      const panel = (w, h, c, k, x, y, z) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide }));
+        m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
+      };
+      panel(7, 2.5, 0xffffff, 6, 0, 6, 2);
+      panel(2.5, 6, 0xffffff, 3.2, -6.5, 1.5, 2);
+      panel(2.5, 6, 0xffffff, 2.2, 6.5, 1.5, -1);
+      panel(8, 1.2, 0xffffff, 1.4, 0, 0.5, 7);
+      const pm = new THREE.PMREMGenerator(renderer);
+      scene.environment = pm.fromScene(env, 0.03).texture;
+      pm.dispose();
+    })();
+
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    key.position.set(-3, 7, 4);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 24 });
+    key.shadow.radius = 6;
+    key.shadow.bias = -0.0003;
+    scene.add(key);
+    const accentLight = new THREE.PointLight(0xff2d3f, 6, 12, 2);
+    accentLight.position.set(2.5, 1.5, -2.5);
+    scene.add(accentLight);
+
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: 0.35 }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.012;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Dimensions (≈ 1 unit = 10 cm)
+    const W = 3.04, D = 2.12, R = 0.1;
+    function rrShape(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function slab(w, d, r, thick, bevel) {
+      const g = new THREE.ExtrudeGeometry(rrShape(w, d, r), { depth: Math.max(thick - bevel * 2, 0.001), bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 5, curveSegments: 28 });
+      g.rotateX(-Math.PI / 2);
+      g.translate(0, bevel, 0);
+      return g;
+    }
+
+    const alu = new THREE.MeshPhysicalMaterial({ color: 0x4a4c51, metalness: 1, roughness: 0.34, clearcoat: 0.3, clearcoatRoughness: 0.4 });
+    const keyMat = new THREE.MeshStandardMaterial({ color: 0x0d0d0f, roughness: 0.55, metalness: 0.1 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x050506, roughness: 0.3, metalness: 0 });
+    const hingeMat = new THREE.MeshStandardMaterial({ color: 0x17171a, roughness: 0.4, metalness: 0.6 });
+
+    const laptop = new THREE.Group();
+    scene.add(laptop);
+
+    // Base
+    const BASE_H = 0.07;
+    const base = new THREE.Mesh(slab(W, D, R, BASE_H, 0.018), alu);
+    base.castShadow = true; base.receiveShadow = true;
+    laptop.add(base);
+    const TOP = BASE_H;
+
+    // Keyboard (instanced keys)
+    const u = 0.178, keyGap = 0.022, rowH = 0.165;
+    const rows = [
+      { h: 0.55, keys: Array(14).fill(1).map((_, i) => (i === 13 ? 1.5 : 0.964)) },
+      { h: 1, keys: [...Array(13).fill(1), 1.5] },
+      { h: 1, keys: [1.5, ...Array(13).fill(1)] },
+      { h: 1, keys: [1.75, ...Array(11).fill(1), 1.75] },
+      { h: 1, keys: [2.25, ...Array(10).fill(1), 2.25] },
+      { h: 1, keys: [1, 1, 1, 1.25, 5, 1.25, 1, 1, 1, 1] },
+    ];
+    const keyGeo = new THREE.ExtrudeGeometry(rrShape(1, 1, 0.14), { depth: 0.6, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.06, bevelSegments: 2, curveSegments: 6 });
+    keyGeo.rotateX(-Math.PI / 2);
+    const totalKeys = rows.reduce((n, r) => n + r.keys.length, 0);
+    const keys = new THREE.InstancedMesh(keyGeo, keyMat, totalKeys);
+    keys.castShadow = false; keys.receiveShadow = true;
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), ps = new THREE.Vector3();
+    let kz = -D / 2 + 0.22, ki = 0;
+    rows.forEach((row) => {
+      const width = row.keys.reduce((a, b) => a + b, 0) * u;
+      let kx = -width / 2;
+      const h = row.h * rowH;
+      row.keys.forEach((kw) => {
+        const w = kw * u;
+        ps.set(kx + w / 2, TOP + 0.001, kz + h / 2);
+        sc.set((w - keyGap) / 1.12, 0.016, (h - keyGap) / 1.12);
+        m4.compose(ps, q, sc);
+        keys.setMatrixAt(ki++, m4);
+        kx += w;
+      });
+      kz += h + 0.006;
+    });
+    laptop.add(keys);
+    const kbBottom = kz;
+
+    // Speaker grilles
+    const grilleTex = (() => {
+      const c = document.createElement("canvas"); c.width = 64; c.height = 512;
+      const g = c.getContext("2d"); g.fillStyle = "#000";
+      for (let y = 6; y < 512; y += 9) for (let x = 6; x < 64; x += 9) { g.beginPath(); g.arc(x + ((y / 9) % 2) * 4, y, 2.2, 0, Math.PI * 2); g.fill(); }
+      const t = new THREE.CanvasTexture(c); return t;
+    })();
+    [-1, 1].forEach((side) => {
+      const gr = new THREE.Mesh(new THREE.PlaneGeometry(0.15, kbBottom - (-D / 2 + 0.22)), new THREE.MeshStandardMaterial({ color: 0x000000, alphaMap: grilleTex, transparent: true, roughness: 0.8 }));
+      gr.rotation.x = -Math.PI / 2;
+      gr.position.set(side * (W / 2 - 0.13), TOP + 0.0015, (-D / 2 + 0.22 + kbBottom) / 2);
+      laptop.add(gr);
+    });
+
+    // Trackpad
+    const tpGeo = new THREE.ShapeGeometry(rrShape(1.32, 0.8, 0.05), 12);
+    tpGeo.rotateX(-Math.PI / 2);
+    const trackpad = new THREE.Mesh(tpGeo, new THREE.MeshPhysicalMaterial({ color: 0x3b3d42, metalness: 0.6, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.15 }));
+    trackpad.position.set(0, TOP + 0.0012, D / 2 - 0.12 - 0.4);
+    trackpad.receiveShadow = true;
+    laptop.add(trackpad);
+    const lipGeo = new THREE.BoxGeometry(0.42, 0.012, 0.012);
+    const lip = new THREE.Mesh(lipGeo, hingeMat);
+    lip.position.set(0, TOP - 0.004, D / 2 + 0.003);
+    laptop.add(lip);
+
+    // Hinge
+    const hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, W - 0.56, 24), hingeMat);
+    hinge.rotation.z = Math.PI / 2;
+    hinge.position.set(0, TOP - 0.005, -D / 2 + 0.03);
+    laptop.add(hinge);
+
+    // Lid (pivot at hinge)
+    const lidPivot = new THREE.Group();
+    lidPivot.position.set(0, TOP + 0.004, -D / 2 + 0.03);
+    laptop.add(lidPivot);
+    const LID_T = 0.045, LID_D = D - 0.03;
+    const lidGeo = slab(W, LID_D, R, LID_T, 0.014);
+    lidGeo.translate(0, 0, LID_D / 2);
+    const lid = new THREE.Mesh(lidGeo, alu);
+    lid.castShadow = true; lid.receiveShadow = true;
+    lidPivot.add(lid);
+
+    const bezelGeo = new THREE.ShapeGeometry(rrShape(W - 0.05, LID_D - 0.05, R - 0.02), 16);
+    bezelGeo.rotateX(Math.PI / 2);
+    const bezel = new THREE.Mesh(bezelGeo, darkMat);
+    bezel.position.set(0, -0.0008, LID_D / 2);
+    lidPivot.add(bezel);
+
+    const SW = W - 0.2, SH = SW / 1.6;
+    const screenZ = LID_D - 0.085 - SH / 2;
+    const screenGeo = new THREE.PlaneGeometry(SW, SH);
+    screenGeo.rotateX(Math.PI / 2);
+    const screenMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, roughness: 0.08, metalness: 0, toneMapped: false });
+    const screen = new THREE.Mesh(screenGeo, screenMat);
+    screen.position.set(0, -0.0016, screenZ);
+    lidPivot.add(screen);
+    const fadeMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, toneMapped: false, depthWrite: false });
+    const fade = new THREE.Mesh(screenGeo, fadeMat);
+    fade.position.set(0, -0.0019, screenZ);
+    lidPivot.add(fade);
+    const notchGeo = new THREE.ShapeGeometry(rrShape(0.34, 0.075, 0.03), 8);
+    notchGeo.rotateX(Math.PI / 2);
+    const notch = new THREE.Mesh(notchGeo, darkMat);
+    notch.position.set(0, -0.0024, LID_D - 0.085 - 0.02);
+    lidPivot.add(notch);
+    const glass = new THREE.Mesh(screenGeo, new THREE.MeshPhysicalMaterial({ color: 0x000000, transparent: true, opacity: 0.12, roughness: 0.03, metalness: 0, clearcoat: 1, depthWrite: false }));
+    glass.position.set(0, -0.0028, screenZ);
+    lidPivot.add(glass);
+
+    // ---------------- Screen textures ----------------
+    const SCR_W = 1440, SCR_H = 900;
+    function makeCanvas() { const c = document.createElement("canvas"); c.width = SCR_W; c.height = SCR_H; return c; }
+    function toTex(c) { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+    const accent = () => (root.dataset.theme === "dark" ? "#ff2d3f" : "#2f45ff");
+
+    function browser(g, url, dark = true) {
+      g.fillStyle = dark ? "#1c1c1f" : "#ececef"; g.fillRect(0, 0, SCR_W, 56);
+      ["#ff5f57", "#febc2e", "#28c840"].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(28 + i * 24, 28, 7, 0, Math.PI * 2); g.fill(); });
+      g.fillStyle = dark ? "#2a2a2e" : "#ffffff";
+      const pw = 520, px = (SCR_W - pw) / 2;
+      g.beginPath(); g.roundRect(px, 13, pw, 30, 15); g.fill();
+      g.fillStyle = dark ? "#b8b8c0" : "#55555c"; g.font = "500 16px " + getComputedStyle(root).getPropertyValue("--font-body");
+      g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(url, SCR_W / 2, 29);
+    }
+    function shotScreen(img, url) {
+      const c = makeCanvas(), g = c.getContext("2d");
+      g.fillStyle = "#0e0e10"; g.fillRect(0, 0, SCR_W, SCR_H);
+      const area = SCR_H - 56, s = Math.max(SCR_W / img.width, area / img.height);
+      g.drawImage(img, (SCR_W - img.width * s) / 2, 56, img.width * s, img.height * s);
+      browser(g, url);
+      return c;
+    }
+    function codeScreen(lines, title) {
+      const c = makeCanvas(), g = c.getContext("2d");
+      g.fillStyle = "#0f1014"; g.fillRect(0, 0, SCR_W, SCR_H);
+      g.fillStyle = "#16171c"; g.fillRect(0, 56, 220, SCR_H);
+      browser(g, title);
+      const mono = "500 26px " + getComputedStyle(root).getPropertyValue("--font-mono");
+      g.font = "500 18px " + getComputedStyle(root).getPropertyValue("--font-mono");
+      ["src", "  components", "  pages", "  styles", "public", "README.md"].forEach((f, i) => { g.fillStyle = i === 2 ? "#e8e8ee" : "#77787f"; g.textAlign = "left"; g.fillText(f, 28, 110 + i * 38); });
+      g.font = mono; g.textBaseline = "middle";
+      lines.forEach((parts, i) => {
+        const y = 120 + i * 46;
+        g.fillStyle = "#4a4b52"; g.textAlign = "right"; g.fillText(String(i + 1), 300, y);
+        g.textAlign = "left";
+        let x = 330;
+        parts.forEach(([t, col]) => { g.fillStyle = col === "a" ? accent() : col; g.fillText(t, x, y); x += g.measureText(t).width; });
+      });
+      return c;
+    }
+    const K = "#c792ea", S = "#c3e88d", P = "#e8e8ee", N = "#f78c6c", C = "#6b6d76";
+    const screens = {
+      intro: () => codeScreen([
+        [["const ", K], ["designer", P], [" = {", P]],
+        [["  name: ", P], ['"Rostyslav"', S], [",", P]],
+        [["  role: ", P], ['"Web Designer"', S], [",", P]],
+        [["  remote: ", P], ["true", N], [",", P]],
+        [["  does: ", P], ["[", P], ['"UX"', S], [", ", P], ['"UI"', S], [", ", P], ['"Banners"', S], [", ", P], ['"Cards"', S], ["]", P]],
+        [["};", P]],
+        [[""]],
+        [["// ", C], ["ready for new projects", C]],
+        [["designer", P], [".", P], ["hire", "a"], ["();", P]],
+      ], "portfolio.js"),
+      services: () => {
+        const c = makeCanvas(), g = c.getContext("2d");
+        g.fillStyle = "#1e1e21"; g.fillRect(0, 0, SCR_W, SCR_H);
+        browser(g, "design.fig");
+        g.strokeStyle = "#3a3a40"; g.lineWidth = 1;
+        for (let x = 0; x < SCR_W; x += 40) { g.beginPath(); g.moveTo(x, 56); g.lineTo(x, SCR_H); g.stroke(); }
+        for (let y = 56; y < SCR_H; y += 40) { g.beginPath(); g.moveTo(0, y); g.lineTo(SCR_W, y); g.stroke(); }
+        const frame = (x, y, w, h, fill) => { g.fillStyle = fill; g.beginPath(); g.roundRect(x, y, w, h, 14); g.fill(); };
+        frame(120, 130, 560, 680, "#f4f4f6");
+        frame(150, 170, 500, 230, accent());
+        frame(150, 420, 300, 26, "#d5d5da"); frame(150, 460, 420, 18, "#e2e2e6"); frame(150, 490, 380, 18, "#e2e2e6");
+        frame(150, 540, 160, 48, "#111114");
+        frame(150, 620, 240, 160, "#e7e7eb"); frame(410, 620, 240, 160, "#e7e7eb");
+        frame(760, 130, 260, 520, "#f4f4f6");
+        frame(780, 160, 220, 220, accent()); frame(780, 400, 180, 20, "#d5d5da"); frame(780, 436, 140, 16, "#e2e2e6");
+        frame(1080, 130, 260, 300, "#f4f4f6"); frame(1100, 150, 220, 160, "#111114"); frame(1100, 330, 160, 18, "#d5d5da");
+        frame(1080, 460, 260, 190, accent());
+        g.strokeStyle = accent(); g.lineWidth = 3; g.strokeRect(746, 116, 288, 548);
+        return c;
+      },
+      process: () => codeScreen([
+        [["const ", K], ["price", P], [" = ", P], ["estimate", "a"], ["({", P]],
+        [["  brief: ", P], ["yourTask", S], [",", P]],
+        [["  budget: ", P], ["yourBudget", S], [",", P]],
+        [["});", P]],
+        [[""]],
+        [["for ", K], ["(", P], ["const ", K], ["step", P], [" of ", K], ["[", P], ['"brief"', S], [", ", P], ['"proto"', S], [", ", P], ['"design"', S], [", ", P], ['"launch"', S], ["]", P], [")", P]],
+        [["  ", P], ["ship", "a"], ["(step);", P]],
+      ], "process.js"),
+      contact: () => {
+        const c = makeCanvas(), g = c.getContext("2d");
+        const grd = g.createLinearGradient(0, 0, SCR_W, SCR_H);
+        grd.addColorStop(0, accent()); grd.addColorStop(1, root.dataset.theme === "dark" ? "#5a0a12" : "#0d1a8a");
+        g.fillStyle = grd; g.fillRect(0, 0, SCR_W, SCR_H);
+        browser(g, "t.me/rostyslavvill");
+        g.fillStyle = "#ffffff"; g.textAlign = "center"; g.textBaseline = "middle";
+        g.font = "600 92px " + getComputedStyle(root).getPropertyValue("--font-display");
+        g.fillText("Let's talk", SCR_W / 2, SCR_H / 2 - 30);
+        g.font = "500 36px " + getComputedStyle(root).getPropertyValue("--font-mono");
+        g.globalAlpha = 0.85; g.fillText("@rostyslavvill", SCR_W / 2, SCR_H / 2 + 70); g.globalAlpha = 1;
+        return c;
+      },
+      barbertio: () => {
+        const c = makeCanvas(), g = c.getContext("2d");
+        const grd = g.createLinearGradient(0, 0, 0, SCR_H);
+        grd.addColorStop(0, "#151515"); grd.addColorStop(1, "#262321");
+        g.fillStyle = grd; g.fillRect(0, 0, SCR_W, SCR_H);
+        browser(g, "barbertio.pl");
+        g.fillStyle = "#f2efe9"; g.textAlign = "left"; g.textBaseline = "alphabetic";
+        g.font = "600 120px " + getComputedStyle(root).getPropertyValue("--font-display");
+        g.fillText("barbertio", 110, 420);
+        g.fillStyle = "#b9a27a"; g.fillRect(114, 470, 160, 6);
+        g.fillStyle = "#9b958c"; g.font = "500 30px " + getComputedStyle(root).getPropertyValue("--font-body");
+        g.fillText("barbertio.pl", 114, 540);
+        g.fillStyle = "#f2efe9"; g.beginPath(); g.roundRect(114, 600, 260, 64, 32); g.fill();
+        g.fillStyle = "#151515"; g.font = "600 24px " + getComputedStyle(root).getPropertyValue("--font-body"); g.textAlign = "center"; g.fillText("barbertio.pl ↗", 244, 641);
+        return c;
+      },
+    };
+    const images = { halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__" };
+    const loaded = {};
+    const SLIDE_SCREEN = ["intro", "services", "halo", "barbertio", "coffee", "ceramics", "process", "contact"];
+    const URLS = { halo: "halo-detail-studio", coffee: "mid-coffee", ceramics: "obzhig-ceramics" };
+    const texCache = {};
+    function screenTexture(name) {
+      if (texCache[name]) return texCache[name];
+      let c;
+      if (screens[name]) c = screens[name]();
+      else if (loaded[name]) c = shotScreen(loaded[name], URLS[name]);
+      else return null;
+      return (texCache[name] = toTex(c));
+    }
+    function invalidateGenerated() { ["intro", "services", "process", "contact", "barbertio"].forEach((n) => { if (texCache[n]) { texCache[n].dispose(); delete texCache[n]; } }); }
+
+    let screenName = null, fadeStart = 0, fadeTo = null;
+    function showScreen(name, instant) {
+      const tex = screenTexture(name);
+      if (!tex) return;
+      if (instant || reduceMotion || !screenMat.emissiveMap) {
+        screenMat.emissiveMap = tex; screenMat.needsUpdate = true; screenName = name; fadeTo = null; fadeMat.opacity = 0; return;
+      }
+      fadeMat.map = tex; fadeMat.needsUpdate = true; fadeTo = name; fadeStart = performance.now();
+    }
+    Object.entries(images).forEach(([k, src]) => {
+      const img = new Image();
+      img.onload = () => { loaded[k] = img; if (SLIDE_SCREEN[index] === k) showScreen(k, true); };
+      img.src = src;
+    });
+    showScreen("intro", true);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { invalidateGenerated(); showScreen(SLIDE_SCREEN[index], true); });
+
+    // ---------------- Poses ----------------
+    const deg = Math.PI / 180;
+    const POSES = [
+      { lid: 32, ry: -78, rx: 10 },
+      { lid: 78, ry: 38, rx: 14 },
+      { lid: 106, ry: -22, rx: 8 },
+      { lid: 106, ry: 22, rx: 8 },
+      { lid: 108, ry: -14, rx: 6 },
+      { lid: 108, ry: 14, rx: 6 },
+      { lid: 96, ry: -64, rx: 16 },
+      { lid: 112, ry: 0, rx: 4 },
+    ];
+    const state = { lid: 0, ry: -100 * deg, rx: 12 * deg, spin: 0 };
+    let tween = null;
+    const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    function pose(i, dur = 1250) {
+      const p = POSES[i];
+      tween = { from: { ...state }, to: { lid: p.lid * deg, ry: p.ry * deg, rx: p.rx * deg }, t0: performance.now(), dur: reduceMotion ? 1 : dur };
+      if (SLIDE_SCREEN[i] !== screenName) showScreen(SLIDE_SCREEN[i]);
+    }
+
+    // ---------------- Theme for 3D ----------------
+    function setTheme(th) {
+      const dark = th === "dark";
+      alu.color.set(dark ? 0x8b8e95 : 0xd3d5d9);
+      alu.roughness = dark ? 0.32 : 0.28;
+      alu.metalness = dark ? 0.72 : 1;
+      trackpad.material.color.set(dark ? 0x6a6d73 : 0xc6c8cc);
+      accentLight.color.set(dark ? 0xff2d3f : 0x2f45ff);
+      accentLight.intensity = dark ? 7 : 4;
+      ground.material.opacity = dark ? 0.32 : 0.12;
+      invalidateGenerated();
+      showScreen(SLIDE_SCREEN[index], true);
+    }
+    window.__laptop = { pose, setTheme };
+    setTheme(root.dataset.theme);
+
+    // ---------------- Layout ----------------
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      const narrow = w < 760;
+      camera.userData.dist = narrow ? Math.max(14, 7.6 / camera.aspect) : Math.max(10.2, 10.2 / Math.min(1.6, camera.aspect) * 1.25);
+      if (narrow) camera.setViewOffset(w, h, 0, h * 0.2, w, h);
+      else camera.setViewOffset(w, h, -w * 0.2, h * 0.02, w, h);
+      camera.updateProjectionMatrix();
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    // Pointer parallax (desktop)
+    const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
+    addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") { pointer.x = e.clientX / innerWidth - 0.5; pointer.y = e.clientY / innerHeight - 0.5; } });
+
+    // ---------------- Loop ----------------
+    let last = performance.now();
+    function frame(now) {
+      const dt = Math.min((now - last) / 1000, 0.05); last = now;
+      if (tween) {
+        const k = Math.min((now - tween.t0) / tween.dur, 1), e = easeInOut(k);
+        state.lid = tween.from.lid + (tween.to.lid - tween.from.lid) * e;
+        state.ry = tween.from.ry + (tween.to.ry - tween.from.ry) * e;
+        state.rx = tween.from.rx + (tween.to.rx - tween.from.rx) * e;
+        state.spin = Math.sin(e * Math.PI) * 0.18;
+        if (k === 1) tween = null;
+      }
+      if (fadeTo) {
+        const k = Math.min((now - fadeStart) / 520, 1);
+        fadeMat.opacity = k;
+        if (k === 1) { screenMat.emissiveMap = fadeMat.map; screenMat.needsUpdate = true; screenName = fadeTo; fadeTo = null; fadeMat.opacity = 0; }
+      }
+      pointer.sx += (pointer.x - pointer.sx) * (1 - Math.exp(-dt * 3));
+      pointer.sy += (pointer.y - pointer.sy) * (1 - Math.exp(-dt * 3));
+      const t = now / 1000, idle = reduceMotion ? 0 : 1;
+      lidPivot.rotation.x = -state.lid;
+      laptop.rotation.set(state.rx + pointer.sy * 0.12 * idle, state.ry + state.spin + pointer.sx * 0.25 * idle + Math.sin(t * 0.5) * 0.03 * idle, 0);
+      laptop.position.y = 0.06 + Math.sin(t * 0.9) * 0.035 * idle;
+      ground.position.y = -0.012;
+      const d = camera.userData.dist;
+      camera.position.set(0, d * 0.42, d);
+      camera.lookAt(0, 0.65, 0);
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // Opening sequence: closed laptop seen from the side, lid opens.
+    setTimeout(() => pose(0, 1800), reduceMotion ? 0 : 350);
+  })();
+  </script>
+</body>
+</html>
