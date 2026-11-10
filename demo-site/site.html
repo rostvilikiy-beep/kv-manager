@@ -495,16 +495,28 @@ document.querySelectorAll("[data-signup]").forEach((form) => {
 
 const pages = [...document.querySelectorAll("[data-page]")];
 const links = [...document.querySelectorAll("[data-nav]")];
-function route() {
-  const hash = location.hash.slice(1);
-  const key = pages.some((p) => p.dataset.page === hash.split("-")[0]) ? hash.split("-")[0] : "home";
+function show(key) {
+  if (!pages.some((p) => p.dataset.page === key)) key = "home";
   pages.forEach((p) => (p.hidden = p.dataset.page !== key));
   links.forEach((a) => (a.getAttribute("href") === "#" + key ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
-  const target = hash.includes("-") && document.getElementById(hash);
-  if (target) target.scrollIntoView(); else if (!hash.includes("-")) window.scrollTo(0, 0);
+  return key;
 }
-addEventListener("hashchange", route);
-route();
+function go(id) {
+  const key = show(id.split("-")[0]);
+  const target = id.includes("-") && document.getElementById(id);
+  if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  try { history.replaceState(null, "", "#" + id); } catch (e) { /* preview frames may block this */ }
+  return key;
+}
+// Клики обрабатываем сами: работает и во встроенном предпросмотре, где переходы по # блокируются.
+document.addEventListener("click", (event) => {
+  const a = event.target.closest('a[href^="#"]');
+  if (!a || a.getAttribute("href") === "#main-content") return;
+  event.preventDefault();
+  go(a.getAttribute("href").slice(1));
+});
+addEventListener("hashchange", () => go(location.hash.slice(1) || "home"));
+go(location.hash.slice(1) || "home");
   </script>
 </body>
 </html>
