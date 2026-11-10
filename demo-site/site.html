@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Академія Горизонт — сертифікатні програми</title>
+  <meta name="description" content="Тестовий сайт: сертифікатні програми.">
+  <meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#12161c" media="(prefers-color-scheme: dark)">
+  <style>
+:root {
+  color-scheme: light dark;
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --ink: #1b2430;
+  --muted: #5d6877;
+  --line: #e6e1d8;
+  --brand: #1f4fd8;
+  --brand-ink: #ffffff;
+  --brand-soft: #e8eefc;
+  --accent: #f2b63d;
+  --radius: 14px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --shadow: 0 1px 2px rgb(27 36 48 / 6%), 0 8px 24px rgb(27 36 48 / 6%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161c;
+    --surface: #1a2029;
+    --ink: #eef1f5;
+    --muted: #a3adbb;
+    --line: #2b3441;
+    --brand: #6f93ff;
+    --brand-ink: #0b1220;
+    --brand-soft: #1e2a47;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 25%);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+a, button, summary, input, select { touch-action: manipulation; }
+[id] { scroll-margin-top: 80px; }
+.facts span, .card, .num { font-variant-numeric: tabular-nums; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1.0625rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { line-height: 1.15; margin: 0 0 0.6em; letter-spacing: -0.02em; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
+h3 { font-size: 1.15rem; letter-spacing: -0.01em; }
+p { margin: 0 0 1em; text-wrap: pretty; }
+
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 6px; }
+
+.skip {
+  position: absolute; left: 1rem; top: -4rem; z-index: 100;
+  background: var(--ink); color: var(--bg); padding: 0.6rem 1rem; border-radius: 8px;
+}
+.skip:focus { top: 1rem; }
+
+.wrap { width: min(1120px, 100% - 2rem); margin-inline: auto; }
+section { padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+
+/* Header */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; }
+.logo { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 700; text-decoration: none; letter-spacing: -0.02em; }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; color: var(--brand-ink); font-size: 0.9rem; }
+.nav { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
+.nav a { text-decoration: none; padding: 0.5rem 0.8rem; border-radius: 8px; color: var(--muted); transition: color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
+.nav a[aria-current="page"] { color: var(--ink); background: var(--brand-soft); }
+@media (hover: hover) and (pointer: fine) {
+  .nav a:hover { color: var(--ink); background: var(--brand-soft); }
+}
+
+@media (max-width: 640px) {
+  .site-header .wrap { flex-direction: column; align-items: flex-start; gap: 0; padding-block: 0.6rem 0.4rem; }
+  .nav { flex-wrap: nowrap; overflow-x: auto; width: 100%; margin-inline: -0.8rem; padding-inline: 0.8rem; scrollbar-width: none; }
+  .nav a { white-space: nowrap; }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 48px; padding: 0.75rem 1.4rem; border-radius: 12px; border: 1px solid transparent;
+  font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+  background: var(--brand); color: var(--brand-ink);
+  transition: transform 160ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { box-shadow: 0 6px 18px rgb(31 79 216 / 28%); }
+  .btn-ghost:hover { background: var(--brand-soft); box-shadow: none; }
+}
+
+/* Hero */
+.hero { padding-top: clamp(2.5rem, 7vw, 5rem); }
+.eyebrow { display: inline-block; font-size: 0.85rem; font-weight: 600; color: var(--brand); background: var(--brand-soft); padding: 0.3rem 0.75rem; border-radius: 999px; margin-bottom: 1.2rem; }
+.lead { font-size: 1.2rem; color: var(--muted); max-width: 60ch; }
+.hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; margin-top: 2.5rem; padding: 0; list-style: none; }
+.facts li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; }
+.facts b { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.facts span { font-size: 1.15rem; font-weight: 600; }
+
+/* Cards & grids */
+.grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); padding: 0; margin: 0; list-style: none; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out); }
+.card p:last-child { margin-bottom: 0; }
+.card .num { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 10px; background: var(--brand-soft); color: var(--brand); font-weight: 700; margin-bottom: 0.8rem; font-variant-numeric: tabular-nums; }
+a.card { display: block; text-decoration: none; }
+@media (hover: hover) and (pointer: fine) {
+  a.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+}
+.muted { color: var(--muted); }
+.band { background: var(--surface); border-block: 1px solid var(--line); }
+
+/* People */
+.person { display: flex; gap: 0.9rem; align-items: center; }
+.avatar { flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; font-weight: 700; }
+.person small { display: block; color: var(--muted); line-height: 1.3; }
+
+/* Quote */
+.quote { margin: 0; }
+.quote blockquote { margin: 0 0 1rem; }
+.quote cite { font-style: normal; font-weight: 600; }
+
+/* FAQ */
+.faq { display: grid; gap: 0.6rem; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.faq summary { cursor: pointer; padding: 1rem 1.2rem; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 1rem; min-height: 48px; align-items: center; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--brand); transition: transform 200ms var(--ease-out); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 1.2rem 1rem; margin: 0; color: var(--muted); }
+
+/* Form */
+.form { display: grid; gap: 1rem; max-width: 520px; }
+.field { display: grid; gap: 0.35rem; }
+.field label { font-weight: 600; font-size: 0.95rem; }
+.field input, .field select {
+  min-height: 48px; padding: 0.6rem 0.85rem; font: inherit; color: inherit;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.field input:focus-visible, .field select:focus-visible { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 30%, transparent); }
+.field input[aria-invalid="true"] { border-color: #d03b3b; }
+.error { color: #d03b3b; font-size: 0.9rem; min-height: 1.2em; margin: 0; }
+.status { margin: 0; font-weight: 600; min-height: 1.5em; }
+
+/* Footer */
+footer { border-top: 1px solid var(--line); padding: 2rem 0; color: var(--muted); font-size: 0.95rem; }
+footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.note { background: var(--brand-soft); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.9rem; color: var(--ink); }
+
+/* Entrance: short, ease-out, staggered. Only transform + opacity. */
+.reveal { opacity: 0; transform: translateY(10px); animation: rise 420ms var(--ease-out) forwards; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { animation: fade 200ms ease forwards; transform: none; }
+  @keyframes fade { to { opacity: 1; } }
+  .btn:active { transform: none; }
+  a.card:hover { transform: none; }
+}
+
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main-content">Перейти до змісту</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="#home"><span class="logo-mark" aria-hidden="true">Г</span> <span translate="no">Академія Горизонт</span></a>
+      <nav class="nav" aria-label="Основна навігація">
+        <a data-nav href="#home">Програми</a>
+        <a data-nav href="#entrance">Підготовка до НМТ</a>
+        <a data-nav href="#teams">Команди</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content">
+<div data-page="home" hidden>
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow reveal" style="--i:0">Тестовий макет</span>
+        <h1 class="reveal" style="--i:1">Сертифікатні програми для школярів і команд</h1>
+        <p class="lead reveal" style="--i:2">Оберіть програму, перегляньте деталі та залиште заявку. Це демонстраційний сайт: назви, ціни й імена вигадані.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="home-programs">
+      <div class="wrap">
+        <h2 id="home-programs">Усі програми</h2>
+        <ul class="grid">
+          <li class="reveal" style="--i:3">
+            <a class="card" href="#entrance">
+              <span class="eyebrow">Річна програма · онлайн</span>
+              <h3>Академія вступника</h3>
+              <p class="muted">Системна підготовка до НМТ з шести предметів, пробні тестування та профорієнтація.</p>
+              <p><b>Старт: 01.09.2027</b></p>
+            </a>
+          </li>
+          <li class="reveal" style="--i:4">
+            <a class="card" href="#teams">
+              <span class="eyebrow">3 дні · офлайн</span>
+              <h3>Команди в нових умовах</h3>
+              <p class="muted">Інтенсив для HR та керівників: підтримка команди, пам'ять і ветеранська політика.</p>
+              <p><b>12–14 листопада · 25&nbsp;000&nbsp;₴</b></p>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+<div data-page="entrance" hidden>
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow reveal" style="--i:0">Річна програма · онлайн</span>
+        <h1 class="reveal" style="--i:1">Академія вступника</h1>
+        <p class="lead reveal" style="--i:2">Підготовка до НМТ 2028: шість предметів, пробні тестування та підтримка протягом усього року.</p>
+        <div class="hero-actions reveal" style="--i:3">
+          <a class="btn" href="#entrance-signup">Повідомити про старт</a>
+          <a class="btn btn-ghost" href="#entrance-program">Програма</a>
+        </div>
+        <ul class="facts reveal" style="--i:4">
+          <li><b>Старт</b><span>01.09.2027</span></li>
+          <li><b>Формат</b><span>Онлайн-платформа</span></li>
+          <li><b>Предметів</b><span>6</span></li>
+          <li><b>Для кого</b><span>Школярі 10–11 класів</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="entrance-who">
+      <div class="wrap">
+        <h2 id="entrance-who">Для кого</h2>
+        <p class="lead">Для учнів, які хочуть системно опрацювати матеріал під керівництвом досвідчених викладачів, а не готуватися хаотично.</p>
+      </div>
+    </section>
+
+    <section id="entrance-program" aria-labelledby="entrance-overview">
+      <div class="wrap">
+        <h2 id="entrance-overview">Огляд програми</h2>
+        <ul class="grid">
+          <li class="card"><span class="num">1</span><h3>Українська мова</h3><p class="muted">Правопис, стилістика, робота з текстом.</p></li>
+          <li class="card"><span class="num">2</span><h3>Математика</h3><p class="muted">Від базових тем до складних завдань.</p></li>
+          <li class="card"><span class="num">3</span><h3>Історія України</h3><p class="muted">Хронологія, причини й наслідки, джерела.</p></li>
+          <li class="card"><span class="num">4</span><h3>Англійська мова</h3><p class="muted">Граматика, читання, аудіювання.</p></li>
+          <li class="card"><span class="num">5</span><h3>Українська література</h3><p class="muted">Автори, твори, аналіз.</p></li>
+          <li class="card"><span class="num">6</span><h3>Біологія</h3><p class="muted">Теорія та розв'язання тестових завдань.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="entrance-perks">
+      <div class="wrap">
+        <h2 id="entrance-perks">Що вас чекає</h2>
+        <ul class="grid">
+          <li class="card"><h3>Курс профорієнтації</h3><p class="muted">Онлайн-курс «Навігатор» у подарунок кожному учаснику.</p></li>
+          <li class="card"><h3>Пробні тестування</h3><p class="muted">У форматі, наближеному до реального іспиту.</p></li>
+          <li class="card"><h3>Матеріали</h3><p class="muted">Усі рекомендовані та додаткові матеріали від викладачів.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="entrance-teachers">
+      <div class="wrap">
+        <h2 id="entrance-teachers">Викладачі</h2>
+        <ul class="grid">
+          <li class="card person"><span class="avatar" aria-hidden="true">ІП</span><div><b>Іван Петренко</b><small>Викладач історії</small></div></li>
+          <li class="card person"><span class="avatar" aria-hidden="true">МК</span><div><b>Марія Коваль</b><small>Викладачка математики</small></div></li>
+          <li class="card person"><span class="avatar" aria-hidden="true">ОШ</span><div><b>Олена Шевчук</b><small>Викладачка української мови</small></div></li>
+        </ul>
+        <p class="note">Імена вигадані — для макета.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="entrance-reviews">
+      <div class="wrap">
+        <h2 id="entrance-reviews">Відгуки учасників</h2>
+        <ul class="grid">
+          <li class="card quote"><blockquote>«Програма складена поступово, є час на повторення й тести. Викладачі пояснюють доступно.»</blockquote><cite>Учениця, 11 клас</cite></li>
+          <li class="card quote"><blockquote>«Уроки цікаві, час спливає швидко. Легко спілкуватися з викладачем.»</blockquote><cite>Учень, 10 клас</cite></li>
+        </ul>
+        <p class="note">Відгуки — зразки тексту.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="entrance-faq">
+      <div class="wrap">
+        <h2 id="entrance-faq">Часті запитання</h2>
+        <div class="faq">
+          <details><summary>Як проходять заняття?</summary><p>Онлайн на платформі академії, за розкладом, який ми надсилаємо перед стартом.</p></details>
+          <details><summary>Чи є пробні тестування?</summary><p>Так, регулярно, у форматі, наближеному до реального іспиту.</p></details>
+          <details><summary>Що, якщо я пропустив заняття?</summary><p>Матеріали та записи доступні на платформі.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="entrance-signup" aria-labelledby="entrance-signup-title">
+      <div class="wrap">
+        <h2 id="entrance-signup-title">Повідомити про старт</h2>
+        <p class="muted">Залиште контакти, і ми напишемо, коли відкриється набір.</p>
+        <form class="form" data-signup novalidate>
+          <div class="field">
+            <label for="entrance-name">Ім'я</label>
+            <input id="entrance-name" name="name" autocomplete="name" aria-describedby="entrance-name-error">
+            <p class="error" id="entrance-name-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="entrance-email">Електронна пошта</label>
+            <input id="entrance-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" aria-describedby="entrance-email-error">
+            <p class="error" id="entrance-email-error" role="alert"></p>
+          </div>
+          <button class="btn" type="submit">Повідомити мене</button>
+          <p class="status" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </div>
+<div data-page="teams" hidden>
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow reveal" style="--i:0">Інтенсив · 3 дні · офлайн</span>
+        <h1 class="reveal" style="--i:1">Команди в нових умовах</h1>
+        <p class="lead reveal" style="--i:2">Як підтримувати людей, інтегрувати ветеранів і будувати стійку культуру в непевний час.</p>
+        <div class="hero-actions reveal" style="--i:3">
+          <a class="btn" href="#teams-signup">Зареєструватися · 25&nbsp;000&nbsp;₴</a>
+          <a class="btn btn-ghost" href="#teams-program">Програма</a>
+        </div>
+        <ul class="facts reveal" style="--i:4">
+          <li><b>Дати</b><span>12–14 листопада</span></li>
+          <li><b>Тривалість</b><span>1 модуль, 3 дні</span></li>
+          <li><b>Місце</b><span>Офлайн, Львів</span></li>
+          <li><b>Вартість</b><span>25&nbsp;000&nbsp;₴</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="teams-overview">
+      <div class="wrap">
+        <h2 id="teams-overview">Огляд програми</h2>
+        <p class="lead">Команди працюють в умовах постійних змін. Програма допоможе:</p>
+        <ul class="grid">
+          <li class="card"><p>Комунікувати з працівниками, що пережили втрату.</p></li>
+          <li class="card"><p>Підтримувати одне одного в команді.</p></li>
+          <li class="card"><p>Інтегрувати ветеранів у робочі процеси з повагою до їхнього досвіду.</p></li>
+          <li class="card"><p>Зберігати культурну спадщину й ідентичність у компанії.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="teams-who">
+      <div class="wrap">
+        <h2 id="teams-who">Для кого</h2>
+        <ul class="grid">
+          <li class="card"><h3>HR та L&amp;D</h3><p class="muted">Фахівці з персоналу й навчання.</p></li>
+          <li class="card"><h3>Керівники команд</h3><p class="muted">Менеджери компаній.</p></li>
+          <li class="card"><h3>Комунікації та культура</h3><p class="muted">Корпоративна культура, внутрішні комунікації.</p></li>
+          <li class="card"><h3>Громадські організації</h3><p class="muted">Керівники громадських і благодійних структур.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="teams-program" aria-labelledby="teams-program-title">
+      <div class="wrap">
+        <h2 id="teams-program-title">Програма</h2>
+        <ul class="grid">
+          <li class="card"><span class="num">01</span><p>Культура пам'яті та її вплив на корпоративну культуру.</p></li>
+          <li class="card"><span class="num">02</span><p>Публічні простори й етичні практики вшанування.</p></li>
+          <li class="card"><span class="num">03</span><p>Стрес, травма й модель психологічної стійкості.</p></li>
+          <li class="card"><span class="num">04</span><p>Проживання втрати та безпечний «простір пам'яті».</p></li>
+          <li class="card"><span class="num">05</span><p>Цінності, довіра й згуртованість команди.</p></li>
+          <li class="card"><span class="num">06</span><p>Етичні меморіальні практики в організації.</p></li>
+          <li class="card"><span class="num">07</span><p>Ветеранська політика компанії: навіщо й як створити.</p></li>
+          <li class="card"><span class="num">08</span><p>Адаптація ветеранів і професійне зростання.</p></li>
+          <li class="card"><span class="num">09</span><p>Підтримка родин і чутлива корпоративна комунікація.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="teams-value">
+      <div class="wrap">
+        <h2 id="teams-value">Цінність програми</h2>
+        <ul class="grid">
+          <li class="card"><h3>3 дні офлайн</h3><p class="muted">Інтенсивне навчання на кампусі.</p></li>
+          <li class="card"><h3>Практика й інструменти</h3><p class="muted">Те, що можна одразу застосувати з командою.</p></li>
+          <li class="card"><h3>Обмін досвідом</h3><p class="muted">Погляд збоку на вашу діяльність.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="teams-speakers">
+      <div class="wrap">
+        <h2 id="teams-speakers">Лектори</h2>
+        <ul class="grid">
+          <li class="card person"><span class="avatar" aria-hidden="true">АК</span><div><b>Андрій Козак</b><small>Керівник напряму підтримки ветеранів</small></div></li>
+          <li class="card person"><span class="avatar" aria-hidden="true">ХР</span><div><b>Христина Руда</b><small>Дослідниця культурної пам'яті</small></div></li>
+          <li class="card person"><span class="avatar" aria-hidden="true">ОЛ</span><div><b>Олена Лис</b><small>Психотерапевтка</small></div></li>
+        </ul>
+        <p class="note">Імена вигадані — для макета.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="teams-reviews">
+      <div class="wrap">
+        <h2 id="teams-reviews">Відгуки учасників</h2>
+        <ul class="grid">
+          <li class="card quote"><blockquote>«Отримали і теорію, і практичні кроки для ветеранської політики. Є з чим повертатися в компанію.»</blockquote><cite>HR-керівниця</cite></li>
+          <li class="card quote"><blockquote>«Корисний обмін досвідом: побачили власну роботу з нового боку.»</blockquote><cite>Керівник громадської організації</cite></li>
+        </ul>
+        <p class="note">Відгуки — зразки тексту.</p>
+      </div>
+    </section>
+
+    <section class="band" id="teams-signup" aria-labelledby="teams-signup-title">
+      <div class="wrap">
+        <h2 id="teams-signup-title">Реєстрація</h2>
+        <p class="muted">12–14 листопада · Львів · 25&nbsp;000&nbsp;₴</p>
+        <form class="form" data-signup novalidate>
+          <div class="field">
+            <label for="teams-name">Ім'я</label>
+            <input id="teams-name" name="name" autocomplete="name" aria-describedby="teams-name-error">
+            <p class="error" id="teams-name-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="teams-email">Електронна пошта</label>
+            <input id="teams-email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" aria-describedby="teams-email-error">
+            <p class="error" id="teams-email-error" role="alert"></p>
+          </div>
+          <button class="btn" type="submit">Зареєструватися</button>
+          <p class="status" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>© Академія Горизонт (демо)</span>
+      <span>hello@example.com</span>
+    </div>
+  </footer>
+  <script>
+// Тестовая заявка: данные никуда не отправляются.
+document.querySelectorAll("[data-signup]").forEach((form) => {
+  const status = form.querySelector(".status");
+
+  const rules = {
+    name: (v) => (v.trim().length >= 2 ? "" : "Введіть ім'я (мінімум 2 символи)."),
+    email: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : "Введіть коректну електронну пошту."),
+  };
+
+  const check = (input) => {
+    const msg = rules[input.name]?.(input.value) ?? "";
+    input.setAttribute("aria-invalid", msg ? "true" : "false");
+    document.getElementById(`${input.id}-error`).textContent = msg;
+    return !msg;
+  };
+
+  form.querySelectorAll("input[name]").forEach((input) => {
+    input.addEventListener("blur", () => check(input));
+    input.addEventListener("input", () => input.getAttribute("aria-invalid") === "true" && check(input));
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const inputs = [...form.querySelectorAll("input[name]")];
+    const results = inputs.map(check);
+    if (results.includes(false)) {
+      inputs[results.indexOf(false)].focus();
+      status.textContent = "";
+      return;
+    }
+    status.textContent = "Дякуємо! Це тестова форма: дані не надсилались.";
+    form.reset();
+  });
+});
+
+
+const pages = [...document.querySelectorAll("[data-page]")];
+const links = [...document.querySelectorAll("[data-nav]")];
+function route() {
+  const hash = location.hash.slice(1);
+  const key = pages.some((p) => p.dataset.page === hash.split("-")[0]) ? hash.split("-")[0] : "home";
+  pages.forEach((p) => (p.hidden = p.dataset.page !== key));
+  links.forEach((a) => (a.getAttribute("href") === "#" + key ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current")));
+  const target = hash.includes("-") && document.getElementById(hash);
+  if (target) target.scrollIntoView(); else if (!hash.includes("-")) window.scrollTo(0, 0);
+}
+addEventListener("hashchange", route);
+route();
+  </script>
+</body>
+</html>
