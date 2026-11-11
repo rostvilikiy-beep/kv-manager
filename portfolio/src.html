@@ -403,8 +403,19 @@
         title: "Rostysław — web designer",
       },
     };
-    let lang = T[store.get("lang")] ? store.get("lang") : "ru";
-    function applyLang(l) {
+    // Language: a manual choice wins; otherwise the first supported browser language; otherwise English.
+    function detectLang() {
+      const saved = store.get("lang");
+      if (T[saved]) return saved;
+      const prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]);
+      for (const p of prefs) {
+        const code = String(p).toLowerCase().split("-")[0];
+        if (T[code]) return code;
+      }
+      return "en";
+    }
+    let lang = detectLang();
+    function applyLang(l, remember = false) {
       lang = l; const t = T[l];
       root.lang = l === "uk" ? "uk" : l;
       document.title = t.title;
@@ -414,7 +425,7 @@
       document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
       dots.forEach((d, i) => d.setAttribute("aria-label", `${i + 1}. ${t.slides[i]}`));
       themeBtn.setAttribute("aria-label", root.dataset.theme === "dark" ? t.themeLight : t.themeDark);
-      store.set("lang", l);
+      if (remember) store.set("lang", l);
     }
 
     // ---------------- Theme ----------------
@@ -489,7 +500,7 @@
       const g = e.target.closest("[data-go]");
       if (g) { go(Number(g.dataset.go), { focus: true }); return; }
       const l = e.target.closest("[data-lang]");
-      if (l) applyLang(l.dataset.lang);
+      if (l) applyLang(l.dataset.lang, true);
     });
 
     // Wheel: one gesture = one slide; trackpad inertia is swallowed.
