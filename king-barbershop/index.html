@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KING BARBERSHOP · Kołobrzeg</title>
+<meta name="description" content="&quot;KING BARBERSHOP to strefa dla każdego mężczyzny. Stawiamy na jakość wykonywanych usług, bo każdy klient jest dla nas ważny ,ponadto team KING to wykwalifikowani rzemieślnicy fryzjerstwa męskiego. KING został…">
+<meta property="og:title" content="KING BARBERSHOP">
+<meta property="og:description" content="&quot;KING BARBERSHOP to strefa dla każdego mężczyzny. Stawiamy na jakość wykonywanych usług, bo każdy klient jest dla nas ważny ,ponadto team KING to wykwalifikowani rzemieślnicy fryzjerstwa męskiego. KING został…">
+<meta property="og:image" content="img/photo-1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0f0f10; --bg2:#17171a; --card:#1d1d21; --line:#2a2a30; --text:#ece9e4; --muted:#a19d96; --gold:#c9a24b; --gold2:#e2c27a; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 Inter, system-ui, sans-serif; }
+  img { max-width:100%; display:block; }
+  a { color:inherit; }
+  .wrap { max-width:1160px; margin:0 auto; padding:0 20px; }
+  h1, h2, h3, .brand { font-family:Oswald, Impact, sans-serif; text-transform:uppercase; letter-spacing:.04em; margin:0; }
+  h2 { font-size:clamp(28px,4vw,42px); margin-bottom:8px; }
+  .kicker { color:var(--gold); font-size:13px; letter-spacing:.25em; text-transform:uppercase; font-weight:600; }
+  section { padding:88px 0; }
+  .btn { display:inline-block; padding:15px 30px; background:var(--gold); color:#111; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:.08em; font-size:14px; border-radius:2px; transition:.2s; }
+  .btn:hover { background:var(--gold2); transform:translateY(-2px); }
+  .btn.ghost { background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.35); }
+  .btn.ghost:hover { border-color:var(--gold); color:var(--gold2); }
+
+  /* шапка */
+  header { position:fixed; inset:0 0 auto; z-index:20; background:linear-gradient(rgba(10,10,11,.85),rgba(10,10,11,0)); transition:.3s; }
+  header.solid { background:rgba(12,12,13,.96); box-shadow:0 1px 0 var(--line); }
+  .nav { display:flex; align-items:center; justify-content:space-between; height:72px; gap:16px; }
+  .brand { font-size:22px; display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
+  .menu { display:flex; gap:26px; align-items:center; }
+  .menu a { text-decoration:none; font-size:14px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+  .menu a:hover { color:var(--text); }
+  .menu .btn { color:#111; padding:10px 18px; }
+  @media (max-width:820px) { .menu a:not(.btn) { display:none; } }
+
+  /* первый экран */
+  .hero { min-height:100vh; display:flex; align-items:center; position:relative; padding:120px 0 80px;
+    background:linear-gradient(90deg, rgba(8,8,9,.92) 0%, rgba(8,8,9,.6) 55%, rgba(8,8,9,.35) 100%), url("img/photo-1.jpg") center/cover no-repeat; }
+  .hero h1 { font-size:clamp(44px,8vw,96px); line-height:.95; margin:14px 0 18px; }
+  .hero p { max-width:560px; color:#d6d2cb; font-size:18px; margin:0 0 30px; }
+  .hero .btns { display:flex; gap:14px; flex-wrap:wrap; }
+  .rating { display:inline-flex; gap:10px; align-items:center; margin-top:34px; padding:10px 16px; background:rgba(0,0,0,.45); border:1px solid var(--line); border-radius:40px; font-size:14px; }
+  .rating b { color:var(--gold2); font-size:18px; }
+  .rating .st { color:var(--gold); letter-spacing:2px; }
+
+  /* о нас */
+  .about { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .about .pic { position:relative; }
+  .about .pic img { width:100%; aspect-ratio:4/5; object-fit:cover; }
+  .about .pic::after { content:""; position:absolute; inset:18px -18px -18px 18px; border:2px solid var(--gold); z-index:-1; }
+  .about .txt p { color:#cfcbc4; }
+  .facts { display:flex; gap:34px; margin-top:26px; flex-wrap:wrap; }
+  .facts div b { display:block; font:700 34px Oswald, sans-serif; color:var(--gold2); }
+  .facts div span { color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.12em; }
+  @media (max-width:860px) { .about { grid-template-columns:1fr; gap:40px; } }
+
+  /* услуги */
+  .services { background:var(--bg2); }
+  .head { text-align:center; margin-bottom:46px; }
+  .price-list { display:grid; grid-template-columns:1fr 1fr; gap:0 56px; }
+  .svc { display:flex; gap:14px; align-items:baseline; padding:18px 0; border-bottom:1px dashed var(--line); }
+  .svc .n { font-weight:600; }
+  .svc .d { color:var(--muted); font-size:13px; }
+  .svc .dots { flex:1; }
+  .svc .p { font:700 20px Oswald, sans-serif; color:var(--gold2); white-space:nowrap; }
+  @media (max-width:860px) { .price-list { grid-template-columns:1fr; } }
+
+  /* галерея */
+  .gallery { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .gallery img { width:100%; aspect-ratio:1; object-fit:cover; filter:grayscale(.25); transition:.3s; }
+  .gallery img:hover { filter:none; transform:scale(1.02); }
+  .gallery a:nth-child(1) { grid-column:span 2; grid-row:span 2; }
+  @media (max-width:700px) { .gallery { grid-template-columns:repeat(2,1fr); } }
+
+  /* отзывы */
+  .reviews { background:var(--bg2); }
+  .rv { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .rv .c { background:var(--card); padding:28px; border-top:3px solid var(--gold); }
+  .rv .st { color:var(--gold); letter-spacing:3px; }
+  .rv p { color:#d3cfc8; margin:12px 0 18px; font-size:15px; }
+  .rv .a { display:flex; gap:12px; align-items:center; font-weight:600; }
+  .rv .a i { width:38px; height:38px; border-radius:50%; background:var(--gold); color:#111; display:grid; place-items:center; font-style:normal; font-weight:700; }
+  @media (max-width:900px) { .rv { grid-template-columns:1fr; } }
+
+  /* контакты */
+  .contact { display:grid; grid-template-columns:1fr 1.2fr; gap:40px; }
+  .box { background:var(--card); padding:32px; }
+  .box h3 { font-size:18px; color:var(--gold2); margin:22px 0 10px; }
+  .box h3:first-child { margin-top:0; }
+  .hours { width:100%; border-collapse:collapse; }
+  .hours td { padding:7px 0; border-bottom:1px solid var(--line); }
+  .hours td:last-child { text-align:right; color:var(--muted); }
+  .map { width:100%; height:100%; min-height:380px; border:0; filter:grayscale(1) invert(.92) contrast(.9); }
+  .soc { display:flex; gap:12px; margin-top:16px; }
+  .soc a { padding:9px 16px; border:1px solid var(--line); text-decoration:none; font-size:14px; }
+  .soc a:hover { border-color:var(--gold); color:var(--gold2); }
+  @media (max-width:860px) { .contact { grid-template-columns:1fr; } }
+
+  footer { padding:30px 0; text-align:center; color:var(--muted); font-size:13px; border-top:1px solid var(--line); }
+  .call { position:fixed; right:18px; bottom:18px; z-index:30; width:58px; height:58px; border-radius:50%; background:var(--gold); color:#111; display:none; place-items:center; font-size:24px; text-decoration:none; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+  @media (max-width:700px) { .call { display:grid; } }
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap nav">
+    <a class="brand" href="#"><img src="img/logo.jpg" alt="KING BARBERSHOP">KING BARBERSHOP</a>
+    <nav class="menu">
+      <a href="#o-nas">O nas</a>
+      <a href="#cennik">Cennik</a>
+      <a href="#galeria">Galeria</a>
+      <a href="#kontakt">Kontakt</a>
+      <a class="btn" href="https://booksy.com/pl-pl/223324_king-barbershop_barber-shop_20258_kolobrzeg" target="_blank" rel="noopener">Umów wizytę</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker">Barber shop · Kołobrzeg</div>
+    <h1>KING BARBERSHOP</h1>
+    <p>&quot;KING BARBERSHOP to strefa dla każdego mężczyzny. Stawiamy na jakość wykonywanych usług, bo każdy klient jest dla nas ważny ,ponadto team KING to wykwalifikowani rzemieślnicy fryzjerstwa męskiego. KING został…</p>
+    <div class="btns">
+      <a class="btn" href="https://booksy.com/pl-pl/223324_king-barbershop_barber-shop_20258_kolobrzeg" target="_blank" rel="noopener">Zarezerwuj online</a>
+      <a class="btn ghost" href="tel:882802745">☎ 882 802 745</a>
+    </div>
+    <div class="rating"><b>4,9</b><span class="st">★★★★★</span><span>1015 opinii</span></div>
+  </div>
+</section>
+
+
+<section id="o-nas">
+  <div class="wrap about">
+    <div class="pic"><img src="img/photo-2.jpg" alt="KING BARBERSHOP" loading="lazy"></div>
+    <div class="txt">
+      <div class="kicker">O nas</div>
+      <h2>KING BARBERSHOP</h2>
+      <p>&quot;KING BARBERSHOP to strefa dla każdego mężczyzny. Stawiamy na jakość wykonywanych usług, bo każdy klient jest dla nas ważny ,ponadto team KING to wykwalifikowani rzemieślnicy fryzjerstwa męskiego. KING został stworzony w trosce o potrzeby klientów. W naszej strefie z pewnością się zrelaksujecie. Zapraszamy&quot;</p>
+      <div class="facts">
+        <div><b>4,9</b><span>średnia ocena</span></div>
+        <div><b>1015+</b><span>opinii klientów</span></div>
+        <div><b>8</b><span>usług</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="services" id="cennik">
+  <div class="wrap">
+    <div class="head"><div class="kicker">Cennik</div><h2>Nasze usługi</h2></div>
+    <div class="price-list">
+      
+      <div class="svc">
+        <div><div class="n">Strzyżenie krótkich włosów</div><div class="d">35min</div></div>
+        <span class="dots"></span>
+        <span class="p">70,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Strzyżenie COMBO (maszynką) włosy+broda</div><div class="d">50min</div></div>
+        <span class="dots"></span>
+        <span class="p">110,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Strzyżenie dzieci (chłopców) do lat 10</div><div class="d">30min</div></div>
+        <span class="dots"></span>
+        <span class="p">50,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Strzyżenie długich włosów</div></div>
+        <span class="dots"></span>
+        <span class="p">Cena ustalana po konsultacji (od 90zł+)</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">1g 10min</div></div>
+        <span class="dots"></span>
+        <span class="p">130,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Strzyżenie, trymowanie, golenie brody</div><div class="d">35min</div></div>
+        <span class="dots"></span>
+        <span class="p">70,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Depilacja woskiem nos/uszy/brwi</div><div class="d">10min</div></div>
+        <span class="dots"></span>
+        <span class="p">20,00 zł</span>
+      </div>
+      
+      <div class="svc">
+        <div><div class="n">Pigmentacja (koloryzacja) włosów/brody</div><div class="d">25min</div></div>
+        <span class="dots"></span>
+        <span class="p">60,00 zł</span>
+      </div>
+      
+    </div>
+    <p style="text-align:center;margin-top:40px"><a class="btn" href="https://booksy.com/pl-pl/223324_king-barbershop_barber-shop_20258_kolobrzeg" target="_blank" rel="noopener">Zarezerwuj termin</a></p>
+  </div>
+</section>
+
+
+
+<section id="galeria">
+  <div class="wrap">
+    <div class="head"><div class="kicker">Galeria</div><h2>Nasze prace</h2></div>
+    <div class="gallery">
+      <a href="img/photo-1.jpg" target="_blank"><img src="img/photo-1.jpg" alt="KING BARBERSHOP – zdjęcie 1" loading="lazy"></a><a href="img/photo-2.jpg" target="_blank"><img src="img/photo-2.jpg" alt="KING BARBERSHOP – zdjęcie 2" loading="lazy"></a><a href="img/photo-3.jpg" target="_blank"><img src="img/photo-3.jpg" alt="KING BARBERSHOP – zdjęcie 3" loading="lazy"></a><a href="img/photo-4.jpg" target="_blank"><img src="img/photo-4.jpg" alt="KING BARBERSHOP – zdjęcie 4" loading="lazy"></a><a href="img/photo-5.jpg" target="_blank"><img src="img/photo-5.jpg" alt="KING BARBERSHOP – zdjęcie 5" loading="lazy"></a><a href="img/photo-6.jpg" target="_blank"><img src="img/photo-6.jpg" alt="KING BARBERSHOP – zdjęcie 6" loading="lazy"></a><a href="img/photo-7.jpg" target="_blank"><img src="img/photo-7.jpg" alt="KING BARBERSHOP – zdjęcie 7" loading="lazy"></a><a href="img/photo-8.jpg" target="_blank"><img src="img/photo-8.jpg" alt="KING BARBERSHOP – zdjęcie 8" loading="lazy"></a><a href="img/photo-9.jpg" target="_blank"><img src="img/photo-9.jpg" alt="KING BARBERSHOP – zdjęcie 9" loading="lazy"></a><a href="img/photo-10.jpg" target="_blank"><img src="img/photo-10.jpg" alt="KING BARBERSHOP – zdjęcie 10" loading="lazy"></a><a href="img/photo-11.jpg" target="_blank"><img src="img/photo-11.jpg" alt="KING BARBERSHOP – zdjęcie 11" loading="lazy"></a><a href="img/photo-12.jpg" target="_blank"><img src="img/photo-12.jpg" alt="KING BARBERSHOP – zdjęcie 12" loading="lazy"></a><a href="img/photo-13.jpg" target="_blank"><img src="img/photo-13.jpg" alt="KING BARBERSHOP – zdjęcie 13" loading="lazy"></a><a href="img/photo-14.jpg" target="_blank"><img src="img/photo-14.jpg" alt="KING BARBERSHOP – zdjęcie 14" loading="lazy"></a><a href="img/photo-15.jpg" target="_blank"><img src="img/photo-15.jpg" alt="KING BARBERSHOP – zdjęcie 15" loading="lazy"></a><a href="img/photo-16.jpg" target="_blank"><img src="img/photo-16.jpg" alt="KING BARBERSHOP – zdjęcie 16" loading="lazy"></a><a href="img/photo-17.jpg" target="_blank"><img src="img/photo-17.jpg" alt="KING BARBERSHOP – zdjęcie 17" loading="lazy"></a><a href="img/photo-18.jpg" target="_blank"><img src="img/photo-18.jpg" alt="KING BARBERSHOP – zdjęcie 18" loading="lazy"></a><a href="img/photo-19.jpg" target="_blank"><img src="img/photo-19.jpg" alt="KING BARBERSHOP – zdjęcie 19" loading="lazy"></a><a href="img/photo-20.jpg" target="_blank"><img src="img/photo-20.jpg" alt="KING BARBERSHOP – zdjęcie 20" loading="lazy"></a><a href="img/photo-21.jpg" target="_blank"><img src="img/photo-21.jpg" alt="KING BARBERSHOP – zdjęcie 21" loading="lazy"></a><a href="img/photo-22.jpg" target="_blank"><img src="img/photo-22.jpg" alt="KING BARBERSHOP – zdjęcie 22" loading="lazy"></a><a href="img/photo-23.jpg" target="_blank"><img src="img/photo-23.jpg" alt="KING BARBERSHOP – zdjęcie 23" loading="lazy"></a>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="reviews">
+  <div class="wrap">
+    <div class="head"><div class="kicker">Opinie</div><h2>Co mówią klienci</h2></div>
+    <div class="rv">
+      
+      <div class="c">
+        <div class="st">★★★★★</div>
+        <p>„Jak zawsze wszystko super ❤️ Polecamy ❤️”</p>
+        <div class="a"><i>A</i>Angelika F…</div>
+      </div>
+      
+      <div class="c">
+        <div class="st">★★★★★</div>
+        <p>„Wspaniała,szybka,profesjonalna obsługa . Byłam z 6-cio letnim synem i jestem bardzo zadowolona.”</p>
+        <div class="a"><i>M</i>Magdalena L…</div>
+      </div>
+      
+      <div class="c">
+        <div class="st">★★★★★</div>
+        <p>„Jak zawsze wszystko dobrze i zawsze wesoło”</p>
+        <div class="a"><i>M</i>Michał</div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+<section id="kontakt">
+  <div class="wrap contact">
+    <div class="box">
+      <h3>Adres</h3>
+      <div>Zwycięzców, 9b, 78-100, Kołobrzeg, 78-100 Kołobrzeg</div>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=KING%20BARBERSHOP%2C%20Zwyci%C4%99zc%C3%B3w%2C%209b%2C%2078-100%2C%20Ko%C5%82obrzeg%2C%2078-100%20Ko%C5%82obrzeg%2C%20Ko%C5%82obrzeg" target="_blank" rel="noopener" style="color:var(--gold2);font-size:14px">Wyznacz trasę →</a>
+      <h3>Telefon</h3><a href="tel:882802745" style="font-size:20px;text-decoration:none">882 802 745</a>
+      
+      
+      <h3>Godziny otwarcia</h3>
+      <table class="hours"><tr><td>Poniedziałek</td><td>08:00–20:00</td></tr><tr><td>Wtorek</td><td>08:00–20:00</td></tr><tr><td>Środa</td><td>08:00–20:00</td></tr><tr><td>Czwartek</td><td>08:00–20:00</td></tr><tr><td>Piątek</td><td>08:00–20:00</td></tr><tr><td>Sobota</td><td>09:00–15:00</td></tr><tr><td>Niedziela</td><td>Zamknięte</td></tr></table>
+      
+      <div class="soc"><a href="https://www.facebook.com/profile.php?id=61555677541059" target="_blank" rel="noopener">Facebook</a></div>
+    </div>
+    <iframe class="map" src="https://maps.google.com/maps?q=54.18074000739867%2C15.567440000000033&amp;z=16&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa"></iframe>
+  </div>
+</section>
+
+<footer>© 2026 KING BARBERSHOP · Zwycięzców, 9b, 78-100, Kołobrzeg, 78-100 Kołobrzeg</footer>
+<a class="call" href="tel:882802745" aria-label="Zadzwoń">☎</a>
+
+<script>
+  const h = document.getElementById("top");
+  addEventListener("scroll", () => h.classList.toggle("solid", scrollY > 40));
+</script>
+</body>
+</html>
