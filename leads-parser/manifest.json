@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Leads Parser: Google Maps + Booksy",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "description": "Собирает телефоны и профили Instagram/Facebook заведений из Google Maps и Booksy, отправляет их в программу рассылки и собирает данные салона для конструктора сайтов.",
   "permissions": [
     "storage",

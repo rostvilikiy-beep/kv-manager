@@ -109,6 +109,67 @@ $("flush").onclick = async () => {
     : "Программа не запущена. Запустите start.bat в папке wa-checker и повторите.");
 };
 
+// ---------- импорт CSV (формат «Скачать CSV» для Booksy) в папку, открытую в программе ----------
+function parseCsv(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  text = text.replace(/^\uFEFF/, "");
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); cell = "";
+      if (row.some((c) => c !== "")) rows.push(row);
+      row = [];
+    } else cell += ch;
+  }
+  row.push(cell);
+  if (row.some((c) => c !== "")) rows.push(row);
+  return rows;
+}
+function csvToSalons(text) {
+  const [head = [], ...body] = parseCsv(text);
+  const col = (name) => head.findIndex((h) => h.trim().toLowerCase() === name);
+  const ix = { name: col("название"), phone: col("телефон"), email: col("почта"), instagram: col("instagram"), facebook: col("facebook"),
+    website: col("сайт"), reviews: col("отзывы"), rating: col("рейтинг"), url: col("ссылка booksy") };
+  if (ix.url < 0 || ix.phone < 0) return null;
+  const get = (r, k) => (ix[k] >= 0 ? (r[ix[k]] || "").trim() : "");
+  const num = (v) => (v === "" || isNaN(Number(v)) ? null : Number(v));
+  return body.map((r) => {
+    const site = get(r, "website"), rating = num(get(r, "rating")), reviews = num(get(r, "reviews"));
+    return {
+      name: get(r, "name"), phone: get(r, "phone"), email: get(r, "email"), url: get(r, "url"),
+      instagram: get(r, "instagram"), facebook: get(r, "facebook"),
+      website: site === "нет" ? "" : site, siteChecked: site !== "",
+      rating, reviews, metricsChecked: rating !== null || reviews !== null,
+    };
+  }).filter((s) => s.url);
+}
+$("import").onclick = () => $("importFile").click();
+$("importFile").onchange = async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const salons = csvToSalons(await file.text());
+  if (!salons) return alert("Не похоже на CSV из «Скачать CSV» (Booksy): нет колонок «Телефон» и «Ссылка Booksy».");
+  if (!salons.length) return alert("В файле нет салонов.");
+  let r = null;
+  try { r = await chrome.runtime.sendMessage({ type: "ping" }); } catch (err) {}
+  if (!r || !r.ok) return alert("Программа не запущена. Запустите её, откройте нужную папку и повторите импорт.");
+  if (!confirm(`Импортировать ${salons.length} салонов в папку «${r.folder || "Без папки"}»?`)) return;
+  $("import").disabled = true;
+  try { r = await chrome.runtime.sendMessage({ type: "importCsv", rows: salons }); } catch (err) { r = null; }
+  $("import").disabled = false;
+  alert(r && r.ok
+    ? `Готово. Отправлено в программу: номеров ${r.leads}, профилей соцсетей ${r.socials}.`
+    : "Не удалось отправить в программу. Данные сохранены в расширении и уйдут при следующей связи.");
+};
+
 // ---------- база ----------
 const csvCell = (v) => `"${(v ?? "").toString().replace(/"/g, '""')}"`;
 function download(rows, name) {

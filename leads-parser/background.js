@@ -38,6 +38,12 @@ async function pingInfo() {
   return { ok: false, folder: "" };
 }
 async function ping() { return (await pingInfo()).ok; }
+// Какая папка открыта в программе прямо сейчас; null — программа не отвечает
+async function currentFolder() { const p = await pingInfo(); return p.ok ? p.folder : null; }
+// В какие папки запись уже отправлялась. Старые записи (без отметки) ушли в «Без папки».
+const sentTo = (x) => (Array.isArray(x.folders) ? x.folders : [""]);
+const isNewFolder = (x, folder) => folder !== null && !sentTo(x).includes(folder);
+function markSent(x, folder) { if (folder !== null && !sentTo(x).includes(folder)) x.folders = sentTo(x).concat(folder); }
 const numOrNull = (v) => (typeof v === "number" && isFinite(v) ? v : null);
 const toApp = (l) => ({
   name: l.name, phone: l.phone, mapsUrl: l.url || l.mapsUrl || "", note: l.note || "", email: l.email || "",
@@ -93,17 +99,21 @@ function saveSocial(item) {
       rating: num(item.rating), reviews: num(item.reviews), priceMin: num(item.priceMin), priceMax: num(item.priceMax),
       currency: item.currency || "", metricsChecked: item.metricsChecked === true,
     };
+    const folder = await currentFolder();
     const old = socials.find((s) => s.url === item.url);
     if (old) {
-      // салон уже был сохранён раньше (без сайта или без показателей): дополняем запись и отправляем в программу
-      if (old.siteChecked && old.metricsChecked && (old.phone || !rec.phone) && (old.email || !rec.email)) return false;
+      // салон уже был сохранён раньше: дополняем запись (сайт, показатели) и отправляем в программу.
+      // Если в программе открыта папка, куда этот салон ещё не попадал, тоже отправляем — иначе папка останется пустой.
+      const complete = old.siteChecked && old.metricsChecked && (old.phone || !rec.phone) && (old.email || !rec.email);
+      if (complete && !isNewFolder(old, folder)) return false;
       Object.assign(old, rec, { phone: rec.phone || old.phone || "", email: rec.email || old.email || "" });
+      markSent(old, folder);
       pendingSocial.push(rec);
       await chrome.storage.local.set({ socials, pendingSocial });
       flushPendingSocials();
       return false;
     }
-    socials.push(rec);
+    socials.push(folder === null ? rec : { ...rec, folders: [folder] });
     pendingSocial.push(rec);
     await chrome.storage.local.set({ socials, pendingSocial });
     flushPendingSocials();
@@ -232,6 +242,7 @@ function saveLead(lead) {
       rating: numOrNull(lead.rating), reviews: numOrNull(lead.reviews), priceMin: numOrNull(lead.priceMin), priceMax: numOrNull(lead.priceMax),
       currency: lead.currency || "", metricsChecked: lead.metricsChecked === true,
     };
+    const folder = await currentFolder();
     const old = leads.find((l) => keyOf(l.phone) === k);
     if (old) {
       // номер уже есть: дополняем запись тем, чего раньше не знали (почта, сайт, показатели) и отправляем в программу
@@ -240,7 +251,10 @@ function saveLead(lead) {
       if (extra.siteChecked && !old.siteChecked) { old.website = extra.website; old.siteChecked = true; changed = true; }
       if (extra.metricsChecked && !old.metricsChecked) { Object.assign(old, { rating: extra.rating, reviews: extra.reviews, priceMin: extra.priceMin, priceMax: extra.priceMax, currency: extra.currency, metricsChecked: true }); changed = true; }
       if (extra.hasSocial && !old.hasSocial) { old.hasSocial = true; changed = true; }
+      // номер уже отправлялся, но в другую папку: отправляем и в открытую сейчас
+      if (isNewFolder(old, folder)) changed = true;
       if (changed) {
+        markSent(old, folder);
         pending.push(toApp(old));
         await chrome.storage.local.set({ leads, pending });
         flushPending();
@@ -248,6 +262,7 @@ function saveLead(lead) {
       return false;
     }
     const item = { name: lead.name || "", phone: lead.phone, url: lead.url || "", note: lead.note || "", email: lead.email || "", ...extra };
+    if (folder !== null) item.folders = [folder];
     leads.push(item);
     pending.push(toApp(item));
     await chrome.storage.local.set({ leads, pending });
@@ -457,6 +472,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const r2 = socials.length ? await postSocials(socials) : { added: 0 };
       if (r2) await chrome.storage.local.set({ pendingSocial: [] });
       return sendResponse(r && r2 ? { ok: true, added: r.added, addedSocial: r2.added } : { ok: false });
+    }
+    // от окна расширения: импорт салонов из CSV (выгрузка «Скачать CSV») в открытую в программе папку
+    if (msg.type === "importCsv") {
+      let leadsN = 0, socialsN = 0;
+      for (const d of Array.isArray(msg.rows) ? msg.rows.slice(0, 5000) : []) {
+        if (!d || !d.url) continue;
+        const hasSocial = !!(d.instagram || d.facebook);
+        if (d.phone) { await saveLead({ ...d, note: "Booksy", hasSocial }); leadsN++; }
+        if (hasSocial) { await saveSocial(d); socialsN++; }
+      }
+      const r = await withLock(flushPending);
+      const r2 = await withLock(flushPendingSocials);
+      return sendResponse({ ok: !!(r && r.ok && r2 && r2.ok), leads: leadsN, socials: socialsN });
     }
     if (msg.cmd === "booksyStart") { await booksyStart(msg.tabId, msg.opts); return sendResponse({ ok: true }); }
     if (msg.cmd === "booksyStop") {
