@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root { --bg:#1d1e21; --glass:rgba(255,255,255,.055); --gb:rgba(255,255,255,.1); --text:#e4e6e9; --muted:#9aa1ab;
+          --a1:#6f8196; --a2:#9db0c4; --ok:#7ccba0; --bad:#e08989; --warn:#e3c07a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    width: 360px; min-height: 480px; position: relative; overflow: hidden;
+    font-family: "Segoe UI", system-ui, sans-serif; font-size: 13px; color: var(--text);
+    background: linear-gradient(165deg, #3b3e44 0%, #2b2d32 45%, #1e1f23 100%);
+  }
+  .wrap { position: relative; padding: 12px; }
+
+  header { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .orb { width: 26px; height: 26px; border-radius: 50%; flex: none; background: linear-gradient(145deg, #d3d7dd, #6c747e); }
+  h1 { margin: 0; font-size: 16px; color: var(--text); }
+  header small { color: var(--muted); display: block; font-size: 11px; }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .seg button { padding: 8px 6px; border-radius: 10px; border: 1px solid var(--gb); background: var(--glass); color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+  .seg button span { display: block; font-size: 17px; margin-bottom: 1px; }
+  .seg button:hover { background: rgba(255,255,255,.1); }
+  .seg button.active { background: rgba(255,255,255,.17); border-color: rgba(255,255,255,.3); }
+
+  .card { background: var(--glass); border: 1px solid var(--gb); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+  .hint { color: var(--muted); font-size: 12px; line-height: 1.4; }
+  #status { margin: 7px 0 5px; min-height: 30px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 7px; }
+  .stat { background: rgba(255,255,255,.06); border-radius: 9px; padding: 6px 4px; text-align: center; }
+  .stat b { display: block; font-size: 17px; }
+  .stat small { color: var(--muted); font-size: 11px; }
+  .stat.ok b { color: var(--ok); }
+
+  .check { display: flex; gap: 8px; align-items: center; margin-top: 8px; cursor: pointer; font-size: 12px; }
+  .check input { width: 15px; height: 15px; accent-color: #9db0c4; }
+
+  .btn { width: 100%; padding: 10px; border: 0; border-radius: 10px; font-size: 14px; font-weight: 600; color: #fff; cursor: pointer;
+    background: linear-gradient(180deg, #7a8da1, #64768a); transition: filter .15s; margin-bottom: 6px; }
+  .btn:hover:not(:disabled) { filter: brightness(1.1); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.stop { background: linear-gradient(180deg, #b97676, #9d6060); }
+  .btn.ghost { background: rgba(255,255,255,.07); border: 1px solid var(--gb); font-size: 13px; padding: 8px; }
+  .btn.danger { background: rgba(224,137,137,.12); border: 1px solid rgba(224,137,137,.35); font-size: 13px; padding: 8px; color: #efb4b4; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .pill { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px; font-size: 12px;
+    background: var(--glass); border: 1px solid var(--gb); margin-bottom: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--muted); }
+  .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="orb"></div>
+    <div><h1>Leads Parser</h1><small>сбор клиентов для рассылки</small></div>
+  </header>
+
+  <div class="seg">
+    <button id="srcMaps" class="active"><span>🗺</span>Google Maps</button>
+    <button id="srcBooksy"><span>💈</span>Booksy</button>
+  </div>
+
+  <div class="card">
+    <div class="hint" id="hint"></div>
+    <div id="status">…</div>
+    <div class="hint" id="last" style="min-height:16px;margin-bottom:4px"></div>
+    <div class="stats">
+      <div class="stat"><b id="vis">0</b><small>просмотрено</small></div>
+      <div class="stat ok"><b id="sav">0</b><small id="savLbl">новых салонов</small></div>
+      <div class="stat"><b id="all">0</b><small id="allLbl">всего в базе</small></div>
+    </div>
+    <label class="check" id="optBox"><input type="checkbox" id="skipSite" /> Пропускать заведения, у которых есть сайт</label>
+    <label class="check" id="emailBox"><input type="checkbox" id="emailOpt" /> Собирать почту (нажимает «Показать», возможна капча)</label>
+  </div>
+
+  <button class="btn" id="toggle">▶ Старт</button>
+
+  <div class="pill"><span class="dot" id="dot"></span><span id="app">Проверяю связь с программой…</span></div>
+  <button class="btn ghost" id="flush">📤 Отправить всё в программу</button>
+  <div class="row">
+    <button class="btn ghost" id="export">⬇ Скачать CSV</button>
+    <button class="btn danger" id="clear">🗑 Очистить базу</button>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

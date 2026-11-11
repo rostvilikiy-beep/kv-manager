@@ -1,0 +1,99 @@
+{
+  "manifest_version": 3,
+  "name": "Leads Parser: Google Maps + Booksy",
+  "version": "4.7.0",
+  "description": "Собирает телефоны и профили Instagram/Facebook заведений из Google Maps и Booksy, отправляет их в программу рассылки и собирает данные салона для конструктора сайтов.",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://booksy.com/*",
+    "https://*.booksy.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Leads Parser"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/maps/*",
+        "https://www.google.pl/maps/*",
+        "https://www.google.ru/maps/*",
+        "https://www.google.de/maps/*",
+        "https://www.google.com.ua/maps/*",
+        "https://maps.google.com/*"
+      ],
+      "js": [
+        "maps.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://booksy.com/*",
+        "https://*.booksy.com/*"
+      ],
+      "js": [
+        "booksy.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.instagram.com/*",
+        "https://instagram.com/*",
+        "https://www.facebook.com/*",
+        "https://m.facebook.com/*",
+        "https://web.facebook.com/*"
+      ],
+      "js": [
+        "social.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.facebook.com/ads/library/*"
+      ],
+      "js": [
+        "adlib.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://booksy.com/*",
+        "https://*.booksy.com/*",
+        "https://www.google.com/maps/*",
+        "https://www.google.pl/maps/*",
+        "https://www.google.ru/maps/*",
+        "https://www.google.de/maps/*",
+        "https://www.google.com.ua/maps/*",
+        "https://maps.google.com/*"
+      ],
+      "js": [
+        "site.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
