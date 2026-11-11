@@ -31,6 +31,16 @@
     --chart-5: 27 87% 67%;
   }
 
+  /* Tailwind v4-style colour names, read by components copied from v4 projects
+     (e.g. sneaker-product-hero). Declared on both :root and .dark so they
+     resolve against whichever theme is active. */
+  :root,
+  .dark {
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+  }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;

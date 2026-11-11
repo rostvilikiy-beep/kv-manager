@@ -10,5 +10,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      // Two pages: the KV manager (index.html) and the product catalog.
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        catalog: path.resolve(__dirname, 'catalog.html'),
+      },
+    },
+  },
 })
 
