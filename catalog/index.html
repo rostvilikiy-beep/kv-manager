@@ -8,48 +8,55 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap">
 <style>
-/* Layout: one horizontal swipe track, the active card centred, the chosen bottle lifts out of its box.
-   Palette: clinical teal-grey ground, deep ink, brand blue for actions. */
+/* Layout: 3D product stage in the centre, product sheet (price, description) at the side; stacks on phones.
+   Palette: clinical cool ground, deep ink, the shop's blue for actions, a per-product tint from the carton. */
 :root {
-  --bg: #eef4f4;
+  --bg: #edf3f4;
   --surface: #ffffff;
   --ink: #0d2528;
-  --muted: #56706f;
-  --line: #d3e0df;
+  --muted: #587173;
+  --line: #d3e0e0;
   --action: #2650a0;
   --action-ink: #ffffff;
   --focus: #0f8a84;
-  --shadow: 0 18px 40px -22px rgba(13, 37, 40, 0.45);
+  --floor: rgba(13, 37, 40, 0.28);
+  --stage-a: #ffffff;
+  --stage-b: #e3ecee;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0c1c1e;
-    --surface: #142a2d;
+    --bg: #0b1a1c;
+    --surface: #132a2d;
     --ink: #e6f1f0;
     --muted: #9ab5b3;
-    --line: #223d40;
+    --line: #213c3f;
     --action: #5b8fe0;
-    --action-ink: #0a1830;
+    --action-ink: #08162c;
     --focus: #4fc3bc;
-    --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.8);
+    --floor: rgba(0, 0, 0, 0.6);
+    --stage-a: #1b3639;
+    --stage-b: #0e2123;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0c1c1e;
-  --surface: #142a2d;
+  --bg: #0b1a1c;
+  --surface: #132a2d;
   --ink: #e6f1f0;
   --muted: #9ab5b3;
-  --line: #223d40;
+  --line: #213c3f;
   --action: #5b8fe0;
-  --action-ink: #0a1830;
+  --action-ink: #08162c;
   --focus: #4fc3bc;
-  --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.8);
+  --floor: rgba(0, 0, 0, 0.6);
+  --stage-a: #1b3639;
+  --stage-b: #0e2123;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -58,579 +65,572 @@ body {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+  padding-block: 18px;
   overflow-x: hidden;
 }
-h1, h2, h3 { font-family: "Manrope", "Inter", system-ui, sans-serif; text-wrap: balance; margin: 0; }
+h1, h2 { font-family: "Manrope", "Inter", system-ui, sans-serif; text-wrap: balance; margin: 0; }
+
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
 /* Header */
-.top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
-}
-.brand h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
-.brand p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.top h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+.top p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
 .cart-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font: 600 14px/1 "Inter", system-ui, sans-serif;
-  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 8px 8px 14px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line);
+  font: 600 14px/1 "Inter", system-ui, sans-serif; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .cart-pill .count {
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: var(--action);
-  color: var(--action-ink);
-  display: inline-grid;
-  place-items: center;
-  font-variant-numeric: tabular-nums;
+  min-width: 26px; height: 26px; padding: 0 7px; border-radius: 999px;
+  background: var(--action); color: var(--action-ink);
+  display: inline-grid; place-items: center;
   transition: transform .3s cubic-bezier(.34,1.56,.64,1);
 }
-.cart-pill .count.bump { transform: scale(1.35); }
+.cart-pill .count.bump { transform: scale(1.3); }
+
+/* Main grid */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: stretch; }
 
 /* Stage */
 .stage {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 18px;
-  max-width: 1100px;
-  width: 100%;
-  margin: 18px auto 0;
-  min-height: 0;
-}
-.viewport {
   position: relative;
+  min-height: 600px;
+  border-radius: 24px;
+  background:
+    radial-gradient(120% 80% at 50% 20%, var(--stage-a), var(--stage-b) 70%),
+    var(--stage-b);
   overflow: hidden;
-  padding-top: 90px;   /* head-room so a lifted bottle is not clipped */
+  perspective: 1500px;
+  perspective-origin: 50% 35%;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   cursor: grab;
+  isolation: isolate;
 }
-.viewport.dragging { cursor: grabbing; }
-.track {
-  display: flex;
-  gap: 28px;
-  transition: transform .7s cubic-bezier(.2,.7,.2,1);
-  will-change: transform;
+.stage.dragging { cursor: grabbing; }
+.stage::before {
+  /* product tint glow behind the carton */
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(45% 40% at 50% 55%, var(--tint, transparent), transparent 70%);
+  opacity: .35;
+  transition: background .6s;
+  z-index: -1;
 }
-.track.dragging { transition: none; }
-
-/* Card */
-.card {
-  flex: 0 0 auto;
-  width: clamp(230px, 64vw, 300px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 14px 20px;
-  border-radius: 20px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  opacity: .5;
-  transform: scale(.92);
-  transition: opacity .5s, transform .6s cubic-bezier(.2,.7,.2,1), border-color .3s;
-}
-.card.is-active { opacity: 1; transform: scale(1); }
-.card.is-selected { border-color: var(--focus); }
-
-/* Carton: open top, bottle sits inside behind the front panel */
-.box {
-  position: relative;
-  width: 100%;
-  height: 230px;
-  background: var(--box-back);
-  border-radius: 6px 6px 4px 4px;
-  cursor: pointer;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.box:focus-visible { box-shadow: 0 0 0 3px var(--focus); }
-.box .front {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 128px;
-  z-index: 2;
-  border-radius: 0 0 4px 4px;
-  background: linear-gradient(160deg, var(--box-front-a), var(--box-front-b));
-  color: #fff;
-  padding: 14px 14px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
-}
-.box .front .brand-mark {
-  font: 800 11px/1 "Manrope", sans-serif;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  opacity: .95;
-}
-.box .front .vol {
-  align-self: flex-end;
-  font: 600 11px/1 "Inter", sans-serif;
-  background: rgba(255,255,255,.2);
-  padding: 4px 7px;
-  border-radius: 4px;
-}
-.box .front .type {
-  font: 600 12px/1.25 "Inter", sans-serif;
-  opacity: .92;
-}
-
-/* Bottle: starts inside the box, lifts out when chosen */
-.bottle {
+.cam {
   position: absolute;
   left: 50%;
-  bottom: 64px;
-  width: 50px;
-  height: 128px;
-  margin-left: -25px;
-  z-index: 1;
+  top: 80%;
+  width: 0; height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-11deg);
+}
+.prod, .shift { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+.shift { transition: transform .8s cubic-bezier(.3,.7,.2,1) .25s; }
+.prod.is-open .shift { transform: translateX(calc(var(--W) * -0.58)); transition-delay: .45s; }
+
+/* Carton: six faces, each with a printed outside and a plain cardboard inside */
+.box {
+  position: absolute;
+  width: var(--W); height: var(--H);
+  left: calc(var(--W) / -2); top: calc(var(--H) * -1);
+  transform-style: preserve-3d;
+}
+.face { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.face > i { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.face > i.out { background-size: 100% 100%; background-color: #f4f7f7; }
+.face > i.in { transform: rotateY(180deg); background: #d9d2c4; box-shadow: inset 0 0 30px rgba(0,0,0,.25); }
+.f-front { width: var(--W); height: var(--H); transform: translateZ(calc(var(--D) / 2)); }
+.f-back  { width: var(--W); height: var(--H); transform: rotateY(180deg) translateZ(calc(var(--D) / 2)); }
+.f-left  { width: var(--D); height: var(--H); left: calc((var(--W) - var(--D)) / 2); transform: rotateY(-90deg) translateZ(calc(var(--W) / 2)); }
+.f-right { width: var(--D); height: var(--H); left: calc((var(--W) - var(--D)) / 2); transform: rotateY(90deg) translateZ(calc(var(--W) / 2)); }
+.f-bottom { width: var(--W); height: var(--D); top: calc((var(--H) - var(--D)) / 2); transform: rotateX(-90deg) translateZ(calc(var(--H) / 2)); }
+.f-lid {
+  width: var(--W); height: var(--D); top: 0;
+  transform-origin: 50% 0;
+  transform: translateZ(calc(var(--D) / -2)) rotateX(90deg);
+  transition: transform .5s cubic-bezier(.4,.1,.3,1) 1s;
+}
+.prod.is-open .f-lid { transform: translateZ(calc(var(--D) / -2)) rotateX(212deg); transition-delay: 0s; }
+.f-lid > i.out, .f-bottom > i.out {
+  background:
+    linear-gradient(90deg, var(--accent) 0 22%, transparent 22%),
+    linear-gradient(180deg, #ffffff, #e9eff0);
+}
+.f-lid > i.out::after {
+  /* tuck flap crease */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 14%;
+  height: 1px; background: rgba(13,37,40,.15);
+}
+
+/* Bottle: a cut-out photo standing inside the carton */
+.bottle {
+  position: absolute;
+  width: var(--BW); height: var(--BH);
+  left: calc(var(--BW) / -2); top: calc(var(--BH) * -1);
+  background-size: 100% 100%;
   transform-origin: 50% 100%;
-  transition: transform .9s cubic-bezier(.34,1.45,.64,1);
+  transform: translate3d(0, 0, 0);
+  filter: drop-shadow(0 6px 10px rgba(13,37,40,.18));
   pointer-events: none;
 }
-.bottle .cap {
-  position: absolute;
-  top: 0; left: 50%;
-  width: 22px; height: 24px;
-  margin-left: -11px;
-  border-radius: 5px 5px 3px 3px;
-  background: linear-gradient(90deg, #c9d7d6, #f4f8f8, #c9d7d6);
+.bottle.opening { animation: flyOut 1.35s cubic-bezier(.45,.05,.25,1) .3s both; }
+.bottle.closing { animation: flyIn 1.1s cubic-bezier(.45,.05,.25,1) both; }
+.bottle.is-out  { transform: translate3d(calc(var(--W) * 1.18), 0, calc(var(--D) * .7)) scale(1.1); }
+@keyframes flyOut {
+  0%   { transform: translate3d(0, 0, 0) rotateZ(0) scale(1); }
+  32%  { transform: translate3d(0, calc(var(--H) * -1.04), 0) rotateZ(0) scale(1); }
+  64%  { transform: translate3d(calc(var(--W) * .85), calc(var(--H) * -1.12), calc(var(--D) * .45)) rotateZ(16deg) scale(1.08); }
+  86%  { transform: translate3d(calc(var(--W) * 1.18), calc(var(--H) * -.06), calc(var(--D) * .7)) rotateZ(-3deg) scale(1.1); }
+  100% { transform: translate3d(calc(var(--W) * 1.18), 0, calc(var(--D) * .7)) rotateZ(0) scale(1.1); }
 }
-.bottle .neck {
-  position: absolute;
-  top: 22px; left: 50%;
-  width: 16px; height: 12px;
-  margin-left: -8px;
-  background: #e8f0ef;
+@keyframes flyIn {
+  0%   { transform: translate3d(calc(var(--W) * 1.18), 0, calc(var(--D) * .7)) rotateZ(0) scale(1.1); }
+  36%  { transform: translate3d(calc(var(--W) * .85), calc(var(--H) * -1.12), calc(var(--D) * .45)) rotateZ(16deg) scale(1.08); }
+  68%  { transform: translate3d(0, calc(var(--H) * -1.04), 0) rotateZ(0) scale(1); }
+  100% { transform: translate3d(0, 0, 0) rotateZ(0) scale(1); }
 }
-.bottle .body {
-  position: absolute;
-  top: 32px; left: 0; right: 0; bottom: 0;
-  border-radius: 14px 14px 10px 10px;
-  background: linear-gradient(90deg, #dbe6e5, #ffffff 45%, #e6eeed);
-  box-shadow: inset 0 0 0 1px rgba(13,37,40,.08);
-  overflow: hidden;
-}
-.bottle .body::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; top: 46%;
-  height: 34%;
-  background: var(--box-front-a);
-}
-.bottle.out {
-  transform: translate3d(0, -128px, 0) rotate(-6deg) scale(1.22);
-  z-index: 4;
-}
-.card.is-selected .box { box-shadow: 0 0 0 2px var(--focus); }
 
-/* Text under the box */
-.info { text-align: center; display: flex; flex-direction: column; gap: 4px; width: 100%; }
-.info h2 { font-size: 17px; font-weight: 700; }
-.info .sub { font-size: 13px; color: var(--muted); }
-.price { display: flex; justify-content: center; align-items: baseline; gap: 8px; margin-top: 6px; font-variant-numeric: tabular-nums; }
-.price .now { font: 800 20px/1 "Manrope", sans-serif; }
-.price .old { font-size: 13px; color: var(--muted); text-decoration: line-through; }
-.price .tag { font-size: 11px; color: var(--muted); }
-.promo {
+/* Soft contact shadows on the floor */
+.shadow {
   position: absolute;
-  top: 12px; right: 12px;
-  font: 700 10px/1 "Inter", sans-serif;
-  letter-spacing: .08em;
-  padding: 5px 7px;
-  border-radius: 4px;
-  background: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  text-transform: uppercase;
-}
-.card { position: relative; }
-
-.add {
-  width: 100%;
-  min-height: 44px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--action);
-  color: var(--action-ink);
-  font: 700 13px/1 "Inter", sans-serif;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: filter .2s, transform .15s;
-}
-.add:hover { filter: brightness(1.08); }
-.add:active { transform: scale(.98); }
-.add.is-on { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--action); }
-.add:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-
-/* Controls */
-.controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-.nav {
-  width: 46px; height: 46px;
   border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 20px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
+  background: radial-gradient(closest-side, var(--floor), transparent);
+  transform: rotateX(90deg);
+  pointer-events: none;
 }
-.nav:disabled { opacity: .35; cursor: default; }
-.nav:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.dots { display: flex; gap: 8px; }
-.dot {
-  width: 9px; height: 9px;
-  border-radius: 999px;
-  border: 0;
-  padding: 0;
-  background: var(--line);
-  cursor: pointer;
-  transition: width .3s, background .3s;
+.shadow.box-sh { width: calc(var(--W) * 2.1); height: calc(var(--D) * 2.1); left: calc(var(--W) * -1.05); top: calc(var(--D) * -1.05 + 1px); }
+.shadow.bottle-sh {
+  width: calc(var(--BW) * 2); height: calc(var(--BW) * 2);
+  left: calc(var(--W) * 1.18 - var(--BW)); top: calc(var(--BW) * -1 + 1px);
+  transform: translateZ(calc(var(--D) * .7)) rotateX(90deg);
+  opacity: 0; transition: opacity .2s;
 }
-.dot.is-on { width: 26px; background: var(--action); }
-.hint { text-align: center; font-size: 12px; color: var(--muted); margin: 0; }
+.prod.is-open .bottle-sh { opacity: 1; transition: opacity .4s 1.45s; }
 
-/* Basket summary */
-.basket {
-  max-width: 1100px;
-  width: 100%;
-  margin: 28px auto 0;
-  padding: 16px 18px;
-  border-radius: 16px;
+/* Stage chrome */
+.arrow {
+  position: absolute; top: 50%; z-index: 5;
+  width: 48px; height: 48px; margin-top: -24px;
+  border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink);
+  font-size: 20px; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 8px 20px -12px rgba(13,37,40,.5);
+}
+.arrow.prev { left: 16px; }
+.arrow.next { right: 16px; }
+.arrow:disabled { opacity: .3; cursor: default; }
+.arrow:focus-visible, .thumb:focus-visible, .buy:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.stage-foot {
+  position: absolute; left: 0; right: 0; bottom: 16px; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding-inline: 16px;
+}
+.thumbs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.thumb {
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  border-radius: 999px; padding: 7px 12px;
+  font: 600 12px/1 "Inter", sans-serif; cursor: pointer;
+  transition: background .3s, color .3s, border-color .3s;
+}
+.thumb.is-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.thumb .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--action); margin-left: 6px; vertical-align: middle; }
+.hint { font-size: 12px; color: var(--muted); margin: 0; text-align: center; }
+.badge {
+  position: absolute; top: 16px; left: 16px; z-index: 5;
+  font: 700 11px/1 "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase;
+  padding: 7px 9px; border-radius: 6px;
+  background: var(--surface); border: 1px solid var(--ink); color: var(--ink);
+}
+
+/* Product sheet */
+.sheet {
   background: var(--surface);
   border: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 16px;
+  border-radius: 24px;
+  padding: 26px 24px;
+  display: flex; flex-direction: column; gap: 18px;
+  min-width: 0;
 }
-.basket .list { font-size: 14px; color: var(--muted); min-width: 0; flex: 1 1 220px; overflow-wrap: anywhere; }
-.basket .list strong { color: var(--ink); font-weight: 600; }
-.basket .sum { font: 800 18px/1 "Manrope", sans-serif; font-variant-numeric: tabular-nums; }
-.basket .clear {
-  border: 0; background: none; color: var(--action);
-  font: 600 13px/1 "Inter", sans-serif; cursor: pointer; padding: 8px 4px;
+.sheet .kicker { font: 600 12px/1 "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink, var(--muted)); }
+.sheet h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+.sheet .desc { margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 60ch; }
+.specs { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.specs li { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.specs li span:first-child { color: var(--muted); }
+.specs li span:last-child { font-weight: 600; text-align: right; }
+.price-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; font-variant-numeric: tabular-nums; }
+.price-row .now { font: 800 36px/1 "Manrope", sans-serif; letter-spacing: -0.02em; }
+.price-row .now.promo { color: #c8312f; }
+.price-row .old { font-size: 16px; color: var(--muted); text-decoration: line-through; }
+.price-row .vat { font-size: 13px; color: var(--muted); }
+.saving { font-size: 13px; font-weight: 600; color: #c8312f; margin-top: -10px; }
+.buy {
+  min-height: 52px; border: 0; border-radius: 10px;
+  background: var(--action); color: var(--action-ink);
+  font: 700 14px/1 "Inter", sans-serif; letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; transition: filter .2s, transform .15s, background .3s, color .3s;
 }
-.basket .clear:disabled { color: var(--muted); cursor: default; }
+.buy:hover { filter: brightness(1.08); }
+.buy:active { transform: scale(.985); }
+.buy.is-on { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--action); }
+.sheet .fade { transition: opacity .25s, transform .25s; }
+.sheet.swap .fade { opacity: 0; transform: translateY(6px); }
+.total { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.total strong { color: var(--ink); }
 
+@media (max-width: 880px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .stage { min-height: 0; height: 66vh; max-height: 600px; min-height: 440px; }
+  .sheet h2 { font-size: 26px; }
+  .price-row .now { font-size: 30px; }
+}
 @media (max-width: 480px) {
-  .bottle.out { transform: translate3d(0, -104px, 0) rotate(-6deg) scale(1.12); }
-  .stage { margin-top: 8px; }
+  .arrow { width: 42px; height: 42px; margin-top: -21px; }
+  .arrow.prev { left: 10px; } .arrow.next { right: 10px; }
+  .top p { display: none; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .01ms !important; }
+  .bottle.opening, .bottle.closing { animation-duration: .01ms; animation-delay: 0s; }
+  .f-lid, .shift, .prod.is-open .f-lid, .prod.is-open .shift { transition-duration: .01ms; transition-delay: 0s; }
 }
 </style>
 </head>
 <body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Krople do oczu FB Vision</h1>
+      <p>Przesuń w bok, aby zmienić produkt. Dotknij pudełka, aby je otworzyć.</p>
+    </div>
+    <div class="cart-pill" aria-live="polite">
+      <span id="cartTotal">0,00 zł</span>
+      <span class="count" id="cartCount" aria-label="Produkty w koszyku">0</span>
+    </div>
+  </header>
 
-<header class="top">
-  <div class="brand">
-    <h1>Krople do oczu</h1>
-    <p>Przesuń, aby zobaczyć produkty. Dotknij pudełka, aby dodać.</p>
-  </div>
-  <div class="cart-pill" aria-live="polite">
-    Koszyk <span class="count" id="cartCount">0</span>
-  </div>
-</header>
+  <div class="layout">
+    <section class="stage" id="stage" aria-label="Produkt w 3D">
+      <span class="badge" id="badge" hidden>Promocja</span>
+      <div class="cam" id="cam"></div>
+      <button class="arrow prev" id="prev" type="button" aria-label="Poprzedni produkt">&#8592;</button>
+      <button class="arrow next" id="next" type="button" aria-label="Następny produkt">&#8594;</button>
+      <div class="stage-foot">
+        <div class="thumbs" id="thumbs"></div>
+        <p class="hint">Przeciągnij lekko, aby obrócić pudełko</p>
+      </div>
+    </section>
 
-<main class="stage">
-  <div class="viewport" id="viewport" aria-roledescription="karuzela" aria-label="Produkty">
-    <div class="track" id="track"></div>
+    <aside class="sheet" id="sheet" aria-live="polite">
+      <div class="fade" style="display:flex;flex-direction:column;gap:10px">
+        <span class="kicker" id="kicker"></span>
+        <h2 id="name"></h2>
+      </div>
+      <p class="desc fade" id="desc"></p>
+      <ul class="specs fade" id="specs"></ul>
+      <div class="price-row fade" id="price"></div>
+      <div class="saving fade" id="saving" hidden></div>
+      <button class="buy" id="buy" type="button" aria-pressed="false">Dodaj do koszyka</button>
+      <div class="total"><span id="cartList">Koszyk jest pusty</span><strong id="cartSum">0,00 zł</strong></div>
+    </aside>
   </div>
-
-  <div class="controls">
-    <button class="nav" id="prev" aria-label="Poprzedni produkt">&#8592;</button>
-    <div class="dots" id="dots"></div>
-    <button class="nav" id="next" aria-label="Następny produkt">&#8594;</button>
-  </div>
-  <p class="hint">Strzałki klawiatury też działają.</p>
-</main>
-
-<section class="basket" aria-label="Podsumowanie koszyka">
-  <div class="list" id="basketList">Koszyk jest pusty.</div>
-  <div class="sum" id="basketSum">0,00 zł</div>
-  <button class="clear" id="clearBtn" disabled>Wyczyść koszyk</button>
-</section>
+</div>
 
 <script>
-// Sample data taken from the product page on screen. Prices are in grosze.
+// Products. Box faces and bottles are cut from the shop photos (img/). Prices are in grosze.
+// Descriptions follow the text printed on each carton; check them before going live.
 const PRODUCTS = [
   {
-    id: "gel-k",
-    name: "Ozodrop Gel K",
-    sub: "Żel okulistyczny",
-    vol: "6 ml",
-    type: "Nawilżający żel",
-    price: 3871,
-    old: 5530,
-    promo: true,
-    front: ["#1aa39a", "#0d6b6a"],
-    back: "#0b5e5d"
+    id: "gelk", name: "Ozodrop Gel K", kicker: "Żel okulistyczny",
+    desc: "Ochronny i nawilżający żel okulistyczny z technologią LipozonEye. Sterylny, w butelce z kroplomierzem.",
+    specs: [["Pojemność", "6 ml"], ["Postać", "Żel"], ["Producent", "FB Vision"]],
+    price: 3871, old: 5530,
+    ratio: 2.096, aspect: 0.331, accent: "#139488", tint: "rgba(19,148,136,.55)"
   },
   {
-    id: "ozodrop",
-    name: "Ozodrop",
-    sub: "Krople okulistyczne",
-    vol: "8 ml",
-    type: "Krople nawilżające",
-    price: 4901,
-    old: null,
-    promo: false,
-    front: ["#3d9be0", "#2459a8"],
-    back: "#1d4b86"
+    id: "ozo", name: "Ozodrop", kicker: "Krople do oczu",
+    desc: "Nawilżające i ochronne krople do oczu z technologią LipozonEye. Sterylne, w butelce z kroplomierzem.",
+    specs: [["Pojemność", "8 ml"], ["Postać", "Krople"], ["Producent", "FB Vision"]],
+    price: 4901, old: null,
+    ratio: 2.2, aspect: 0.348, accent: "#2b8fd8", tint: "rgba(43,143,216,.5)"
   },
   {
-    id: "immunodrop",
-    name: "Immunodrop",
-    sub: "Krople okulistyczne",
-    vol: "8 ml",
-    type: "Krople wspierające",
-    price: 4901,
-    old: null,
-    promo: false,
-    front: ["#6fa58f", "#3f7663"],
-    back: "#33604f"
+    id: "immuno", name: "Immunodrop", kicker: "Krople do oczu",
+    desc: "Krople oczne chroniące powierzchnię oka. Sterylne, w butelce z kroplomierzem.",
+    specs: [["Pojemność", "8 ml"], ["Postać", "Krople"], ["Producent", "FB Vision"]],
+    price: 4901, old: null,
+    ratio: 1.875, aspect: 0.343, accent: "#1aa36a", tint: "rgba(26,163,106,.5)"
   }
 ];
 
-const fmt = (grosze) => (grosze / 100).toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " zł";
+const fmt = (g) => (g / 100).toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " zł";
+const $ = (id) => document.getElementById(id);
+const stage = $("stage"), cam = $("cam"), sheet = $("sheet");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const viewport = document.getElementById("viewport");
-const track = document.getElementById("track");
-const dotsEl = document.getElementById("dots");
-const prevBtn = document.getElementById("prev");
-const nextBtn = document.getElementById("next");
-const cartCount = document.getElementById("cartCount");
-const basketList = document.getElementById("basketList");
-const basketSum = document.getElementById("basketSum");
-const clearBtn = document.getElementById("clearBtn");
-
-const selected = new Set();
+const cart = new Set();
 let index = 0;
-let cardW = 0;
-let step = 0;
+let prodEl = null;
+let boxEl = null;
+let dragDx = 0;
+let spin = 0;          // extra rotation from dragging, eases back to 0
+let busy = false;
 
-// Build cards
-PRODUCTS.forEach((p, i) => {
-  const card = document.createElement("article");
-  card.className = "card";
-  card.dataset.id = p.id;
-  card.setAttribute("aria-label", p.name);
-  card.style.setProperty("--box-front-a", p.front[0]);
-  card.style.setProperty("--box-front-b", p.front[1]);
-  card.style.setProperty("--box-back", p.back);
-
-  const priceHtml = p.old
-    ? `<span class="now">${fmt(p.price)}</span><span class="old">${fmt(p.old)}</span><span class="tag">z VAT</span>`
-    : `<span class="now">${fmt(p.price)}</span><span class="tag">z VAT</span>`;
-
-  card.innerHTML = `
-    ${p.promo ? '<span class="promo">Promocja</span>' : ""}
-    <div class="box" role="button" tabindex="0" aria-pressed="false" aria-label="${p.name}, dotknij, aby dodać do koszyka">
-      <div class="bottle" aria-hidden="true">
-        <div class="cap"></div>
-        <div class="neck"></div>
-        <div class="body"></div>
-      </div>
-      <div class="front">
-        <span class="brand-mark">Ozodrop</span>
-        <span class="type">${p.type}</span>
-        <span class="vol">${p.vol}</span>
-      </div>
-    </div>
-    <div class="info">
-      <h2>${p.name}</h2>
-      <span class="sub">${p.sub}</span>
-      <div class="price">${priceHtml}</div>
-    </div>
-    <button class="add" type="button" aria-pressed="false">Dodaj do koszyka</button>
-  `;
-
-  const box = card.querySelector(".box");
-  const btn = card.querySelector(".add");
-  box.addEventListener("click", () => onPick(i));
-  box.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPick(i); }
-  });
-  btn.addEventListener("click", () => onPick(i));
-
-  track.appendChild(card);
-
-  const dot = document.createElement("button");
-  dot.className = "dot";
-  dot.type = "button";
-  dot.setAttribute("aria-label", `Produkt ${i + 1}: ${p.name}`);
-  dot.addEventListener("click", () => goTo(i));
-  dotsEl.appendChild(dot);
-});
-
-function metrics() {
-  const first = track.children[0];
-  cardW = first.offsetWidth;
-  const gap = parseFloat(getComputedStyle(track).columnGap) || 28;
-  step = cardW + gap;
+// ---------- 3D product ----------
+function sizeVars(p) {
+  const r = stage.getBoundingClientRect();
+  let H = Math.min(r.height * 0.42, 320);
+  let W = H / p.ratio;
+  W = Math.min(W, r.width * 0.27);
+  H = W * p.ratio;
+  const D = W * 0.92;
+  const BH = H * 0.74;
+  return { W, H, D, BH, BW: BH * p.aspect };
 }
 
-function place(dx = 0) {
-  const x = viewport.clientWidth / 2 - cardW / 2 - index * step + dx;
-  track.style.transform = `translate3d(${x}px, 0, 0)`;
+function applySize(el, p) {
+  const s = sizeVars(p);
+  for (const k of ["W", "H", "D", "BW", "BH"]) el.style.setProperty("--" + k, s[k].toFixed(1) + "px");
 }
 
-function render() {
-  [...track.children].forEach((card, i) => {
-    const active = i === index;
-    card.classList.toggle("is-active", active);
-    card.setAttribute("aria-hidden", active ? "false" : "true");
-  });
-  [...dotsEl.children].forEach((d, i) => {
-    d.classList.toggle("is-on", i === index);
-    d.setAttribute("aria-current", i === index ? "true" : "false");
-  });
-  prevBtn.disabled = index === 0;
-  nextBtn.disabled = index === PRODUCTS.length - 1;
+function face(cls, img) {
+  const f = document.createElement("div");
+  f.className = "face " + cls;
+  const out = document.createElement("i");
+  out.className = "out";
+  if (img) out.style.backgroundImage = `url("${img}")`;
+  const inn = document.createElement("i");
+  inn.className = "in";
+  f.append(out, inn);
+  return f;
 }
 
-function goTo(i) {
-  index = Math.max(0, Math.min(PRODUCTS.length - 1, i));
-  place();
-  render();
+function buildProduct(p) {
+  const prod = document.createElement("div");
+  prod.className = "prod";
+  prod.style.setProperty("--accent", p.accent);
+  applySize(prod, p);
+
+  const shift = document.createElement("div");
+  shift.className = "shift";
+
+  const boxSh = document.createElement("div");
+  boxSh.className = "shadow box-sh";
+  const botSh = document.createElement("div");
+  botSh.className = "shadow bottle-sh";
+
+  const box = document.createElement("div");
+  box.className = "box";
+  box.append(
+    face("f-back", `img/${p.id}-front.jpg`),
+    face("f-right", `img/${p.id}-side.jpg`),
+    face("f-bottom"),
+    face("f-left", `img/${p.id}-side.jpg`),
+    face("f-front", `img/${p.id}-front.jpg`),
+    face("f-lid")
+  );
+
+  const bottle = document.createElement("div");
+  bottle.className = "bottle";
+  bottle.style.backgroundImage = `url("img/${p.id}-bottle.png")`;
+
+  shift.append(boxSh, botSh, box, bottle);
+  prod.append(shift);
+
+  if (cart.has(p.id)) {
+    prod.classList.add("is-open");
+    bottle.classList.add("is-out");
+  }
+  return prod;
 }
 
-// Choosing a product: its bottle lifts out of the box, or slides back in when unchosen.
-function onPick(i) {
-  if (dragMoved) return;
-  const p = PRODUCTS[i];
-  const card = track.children[i];
-  const on = !selected.has(p.id);
-  on ? selected.add(p.id) : selected.delete(p.id);
+function mount(p, from) {
+  const el = buildProduct(p);
+  cam.appendChild(el);
+  prodEl = el;
+  boxEl = el.querySelector(".box");
+  if (from && !reduceMotion) {
+    el.animate(
+      [
+        { transform: `translateX(${from * 70}vw) rotateY(${from * -50}deg)`, opacity: 0 },
+        { transform: "translateX(0) rotateY(0)", opacity: 1 }
+      ],
+      { duration: 650, easing: "cubic-bezier(.2,.8,.2,1)" }
+    );
+  }
+}
 
-  card.querySelector(".bottle").classList.toggle("out", on);
-  card.classList.toggle("is-selected", on);
-  const btn = card.querySelector(".add");
-  btn.textContent = on ? "Usuń z koszyka" : "Dodaj do koszyka";
-  btn.classList.toggle("is-on", on);
-  btn.setAttribute("aria-pressed", on ? "true" : "false");
-  card.querySelector(".box").setAttribute("aria-pressed", on ? "true" : "false");
+function go(dir) {
+  const next = index + dir;
+  if (busy || next < 0 || next >= PRODUCTS.length) { spin = 0; return; }
+  busy = true;
+  const old = prodEl;
+  index = next;
+  const done = () => { old.remove(); busy = false; };
+  if (reduceMotion) done();
+  else old.animate(
+    [
+      { transform: `translateX(${dragDx}px) rotateY(0)`, opacity: 1 },
+      { transform: `translateX(${-dir * 70}vw) rotateY(${dir * 50}deg)`, opacity: 0 }
+    ],
+    { duration: 450, easing: "cubic-bezier(.5,0,.8,.4)", fill: "forwards" }
+  ).onfinish = done;
+  spin = 0;
+  mount(PRODUCTS[index], dir);
+  renderInfo(true);
+}
 
+// Gentle idle sway plus drag rotation
+let t0 = performance.now();
+function frame(t) {
+  if (boxEl) {
+    const idle = reduceMotion ? 0 : Math.sin((t - t0) / 1600) * 7;
+    if (!dragging) spin *= 0.9;
+    boxEl.style.transform = `rotateY(${32 + idle + spin}deg)`;
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- Open / close ----------
+function toggle() {
+  const p = PRODUCTS[index];
+  const bottle = prodEl.querySelector(".bottle");
+  const on = !cart.has(p.id);
+  on ? cart.add(p.id) : cart.delete(p.id);
+  bottle.classList.remove("opening", "closing", "is-out");
+  void bottle.offsetWidth;
   if (on) {
-    index = i;
-    place();
-    render();
+    prodEl.classList.add("is-open");
+    bottle.classList.add("opening");
+    bottle.addEventListener("animationend", function fin() {
+      bottle.removeEventListener("animationend", fin);
+      if (bottle.classList.contains("opening")) { bottle.classList.remove("opening"); bottle.classList.add("is-out"); }
+    });
+  } else {
+    prodEl.classList.remove("is-open");
+    bottle.classList.add("closing");
+    bottle.addEventListener("animationend", function fin() {
+      bottle.removeEventListener("animationend", fin);
+      bottle.classList.remove("closing");
+    });
   }
-  updateBasket(on);
+  renderInfo(false);
+  renderCart(true);
 }
 
-function updateBasket(bumped) {
-  const items = PRODUCTS.filter((p) => selected.has(p.id));
-  const total = items.reduce((s, p) => s + p.price, 0);
-  const count = items.length;
-  cartCount.textContent = count;
-  if (bumped) {
-    cartCount.classList.remove("bump");
-    void cartCount.offsetWidth;
-    cartCount.classList.add("bump");
-    setTimeout(() => cartCount.classList.remove("bump"), 300);
-  }
-  basketList.innerHTML = count
-    ? items.map((p) => `<strong>${p.name}</strong>`).join(", ")
-    : "Koszyk jest pusty.";
-  basketSum.textContent = fmt(total);
-  clearBtn.disabled = count === 0;
-}
+// ---------- Side sheet ----------
+function renderInfo(animate) {
+  const p = PRODUCTS[index];
+  const fill = () => {
+    $("kicker").textContent = p.kicker;
+    $("name").textContent = p.name;
+    $("desc").textContent = p.desc;
+    $("specs").innerHTML = p.specs.map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`).join("");
+    $("price").innerHTML = p.old
+      ? `<span class="now promo">${fmt(p.price)}</span><span class="old">${fmt(p.old)}</span><span class="vat">z VAT</span>`
+      : `<span class="now">${fmt(p.price)}</span><span class="vat">z VAT</span>`;
+    const saving = $("saving");
+    saving.hidden = !p.old;
+    if (p.old) saving.textContent = `Oszczędzasz ${fmt(p.old - p.price)} (−${Math.round((1 - p.price / p.old) * 100)}%)`;
+    $("badge").hidden = !p.old;
+    stage.style.setProperty("--tint", p.tint);
+    sheet.style.setProperty("--accent-ink", p.accent);
+    sheet.classList.remove("swap");
+  };
+  if (animate && !reduceMotion) { sheet.classList.add("swap"); setTimeout(fill, 220); } else fill();
 
-clearBtn.addEventListener("click", () => {
-  [...selected].forEach((id) => {
-    const i = PRODUCTS.findIndex((p) => p.id === id);
-    const card = track.children[i];
-    card.querySelector(".bottle").classList.remove("out");
-    card.classList.remove("is-selected");
-    const btn = card.querySelector(".add");
-    btn.textContent = "Dodaj do koszyka";
-    btn.classList.remove("is-on");
-    btn.setAttribute("aria-pressed", "false");
+  const on = cart.has(p.id);
+  const buy = $("buy");
+  buy.textContent = on ? "Usuń z koszyka" : "Dodaj do koszyka";
+  buy.classList.toggle("is-on", on);
+  buy.setAttribute("aria-pressed", String(on));
+
+  $("prev").disabled = index === 0;
+  $("next").disabled = index === PRODUCTS.length - 1;
+  [...$("thumbs").children].forEach((b, i) => {
+    b.classList.toggle("is-on", i === index);
+    b.setAttribute("aria-current", i === index ? "true" : "false");
   });
-  selected.clear();
-  updateBasket(false);
+}
+
+function renderCart(bump) {
+  const items = PRODUCTS.filter((p) => cart.has(p.id));
+  const sum = items.reduce((s, p) => s + p.price, 0);
+  $("cartCount").textContent = items.length;
+  $("cartTotal").textContent = fmt(sum);
+  $("cartSum").textContent = fmt(sum);
+  $("cartList").textContent = items.length ? items.map((p) => p.name).join(", ") : "Koszyk jest pusty";
+  [...$("thumbs").children].forEach((b, i) => {
+    b.querySelector(".dot").hidden = !cart.has(PRODUCTS[i].id);
+  });
+  if (bump) {
+    const c = $("cartCount");
+    c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump");
+    setTimeout(() => c.classList.remove("bump"), 300);
+  }
+}
+
+// ---------- Controls ----------
+PRODUCTS.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "thumb";
+  b.innerHTML = `${p.name}<span class="dot" hidden></span>`;
+  b.addEventListener("click", () => { if (i !== index) go(i - index > 0 ? 1 : -1) ; });
+  $("thumbs").appendChild(b);
 });
-
-prevBtn.addEventListener("click", () => goTo(index - 1));
-nextBtn.addEventListener("click", () => goTo(index + 1));
-
+$("prev").addEventListener("click", () => go(-1));
+$("next").addEventListener("click", () => go(1));
+$("buy").addEventListener("click", toggle);
 document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft") goTo(index - 1);
-  if (e.key === "ArrowRight") goTo(index + 1);
+  if (e.key === "ArrowLeft") go(-1);
+  if (e.key === "ArrowRight") go(1);
 });
 
-// Swipe / drag
-let startX = 0;
-let dragging = false;
-let dragMoved = false;
-viewport.addEventListener("pointerdown", (e) => {
-  dragging = true;
-  dragMoved = false;
-  startX = e.clientX;
-  track.classList.add("dragging");
-  viewport.classList.add("dragging");
+// Swipe: a long drag changes product, a short drag spins the carton, a tap opens it.
+let dragging = false, startX = 0, startY = 0, moved = false;
+stage.addEventListener("pointerdown", (e) => {
+  if (e.target.closest("button")) return;
+  dragging = true; moved = false; dragDx = 0;
+  startX = e.clientX; startY = e.clientY;
+  stage.classList.add("dragging");
 });
 window.addEventListener("pointermove", (e) => {
   if (!dragging) return;
-  const dx = e.clientX - startX;
-  if (Math.abs(dx) > 6) dragMoved = true;
-  place(dx);
+  dragDx = e.clientX - startX;
+  if (Math.abs(dragDx) > 6) moved = true;
+  spin = dragDx * 0.45;
+  if (prodEl) prodEl.style.transform = `translateX(${dragDx * 0.35}px)`;
 });
 function endDrag(e) {
   if (!dragging) return;
   dragging = false;
-  track.classList.remove("dragging");
-  viewport.classList.remove("dragging");
+  stage.classList.remove("dragging");
+  if (prodEl) prodEl.style.transform = "";
   const dx = e.clientX - startX;
-  if (dx < -50) goTo(index + 1);
-  else if (dx > 50) goTo(index - 1);
-  else place();
-  // Clear the drag flag after the click event (if any) has been dispatched.
-  setTimeout(() => { dragMoved = false; }, 0);
+  if (!moved) {
+    // tap: open/close only when the tap lands near the product
+    const r = stage.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    if (Math.abs(e.clientX - cx) < r.width * 0.35) toggle();
+  } else if (dx < -90) go(1);
+  else if (dx > 90) go(-1);
+  dragDx = 0;
 }
 window.addEventListener("pointerup", endDrag);
 window.addEventListener("pointercancel", endDrag);
 
-window.addEventListener("resize", () => { metrics(); place(); });
+window.addEventListener("resize", () => { if (prodEl) applySize(prodEl, PRODUCTS[index]); });
 
-metrics();
-goTo(0);
-updateBasket(false);
+mount(PRODUCTS[0], 0);
+renderInfo(false);
+renderCart(false);
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
