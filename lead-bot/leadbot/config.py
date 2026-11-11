@@ -28,6 +28,12 @@ class Config:
     threads_poll_minutes: int
     db_path: str
     dedup_hours: int
+    free_delay_hours: float
+    free_contacts_per_day: int
+    pro_price_stars: int
+    pro_days: int
+    ref_bonus_days: int
+    tz: str
     extra: dict = field(default_factory=dict)
 
     @property
@@ -59,4 +65,10 @@ def load() -> Config:
         threads_poll_minutes=int(os.environ.get("THREADS_POLL_MINUTES") or 10),
         db_path=os.environ.get("DB_PATH", "data/leadbot.sqlite3"),
         dedup_hours=int(os.environ.get("DEDUP_HOURS") or 48),
+        free_delay_hours=float(os.environ.get("FREE_DELAY_HOURS") or 4),
+        free_contacts_per_day=int(os.environ.get("FREE_CONTACTS_PER_DAY") or 5),
+        pro_price_stars=int(os.environ.get("PRO_PRICE_STARS") or 500),
+        pro_days=int(os.environ.get("PRO_DAYS") or 30),
+        ref_bonus_days=int(os.environ.get("REF_BONUS_DAYS") or 3),
+        tz=os.environ.get("TZ_NAME", "Europe/Kyiv"),
     )

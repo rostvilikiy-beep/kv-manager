@@ -8,7 +8,7 @@ import re
 
 from telethon import TelegramClient, events, functions, types
 from telethon.errors import FloodWaitError, UserAlreadyParticipantError
-from telethon.utils import get_display_name
+from telethon.utils import get_display_name, get_peer_id
 
 from .pipeline import Incoming, Pipeline
 
@@ -68,6 +68,7 @@ class UserBot:
         msg = Incoming(
             source="telegram",
             text=text,
+            chat_id=event.chat_id,
             chat=get_display_name(chat),
             author=f"@{username}" if username else get_display_name(sender),
             author_url=f"https://t.me/{username}" if username else f"tg://user?id={sender.id}",
@@ -79,36 +80,46 @@ class UserBot:
             log.exception("Ошибка обработки сообщения")
 
     # ---------- управление чатами (команды админа) ----------
-    async def join(self, link: str) -> str:
+    async def join(self, link: str) -> tuple[int | None, str, bool]:
+        """Вступить в чат. Возвращает (chat_id или None при ошибке, название/ошибка,
+        состоял_ли_уже_в_чате)."""
         link = link.strip()
+        already = False
         try:
             m = _INVITE_RX.search(link)
             if m:
-                res = await self.client(functions.messages.ImportChatInviteRequest(m.group(1)))
-                return f"Вступил: {get_display_name(res.chats[0])}"
-            m = _PUBLIC_RX.search(link)
-            if not m:
-                return "Не понял ссылку. Пример: @chatname или https://t.me/chatname"
-            entity = await self.client.get_entity(m.group(1) or m.group(2))
-            await self.client(functions.channels.JoinChannelRequest(entity))
-            return f"Вступил: {get_display_name(entity)}"
-        except UserAlreadyParticipantError:
-            return "Уже состою в этом чате"
+                try:
+                    res = await self.client(functions.messages.ImportChatInviteRequest(m.group(1)))
+                    entity = res.chats[0]
+                except UserAlreadyParticipantError:
+                    already = True
+                    info = await self.client(functions.messages.CheckChatInviteRequest(m.group(1)))
+                    entity = getattr(info, "chat", None)
+                    if entity is None:
+                        return None, "Уже состою в этом чате, но не смог его определить", True
+            else:
+                m = _PUBLIC_RX.search(link)
+                if not m:
+                    return None, "Не понял ссылку. Пример: @chatname или https://t.me/chatname", False
+                entity = await self.client.get_entity(m.group(1) or m.group(2))
+                if isinstance(entity, types.User):
+                    return None, "Это пользователь, а не чат", False
+                if isinstance(entity, types.Channel) and entity.broadcast:
+                    return None, "Это канал, а не чат — в каналах заказы не публикуют клиенты", False
+                already = isinstance(entity, types.Channel) and not entity.left
+                if not already:
+                    await self.client(functions.channels.JoinChannelRequest(entity))
+            return get_peer_id(entity), get_display_name(entity), already
         except FloodWaitError as e:
-            return f"Telegram просит подождать {e.seconds} сек. Не вступай слишком часто."
+            return None, f"Telegram просит подождать {e.seconds} сек. Попробуй позже.", False
         except Exception as e:
-            return f"Ошибка: {e}"
+            return None, f"Ошибка: {e}", False
 
-    async def leave(self, link: str) -> str:
-        m = _PUBLIC_RX.search(link.strip())
+    async def leave_by_id(self, chat_id: int) -> None:
         try:
-            entity = await self.client.get_entity(m.group(1) or m.group(2)) if m else None
-            if entity is None:
-                return "Не понял ссылку"
-            await self.client.delete_dialog(entity)
-            return f"Вышел из: {get_display_name(entity)}"
-        except Exception as e:
-            return f"Ошибка: {e}"
+            await self.client.delete_dialog(chat_id)
+        except Exception:
+            log.warning("Не удалось выйти из чата %s", chat_id, exc_info=True)
 
     async def list_chats(self) -> list[str]:
         out = []

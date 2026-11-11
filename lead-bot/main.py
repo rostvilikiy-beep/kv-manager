@@ -1,12 +1,13 @@
-"""Запуск: бот-интерфейс + юзербот (Telegram) + опрос Threads в одном процессе."""
+"""Запуск: бот-интерфейс + юзербот (Telegram) + опрос Threads + рассылка очереди."""
 import asyncio
 import logging
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.types import BotCommand
 
-from leadbot import bot_ui, config
+from leadbot import config, ui
 from leadbot.classifier import Classifier
 from leadbot.db import DB
 from leadbot.pipeline import Pipeline
@@ -26,37 +27,40 @@ async def main() -> None:
     await db.open()
 
     bot = Bot(cfg.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    me = await bot.get_me()
     classifier = Classifier(cfg.anthropic_key, cfg.claude_model) if cfg.ai_available else None
-    pipeline = Pipeline(db, classifier, bot_ui.make_notifier(bot), cfg.dedup_hours)
+    pipeline = Pipeline(db, classifier, ui.make_sender(bot), dedup_hours=cfg.dedup_hours,
+                        free_delay_hours=cfg.free_delay_hours, admin_ids=cfg.admin_ids)
 
-    bot_ui.ctx.cfg, bot_ui.ctx.db, bot_ui.ctx.pipeline = cfg, db, pipeline
-    for admin in cfg.admin_ids:  # админы сразу получают заказы с настройками по умолчанию
-        await db.ensure_user(admin, None)
+    ui.ctx.cfg, ui.ctx.db, ui.ctx.pipeline = cfg, db, pipeline
+    ui.ctx.classifier, ui.ctx.bot_username = classifier, me.username
+    for admin in cfg.admin_ids:
+        await db.ensure_user(admin)
 
-    tasks = []
+    tasks = [asyncio.create_task(pipeline.run_sender())]
     if cfg.tg_api_id and cfg.tg_api_hash:
         userbot = UserBot(cfg.tg_api_id, cfg.tg_api_hash, cfg.tg_session, pipeline)
         await userbot.start()
-        userbot.ignore_ids.add((await bot.get_me()).id)
-        bot_ui.ctx.userbot = userbot
+        userbot.ignore_ids.add(me.id)
+        ui.ctx.userbot = userbot
         tasks.append(asyncio.create_task(userbot.client.run_until_disconnected()))
     else:
         log.warning("TG_API_ID/TG_API_HASH не заданы — Telegram-чаты не слушаем")
 
     if cfg.threads_available:
         threads = ThreadsSource(cfg.threads_token, db, pipeline, cfg.threads_poll_minutes)
-        bot_ui.ctx.threads = threads
+        ui.ctx.threads = threads
         tasks.append(asyncio.create_task(threads.run_forever()))
 
-    log.info("ИИ-фильтр: %s", cfg.claude_model if classifier else "выключен (нет ANTHROPIC_API_KEY)")
-    dp = bot_ui.build_dispatcher()
+    log.info("ИИ: %s", cfg.claude_model if classifier else "выключен (нет ANTHROPIC_API_KEY)")
+    await bot.set_my_commands([BotCommand(command="menu", description="Главное меню")])
     try:
-        await dp.start_polling(bot)
+        await ui.build_dispatcher().start_polling(bot)
     finally:
         for t in tasks:
             t.cancel()
-        if bot_ui.ctx.userbot:
-            await bot_ui.ctx.userbot.stop()
+        if ui.ctx.userbot:
+            await ui.ctx.userbot.stop()
         await db.close()
 
 

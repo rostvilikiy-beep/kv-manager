@@ -1,24 +1,29 @@
 import pytest
 
-from leadbot.filters import DEFAULT_STOPWORDS, UserFilter, match, text_hash
+from leadbot.filters import (CATEGORIES, DEFAULT_STOPWORDS, UserFilter, detect_lang,
+                             extract_contacts, mask_contacts, match, text_hash)
 
-F = UserFilter(categories=["site", "landing", "shop", "tgbot"], keywords=[],
-               stopwords=DEFAULT_STOPWORDS)
+F = UserFilter(categories=list(CATEGORIES), keywords=[], stopwords=DEFAULT_STOPWORDS)
 
 LEADS = [
     "Всем привет! Нужен сайт для кофейни, бюджет 30к",
     "Ищу разработчика, кто может сделать лендинг на тильде?",
     "Подскажите, кто сделает интернет-магазин одежды? Пишите в лс",
     "Нужен телеграм бот для записи клиентов",
-    "Требуется сделать сайт-визитку для юриста, срок неделя",
+    "Треба зробити телеграм бота з широким спектром функцій",
+    "Потрібен фахівець для термінового виконання задачі: брендинг та логотип",
+    "Шукають UI/UX Designer (Middle+) для роботи над веб- та мобільними платформами",
+    "Вакансия: веб-разработчик в штат, оклад 150к",
+    "We are hiring a Webflow developer for a landing page",
 ]
 NOT_LEADS = [
     "Делаю сайты на Tilda недорого, портфолио в профиле",
     "Беру заказы на лендинги, пишите",
-    "Вакансия: веб-разработчик в штат, оклад 150к",
+    "Роблю сайти під ключ, пишіть",
     "Купил ботинки, нужен совет по размеру",
     "Нужен совет по налогам для ИП",
     "Какой сайт лучше для покупки билетов?",
+    "Ищу работу веб-дизайнером, опыт 3 года",
 ]
 
 
@@ -51,3 +56,21 @@ def test_user_stopword():
 
 def test_dedup_hash_ignores_punctuation():
     assert text_hash("Нужен сайт!!!") == text_hash("нужен   сайт")
+
+
+@pytest.mark.parametrize("text,lang", [
+    ("Треба зробити телеграм бота з широким спектром функцій", "uk"),
+    ("Нужен сайт для кофейни, бюджет 30к", "ru"),
+    ("We are hiring a Webflow developer", "en"),
+])
+def test_detect_lang(text, lang):
+    assert detect_lang(text) == lang
+
+
+def test_contacts():
+    t = "Пишите @ivan_dev или +38 (067) 123-45-67, почта a.b@mail.com, t.me/ivan"
+    found = extract_contacts(t)
+    assert "@ivan_dev" in found and "a.b@mail.com" in found and "t.me/ivan" in found
+    assert any("067" in x for x in found)
+    masked = mask_contacts(t)
+    assert "ivan_dev" not in masked and "067" not in masked and "mail.com" not in masked
