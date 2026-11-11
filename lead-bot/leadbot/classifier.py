@@ -1,10 +1,9 @@
-"""ИИ: проверка «это реально заказ/вакансия?», заголовок и выжимка для карточки,
-генерация отклика."""
+"""ИИ-фильтр: отличает «человек ищет исполнителя» от рекламы, спама и вакансий."""
 from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 
 import anthropic
 
@@ -12,73 +11,46 @@ from .filters import CATEGORIES
 
 log = logging.getLogger(__name__)
 
-FALLBACK = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+SYSTEM = """Ты фильтруешь сообщения из Telegram-чатов и Threads для фрилансера-разработчика.
+Определи, является ли сообщение ЗАПРОСОМ КЛИЕНТА: автор сам ищет исполнителя \
+(сделать сайт, лендинг, магазин, бота, приложение, дизайн, SEO, автоматизацию и т.п.).
 
-SYSTEM = """Ты фильтруешь сообщения из Telegram-чатов и Threads для фрилансеров и специалистов.
-Определи, является ли сообщение ЗАПРОСОМ НА ИСПОЛНИТЕЛЯ: автор (человек или компания) \
-ищет, кто сделает работу — разовый заказ (сайт, бот, дизайн, логотип, SMM, монтаж…) \
-или сотрудника/фрилансера в команду (вакансия).
-
-НЕ подходит (is_relevant=false):
+НЕ лид:
 - исполнитель/студия рекламирует свои услуги («делаю сайты», «возьму заказ»);
-- человек ищет работу для себя, резюме;
-- курсы, обучение, вебинары, продажа шаблонов/аккаунтов;
-- вопрос «как сделать самому», обсуждение, мем, спам, крипта-схемы.
+- вакансия в штат, поиск сотрудника на зарплату;
+- курсы, обучение, вебинары, продажа готовых шаблонов;
+- вопрос «как сделать самому», обсуждение, мем, спам.
 
-Поля:
-- kind: "order" — разовый заказ/проект, "job" — работа в компании (штат, part/full-time).
-- title: заголовок карточки на русском, начинается с «Ищут …», до 8 слов. \
-Пример: «Ищут разработчика телеграм-бота», «Ищут UI/UX дизайнера для международного проекта».
-- summary: 1–3 предложения на русском: что нужно, требования, условия. Без контактов.
-- experience: требуемый опыт («от 2 лет») или null.
-- work_format: remote / office / hybrid / unknown.
-- budget, deadline: как в тексте, или null."""
+Пиши summary и need по-русски, коротко (до 15 слов). Если бюджета или срока нет — null."""
 
 SCHEMA = {
     "type": "object",
     "properties": {
-        "is_relevant": {"type": "boolean"},
+        "is_lead": {"type": "boolean"},
         "confidence": {"type": "integer", "description": "0-100"},
-        "kind": {"type": "string", "enum": ["order", "job"]},
         "category": {"type": "string", "enum": list(CATEGORIES.keys()) + ["other"]},
-        "title": {"type": "string"},
-        "summary": {"type": "string"},
-        "experience": {"type": ["string", "null"]},
-        "work_format": {"type": "string", "enum": ["remote", "office", "hybrid", "unknown"]},
+        "need": {"type": "string", "description": "что именно нужно сделать"},
         "budget": {"type": ["string", "null"]},
         "deadline": {"type": ["string", "null"]},
+        "summary": {"type": "string"},
     },
-    "required": ["is_relevant", "confidence", "kind", "category", "title", "summary",
-                 "experience", "work_format", "budget", "deadline"],
+    "required": ["is_lead", "confidence", "category", "need", "budget", "deadline", "summary"],
     "additionalProperties": False,
 }
 
 
 @dataclass
 class Verdict:
-    is_relevant: bool
+    is_lead: bool
     confidence: int
-    kind: str
     category: str
-    title: str
-    summary: str
-    experience: str | None
-    work_format: str
+    need: str
     budget: str | None
     deadline: str | None
+    summary: str
 
     def as_dict(self) -> dict:
         return self.__dict__.copy()
-
-    @classmethod
-    def from_dict(cls, d: dict | None) -> "Verdict | None":
-        if not d:
-            return None
-        names = {f.name for f in fields(cls)}
-        try:
-            return cls(**{k: d.get(k) for k in names})
-        except TypeError:
-            return None
 
 
 class Classifier:
@@ -86,55 +58,40 @@ class Classifier:
         self.client = anthropic.AsyncAnthropic(api_key=api_key)
         self.model = model
 
-    async def _call(self, **kw):
+    async def classify(self, text: str) -> Verdict | None:
+        """None — если ИИ недоступен (ошибка сети, лимиты). Тогда решает обычный фильтр."""
         try:
-            return await self.client.beta.messages.create(model=self.model, **FALLBACK, **kw)
+            resp = await self.client.beta.messages.create(
+                model=self.model,
+                max_tokens=1024,
+                system=SYSTEM,
+                messages=[{"role": "user", "content": f"<message>\n{text[:4000]}\n</message>"}],
+                output_config={
+                    "effort": "low",
+                    "format": {"type": "json_schema", "schema": SCHEMA},
+                },
+                # если основная модель откажется отвечать — запрос автоматически
+                # повторится на запасной модели
+                betas=["server-side-fallback-2026-07-01"],
+                fallbacks="default",
+            )
         except anthropic.RateLimitError:
-            log.warning("Claude: rate limit")
+            log.warning("Claude: rate limit, пропускаю ИИ-проверку")
+            return None
         except anthropic.APIStatusError as e:
             log.warning("Claude API error %s: %s", e.status_code, e.message)
+            return None
         except anthropic.APIConnectionError as e:
             log.warning("Claude: нет соединения: %s", e)
-        return None
-
-    async def classify(self, text: str) -> Verdict | None:
-        """None — если ИИ недоступен. Тогда решает обычный фильтр."""
-        resp = await self._call(
-            max_tokens=1024,
-            system=SYSTEM,
-            messages=[{"role": "user", "content": f"<message>\n{text[:4000]}\n</message>"}],
-            output_config={"effort": "low",
-                           "format": {"type": "json_schema", "schema": SCHEMA}},
-        )
-        if resp is None:
             return None
+
         if resp.stop_reason == "refusal":
-            return Verdict(False, 0, "order", "other", "", "", None, "unknown", None, None)
+            return Verdict(False, 0, "other", "", None, None, "отклонено моделью")
+
         raw = next((b.text for b in resp.content if b.type == "text"), "")
         try:
-            return Verdict.from_dict(json.loads(raw))
-        except json.JSONDecodeError:
-            log.warning("Claude: не удалось разобрать ответ: %r", raw[:200])
+            data = json.loads(raw)
+            return Verdict(**{k: data.get(k) for k in SCHEMA["required"]})
+        except (json.JSONDecodeError, TypeError) as e:
+            log.warning("Claude: не удалось разобрать ответ (%s): %r", e, raw[:200])
             return None
-
-    async def write_reply(self, lead_text: str, about_me: str, lang: str) -> str | None:
-        """Черновик отклика на заказ/вакансию от лица пользователя."""
-        lang_name = {"uk": "украинском", "en": "английском"}.get(lang, "русском")
-        system = (
-            "Ты пишешь короткий отклик фрилансера на заказ или вакансию. "
-            f"Пиши на {lang_name} языке, от первого лица, 3–6 предложений, без шаблонных фраз "
-            "и без выдуманных фактов. Покажи, что понял задачу, коротко скажи, почему подходишь, "
-            "задай 1 уточняющий вопрос. Только текст отклика, без пояснений."
-        )
-        about = about_me.strip() or "Специалист-фрилансер. Подробностей о себе не указал."
-        resp = await self._call(
-            max_tokens=2048,
-            system=system,
-            messages=[{"role": "user", "content":
-                       f"<about_me>\n{about[:2000]}\n</about_me>\n\n"
-                       f"<post>\n{lead_text[:4000]}\n</post>"}],
-            output_config={"effort": "low"},
-        )
-        if resp is None or resp.stop_reason == "refusal":
-            return None
-        return next((b.text for b in resp.content if b.type == "text"), None)
