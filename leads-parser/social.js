@@ -1,4 +1,4 @@
-// Instagram и Facebook: автоподписка и автоотправка сообщений.
+// Instagram, Facebook и ВКонтакте: автоподписка и автоотправка сообщений (ВК — только сообщения).
 // Срабатывает ТОЛЬКО когда страница открыта программой (в адресе стоит метка #lp-follow=…, #lp-dm=… или #lp-inbox).
 // При обычном просмотре соцсетей расширение ничего не делает.
 (async () => {
@@ -18,7 +18,8 @@
     else return;
   }
   window.__lpFollow = true;
-  const net = /instagram\.com$/.test(location.hostname) ? "instagram" : "facebook";
+  const net = /instagram\.com$/.test(location.hostname) ? "instagram" : /(^|\.)vk\.(com|ru)$/.test(location.hostname) ? "vk" : "facebook";
+  if (net === "vk" && !md) return; // во ВКонтакте только рассылка
   try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} // убираем метку из адреса
 
   const FAST = !!window.__LP_FAST; // только для тестов
@@ -46,6 +47,7 @@
   }
   const loginWall = () =>
     /\/accounts\/login|\/login/.test(location.pathname) ||
+    (net === "vk" && !!document.querySelector('a[href*="/join"], a[href*="id.vk.com"]') && !document.querySelector('a[href^="/im"], a[href*="/im?"]')) ||
     !!document.querySelector('input[name="username"], input[name="email"], input[type="password"]');
   const BLOCK_RE = /(try again later|action blocked|we restrict certain activity|temporarily blocked|spróbuj ponownie później|tymczasowo zablokowan|ta czynność została zablokowana|повторите попытку позже|временно заблокирован)/i;
   const blockedDialog = () => Array.from(document.querySelectorAll('div[role="dialog"], div[role="alertdialog"]')).some((d) => BLOCK_RE.test(d.innerText || ""));
@@ -103,11 +105,15 @@
   // ---------- сообщение ----------
   const MSG_RE = /^(message|send message|wiadomość|wyślij wiadomość|napisz wiadomość|написать|сообщение|отправить сообщение|написать сообщение)$/i;
   const SEND_RE = /^(send|wyślij|отправить)$/i;
-  const findMessageBtn = () => buttons().find((b) => MSG_RE.test(labelOf(b)));
+  // ВКонтакте: «Написать сообщение» у сообществ и людей — часто обычная ссылка на /im или /write
+  const findMessageBtn = () => net !== "vk" ? buttons().find((b) => MSG_RE.test(labelOf(b)))
+    : Array.from(document.querySelectorAll('button, a, [role="button"]')).filter(visible).find((b) => MSG_RE.test(labelOf(b)))
+      || Array.from(document.querySelectorAll('a[href*="/im?sel="], a[href*="/im/convo/"], a[href*="/write"]')).filter(visible)[0] || null;
+  const vkInChat = () => net === "vk" && /^\/(im|write)/.test(location.pathname);
   // Поле сообщения. Ищем по подписи («Message», «Wiadomość», «Сообщение»), а если подпись другая (в Facebook поле часто
   // подписано просто «Aa»), берём поле, которого на странице не было до нажатия «Message» (параметр before).
   function findComposer(before) {
-    const BAD = /comment|komentar|коммент|search|szukaj|поиск|what'?s on your mind|co słychać|о чём вы думаете|о чем вы думаете/i;
+    const BAD = /comment|komentar|коммент|search|szukaj|поиск|what'?s on your mind|co słychać|о чём вы думаете|о чем вы думаете|что у вас нового|что-нибудь|запись/i;
     const label = (el) => el.getAttribute("aria-label") || el.getAttribute("placeholder") || "";
     const cands = Array.from(document.querySelectorAll('div[role="textbox"][contenteditable="true"], div[contenteditable="true"], textarea')).filter(visible);
     const ok = cands.filter((el) => !BAD.test(label(el)));
@@ -118,6 +124,7 @@
       if (fresh) return fresh;
     }
     if (net === "instagram") return ok.find((el) => el.matches('div[role="textbox"]')) || null;
+    if (net === "vk") return ok.find((el) => el.matches('[role="textbox"], [contenteditable="true"]')) || null;
     return null;
   }
   // Окна, которые мешают отправке: просьба ввести PIN Messenger, запрет писать этому аккаунту
@@ -302,15 +309,17 @@
       if (task.follow) followRes = await followStep(task.salonId);
       if (blockedDialog()) return report("blocked", followRes);
 
-      const mbtn = await waitFor(findMessageBtn, 6000);
-      if (!mbtn) return report("cannot_message", followRes);
+      // ВК мог уже перейти в переписку (страница перезагрузилась после нажатия «Написать сообщение»)
+      const inChat = vkInChat();
+      const mbtn = inChat ? null : await waitFor(findMessageBtn, 6000);
+      if (!mbtn && !inChat) return report("cannot_message", followRes);
       await sleep(rnd(1500, 4000));
       const pageName = ((document.querySelector("h1") || {}).innerText || document.title || "").trim();
       if (net === "facebook") await closeOpenChats(); // чтобы новый чат открылся окном, а не свернулся в кружок
       // запоминаем поля, которые уже были на странице: поле чата потом узнаем по тому, что оно появилось после нажатия
       const before = new Set(document.querySelectorAll('[contenteditable="true"], textarea'));
-      const findBox = () => findComposer(before);
-      mbtn.click();
+      const findBox = () => findComposer(inChat ? null : before);
+      if (mbtn) mbtn.click();
       await sleep(rnd(2000, 4000));
       dismissDialogs();
       // ждём поле сообщения (в Facebook чат грузится медленно), попутно нажимая «Начать» и замечая окна с причиной

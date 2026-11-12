@@ -9,7 +9,7 @@
   let visited = 0;
   let saved = 0;
   // Настоящий ли это сайт: закрытые сайты Google (business.site), ссылки на соцсети, страницы записи и бесплатные конструкторы настоящими не считаем
-  const FAKE_SITE_RE = /(^|\.)(business\.site|negocio\.site|instagram\.com|facebook\.com|fb\.com|fb\.me|linktr\.ee|linktree\.com|beacons\.ai|lnk\.bio|bio\.site|taplink\.cc|campsite\.bio|booksy\.com|fresha\.com|vagaro\.com|styleseat\.com|schedulicity\.com|glossgenius\.com|setmore\.com|calendly\.com|wixsite\.com|weebly\.com|godaddysites\.com|mystrikingly\.com)$/i;
+  const FAKE_SITE_RE = /(^|\.)(business\.site|negocio\.site|instagram\.com|facebook\.com|fb\.com|fb\.me|linktr\.ee|linktree\.com|beacons\.ai|lnk\.bio|bio\.site|taplink\.cc|campsite\.bio|booksy\.com|fresha\.com|vagaro\.com|styleseat\.com|schedulicity\.com|glossgenius\.com|setmore\.com|calendly\.com|wixsite\.com|weebly\.com|godaddysites\.com|mystrikingly\.com|vk\.com|vk\.ru|ok\.ru|t\.me|wa\.me|taplink\.ws|mssg\.me|hipolink\.me|dikidi\.net|dikidi\.ru|yclients\.com|2gis\.ru|tilda\.ws)$/i;
   function siteIsReal(url) {
     try { return !FAKE_SITE_RE.test(new URL(url).hostname.toLowerCase().replace(/^www\./, "")); } catch (e) { return true; }
   }
@@ -56,7 +56,22 @@
 
     const webEl = document.querySelector('a[data-item-id="authority"]');
     const website = webEl ? webEl.href : "";
-    return { name, phone, website };
+    return { name, phone, website, ...readMetrics() };
+  }
+
+  // Рейтинг и количество отзывов из шапки карточки: «4,8 ★★★★★ (123)»
+  const toNum = (s) => { const n = Number(String(s || "").replace(/[\s\u00a0\u202f.,](?=\d{3}\b)/g, "").replace(",", ".")); return isFinite(n) ? n : null; };
+  function readMetrics() {
+    let rating = null, reviews = null;
+    const box = document.querySelector("div.F7nice") || document.querySelector('[role="main"] [role="img"][aria-label*="★"], [role="main"] span[role="img"]')?.parentElement;
+    const text = clean(box && box.innerText);
+    const m = text.match(/([1-5][.,]\d)\s*\(?\s*([\d\s\u00a0\u202f.,]+)?\)?/);
+    if (m) { rating = toNum(m[1]); if (m[2] && /\d/.test(m[2])) reviews = toNum(m[2].trim()); }
+    if (reviews === null) {
+      const el = Array.from(document.querySelectorAll('[role="main"] [aria-label]')).find((e) => /\d[\d\s\u00a0.,]*\s*(reviews?|opini|recenz|отзыв|Rezension|reseñ|avis)/i.test(e.getAttribute("aria-label")));
+      if (el) reviews = toNum((el.getAttribute("aria-label").match(/\d[\d\s\u00a0.,]*/) || [""])[0].trim());
+    }
+    return { rating, reviews, metricsChecked: rating !== null || reviews !== null };
   }
 
   async function processOne(link) {
@@ -87,7 +102,7 @@
     try {
       const res = await chrome.runtime.sendMessage({
         type: "lead",
-        lead: { name: d.name, phone: d.phone, url: location.href, note: "Google Maps", website: d.website || "", siteChecked: true },
+        lead: { name: d.name, phone: d.phone, url: location.href, note: "Google Maps", website: d.website || "", siteChecked: true, rating: d.rating, reviews: d.reviews, metricsChecked: d.metricsChecked },
       });
       if (res && res.saved) saved++;
     } catch (e) {}

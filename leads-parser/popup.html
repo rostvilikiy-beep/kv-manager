@@ -19,7 +19,7 @@
   h1 { margin: 0; font-size: 16px; color: var(--text); }
   header small { color: var(--muted); display: block; font-size: 11px; }
 
-  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
   .seg button { padding: 8px 6px; border-radius: 10px; border: 1px solid var(--gb); background: var(--glass); color: var(--text);
     font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
   .seg button span { display: block; font-size: 17px; margin-bottom: 1px; }
@@ -63,6 +63,7 @@
   <div class="seg">
     <button id="srcMaps" class="active"><span>🗺</span>Google Maps</button>
     <button id="srcBooksy"><span>💈</span>Booksy</button>
+    <button id="srcDgis"><span>📍</span>2ГИС</button>
   </div>
 
   <div class="card">
@@ -74,11 +75,12 @@
       <div class="stat ok"><b id="sav">0</b><small id="savLbl">новых салонов</small></div>
       <div class="stat"><b id="all">0</b><small id="allLbl">всего в базе</small></div>
     </div>
-    <label class="check" id="optBox"><input type="checkbox" id="skipSite" /> Пропускать заведения, у которых есть сайт</label>
+    <label class="check" id="optBox"><input type="checkbox" id="skipSite" /> <span id="optText">Пропускать заведения, у которых есть сайт</span></label>
     <label class="check" id="emailBox"><input type="checkbox" id="emailOpt" /> Собирать почту (нажимает «Показать», возможна капча)</label>
   </div>
 
   <button class="btn" id="toggle">▶ Старт</button>
+  <button class="btn ghost" id="panel" style="display:none">📋 Панель 2ГИС: выбрать бизнесы и разослать в ВК</button>
 
   <div class="pill"><span class="dot" id="dot"></span><span id="app">Проверяю связь с программой…</span></div>
   <button class="btn ghost" id="flush">📤 Отправить всё в программу</button>

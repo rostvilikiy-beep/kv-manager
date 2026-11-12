@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Панель 2ГИС</title>
+<style>
+  :root { --bg:#1d1e21; --card:rgba(255,255,255,.055); --line:rgba(255,255,255,.1); --text:#e4e6e9; --muted:#9aa1ab;
+          --accent:#9db0c4; --ok:#7ccba0; --bad:#e08989; --warn:#e3c07a; --vk:#4c75a3; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px "Segoe UI", system-ui, sans-serif; color: var(--text);
+         background: linear-gradient(165deg, #34373c 0%, #26282c 40%, #1b1c1f 100%) fixed; min-height: 100vh; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  .sub { color: var(--muted); margin-bottom: 18px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .card h2 { margin: 0 0 10px; font-size: 15px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 10px; }
+  .filters input[type=search] { flex: 1 1 220px; }
+  input[type=search], input[type=number], textarea {
+    background: rgba(0,0,0,.25); color: var(--text); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font: inherit; }
+  input[type=number] { width: 80px; }
+  textarea { width: 100%; min-height: 150px; resize: vertical; line-height: 1.45; }
+  label.chk { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--muted); font-size: 13px; }
+  label.chk input { accent-color: var(--accent); width: 15px; height: 15px; }
+  .tablebox { overflow: auto; max-height: calc(100vh - 230px); border-radius: 10px; border: 1px solid var(--line); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: #2a2c31; color: var(--muted); font-weight: 600; z-index: 1; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(255,255,255,.03); }
+  td small { color: var(--muted); display: block; }
+  a { color: var(--accent); }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 12px; background: rgba(255,255,255,.08); white-space: nowrap; }
+  .tag.ok { background: rgba(124,203,160,.15); color: var(--ok); }
+  .tag.bad { background: rgba(224,137,137,.15); color: var(--bad); }
+  .tag.warn { background: rgba(227,192,122,.15); color: var(--warn); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .chip { border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--text); border-radius: 99px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px; }
+  .chip:hover { background: rgba(255,255,255,.12); }
+  .preview { white-space: pre-wrap; background: rgba(0,0,0,.2); border-radius: 9px; padding: 10px; font-size: 13px; min-height: 40px; color: var(--text); }
+  .preview.err { color: var(--bad); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0; color: var(--muted); font-size: 13px; }
+  .btn { width: 100%; padding: 11px; border: 0; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; cursor: pointer;
+         background: linear-gradient(180deg, #5b84b5, var(--vk)); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.stop { background: linear-gradient(180deg, #b97676, #9d6060); }
+  .btn.ghost { background: rgba(255,255,255,.07); border: 1px solid var(--line); font-weight: 500; margin-top: 8px; }
+  .log { margin-top: 10px; max-height: 220px; overflow: auto; font-size: 12px; color: var(--muted); }
+  .log div { padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+  .muted { color: var(--muted); }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📍 Панель 2ГИС → рассылка ВКонтакте</h1>
+  <div class="sub">Организации, собранные расширением в 2ГИС. Отметьте нужные, напишите сообщение и запустите рассылку: расширение само откроет страницу ВК каждого бизнеса и отправит текст.</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="filters">
+        <input type="search" id="q" placeholder="Поиск по названию, рубрике, адресу" />
+        <label class="chk"><input type="checkbox" id="fVk" checked /> только с ВК</label>
+        <label class="chk"><input type="checkbox" id="fNoSite" /> только без сайта</label>
+        <label class="chk"><input type="checkbox" id="fHideSent" checked /> скрыть, кому уже писали</label>
+      </div>
+      <div class="row" style="margin-top:0">
+        <span id="count">0</span>
+        <span>·</span>
+        <span>выбрано <b id="selCount">0</b></span>
+        <span style="flex:1"></span>
+        <button class="chip" id="exportSel">⬇ CSV выбранных</button>
+        <button class="chip" id="delSel">🗑 удалить выбранные</button>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" id="all" title="Выбрать все показанные" /></th>
+            <th>Название</th><th>Телефон</th><th>ВКонтакте</th><th class="num">Рейтинг</th><th class="num">Отзывы</th><th>Сайт</th><th>Рассылка ВК</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Сообщение</h2>
+      <textarea id="tpl" placeholder="Здравствуйте! Увидел {имя} в 2ГИС: рейтинг {рейтинг} и {отзывы} отзывов — отличный результат. Делаю сайты для салонов…"></textarea>
+      <div class="chips">
+        <button class="chip" data-var="{имя}">{имя} — название</button>
+        <button class="chip" data-var="{отзывы}">{отзывы} — кол-во отзывов</button>
+        <button class="chip" data-var="{рейтинг}">{рейтинг}</button>
+      </div>
+      <div class="muted" style="font-size:12px;margin-bottom:6px">Так увидит первый выбранный бизнес:</div>
+      <div class="preview" id="preview">—</div>
+      <div class="row">
+        Пауза между сообщениями, сек: <input type="number" id="dMin" min="20" value="60" /> – <input type="number" id="dMax" min="20" value="120" />
+      </div>
+      <div class="row">
+        Лимит в день: <input type="number" id="limit" min="1" value="20" />
+        <span>сегодня отправлено: <b id="today">0</b></span>
+      </div>
+      <button class="btn" id="start">▶ Разослать выбранным в ВК</button>
+      <div class="muted" style="font-size:12px;margin-top:8px">Во время рассылки не закрывайте эту вкладку. Войдите во ВКонтакте в этом браузере заранее. Если в шаблоне есть {отзывы}, а у бизнеса отзывов нет, ему не пишем.</div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+</div>
+<script src="template.js"></script>
+<script src="panel.js"></script>
+</body>
+</html>

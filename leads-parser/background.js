@@ -1,3 +1,5 @@
+importScripts("template.js");
+
 // Центр расширения: хранит базу номеров, отправляет её в программу рассылки
 // и ведёт обход салонов Booksy (в отдельной фоновой вкладке).
 
@@ -147,7 +149,7 @@ async function postFollow(msg) {
 async function dmCount() {
   const { dmCount: c } = await chrome.storage.local.get("dmCount");
   const d = new Date().toLocaleDateString("sv");
-  return c && c.date === d ? c : { date: d, instagram: 0, facebook: 0 };
+  return c && c.date === d ? c : { date: d, instagram: 0, facebook: 0, vk: 0 };
 }
 async function getDmTasks() {
   const { dmTasks = {} } = await chrome.storage.local.get("dmTasks");
@@ -216,6 +218,8 @@ function toIntl(phone, url) {
   const p = String(phone || "").trim();
   if (!p || p.startsWith("+")) return p;
   let d = p.replace(/\D/g, "");
+  // российский формат «8 (495) 123-45-67» (Google Maps и 2ГИС в России) → +7
+  if (d.length === 11 && /^8\s*\(?\d{3,5}\)?/.test(p) && !/booksy\.com/.test(String(url || ""))) return "+7 " + d.slice(1);
   if (d.startsWith("00")) return "+" + d.slice(2);
   const region = regionFromUrl(url);
   if (!region) return NANP.test(p) ? "+1 " + p : p; // страна неизвестна: узнаём только американский формат
@@ -456,6 +460,49 @@ async function siteClose(id, delay = 0) {
   }, delay);
 }
 
+// ---------- шаблоны сообщений: {имя}, {отзывы}, {рейтинг} ----------
+// функции fillTemplate, hasVars, cleanName — в template.js (общие с панелью 2ГИС)
+// Ссылка на профиль без мусора: для сравнения ссылок из разных мест
+function normProfile(u) {
+  try {
+    const x = new URL(String(u || "").trim());
+    const host = x.hostname.toLowerCase().replace(/^(www|m|web)\./, "").replace(/^vk\.ru$/, "vk.com");
+    const path = x.pathname.replace(/\/+$/, "").toLowerCase();
+    return host + path + (path === "/profile.php" ? "?id=" + x.searchParams.get("id") : "");
+  } catch (e) { return ""; }
+}
+// Данные салона для шаблона: ищем по ссылке на профиль среди салонов Booksy и организаций 2ГИС
+async function profileData(url) {
+  const key = normProfile(url);
+  if (!key) return null;
+  const { socials = [], dgisFirms = [] } = await chrome.storage.local.get(["socials", "dgisFirms"]);
+  const s = socials.find((x) => normProfile(x.instagram) === key || normProfile(x.facebook) === key);
+  if (s) return { name: s.name, reviews: s.reviews, rating: s.rating };
+  const f = dgisFirms.find((x) => normProfile(x.vk) === key || normProfile(x.instagram) === key);
+  if (f) return { name: f.name, reviews: f.reviews, rating: f.rating };
+  return null;
+}
+
+// ---------- 2ГИС: база организаций ----------
+const S = (v) => String(v || "").slice(0, 300);
+function saveDgisFirm(f) {
+  return withLock(async () => {
+    const id = S(f.id).replace(/\D/g, "");
+    if (!id) return { saved: false };
+    const { dgisFirms = [] } = await chrome.storage.local.get("dgisFirms");
+    const rec = {
+      id, url: S(f.url), name: S(f.name), address: S(f.address), rubric: S(f.rubric),
+      phone: S(f.phone), phones: Array.isArray(f.phones) ? f.phones.slice(0, 5).map(S) : [],
+      email: S(f.email), website: S(f.website), siteReal: f.siteReal === true, vk: S(f.vk), telegram: S(f.telegram), whatsapp: S(f.whatsapp), instagram: S(f.instagram),
+      rating: numOrNull(f.rating), reviews: numOrNull(f.reviews), updatedAt: Date.now(),
+    };
+    const old = dgisFirms.find((x) => x.id === id);
+    if (old) Object.assign(old, rec); else dgisFirms.push({ ...rec, addedAt: Date.now() });
+    await chrome.storage.local.set({ dgisFirms });
+    return { saved: !old, phone: rec.phone, rec };
+  });
+}
+
 // ---------- сообщения ----------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   (async () => {
@@ -485,6 +532,35 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const r = await withLock(flushPending);
       const r2 = await withLock(flushPendingSocials);
       return sendResponse({ ok: !!(r && r.ok && r2 && r2.ok), leads: leadsN, socials: socialsN });
+    }
+    // от 2ГИС: организация из выдачи. Телефон уходит в программу (база номеров), остальное хранится в расширении (панель 2ГИС)
+    if (msg.type === "dgisFirm") {
+      const f = msg.firm || {};
+      const r = await saveDgisFirm(f);
+      if (r.phone) {
+        await saveLead({ name: f.name, phone: r.phone, url: r.rec.url, note: "2ГИС", email: r.rec.email, website: r.rec.website, siteChecked: true,
+          hasSocial: !!(r.rec.vk || r.rec.instagram || r.rec.telegram), rating: r.rec.rating, reviews: r.rec.reviews, metricsChecked: r.rec.rating !== null || r.rec.reviews !== null });
+      }
+      return sendResponse({ saved: r.saved });
+    }
+    // от панели 2ГИС: пометка о рассылке ВК
+    if (msg.type === "dgisMark") {
+      return withLock(async () => {
+        const { dgisFirms = [] } = await chrome.storage.local.get("dgisFirms");
+        const f = dgisFirms.find((x) => x.id === String(msg.id || ""));
+        if (f) { f.vk_result = S(msg.result); f.vk_detail = S(msg.detail); f.vk_at = Date.now(); await chrome.storage.local.set({ dgisFirms }); }
+        sendResponse({ ok: !!f });
+      });
+    }
+    if (msg.type === "dgisDelete") {
+      return withLock(async () => {
+        const ids = new Set((msg.ids || []).map(String));
+        const { dgisFirms = [], leads = [] } = await chrome.storage.local.get(["dgisFirms", "leads"]);
+        const left = ids.size ? dgisFirms.filter((x) => !ids.has(x.id)) : [];
+        const gone = new Set(dgisFirms.filter((x) => !left.includes(x)).map((x) => x.url));
+        await chrome.storage.local.set({ dgisFirms: left, leads: leads.filter((l) => !(l.note === "2ГИС" && gone.has(l.url))) });
+        sendResponse({ ok: true, left: left.length });
+      });
     }
     if (msg.cmd === "booksyStart") { await booksyStart(msg.tabId, msg.opts); return sendResponse({ ok: true }); }
     if (msg.cmd === "booksyStop") {
@@ -649,17 +725,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === "dmPing") return sendResponse({ ok: true, version: chrome.runtime.getManifest().version });
     if (msg.type === "dmTask") {
       const t = msg.task || {};
-      const net = t.net === "facebook" ? "facebook" : t.net === "instagram" ? "instagram" : "";
-      const url = String(t.url || "");
-      const okUrl = net === "instagram" ? /^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._]+\/?$/.test(url) : net === "facebook" ? /^https:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(url) : false;
-      const text = String(t.text || "");
-      if (!okUrl || !text.trim() || text.length > 2000) return sendResponse({ done: true, state: "done", result: "error", detail: "некорректное задание" });
+      const net = ["facebook", "instagram", "vk"].includes(t.net) ? t.net : "";
+      let url = String(t.url || "");
+      if (net === "vk") url = url.replace(/^https?:\/\/(?:www\.|m\.)?vk\.(?:com|ru)\//i, "https://vk.com/");
+      const okUrl = net === "instagram" ? /^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._]+\/?$/.test(url)
+        : net === "facebook" ? /^https:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(url)
+        : net === "vk" ? /^https:\/\/vk\.com\/[A-Za-z0-9_.]+\/?$/.test(url) : false;
+      let text = String(t.text || "");
+      if (!okUrl || !text.trim()) return sendResponse({ done: true, state: "done", result: "error", detail: "некорректное задание" });
+      // переменные {имя}, {отзывы}, {рейтинг}: данные передаёт программа (t.vars) или берём из базы расширения по ссылке
+      if (hasVars(text)) {
+        const data = t.vars && typeof t.vars === "object" ? t.vars : await profileData(url);
+        const r = fillTemplate(text, data);
+        if (r.error) return sendResponse({ done: true, state: "done", result: "error", detail: r.error + " — сообщение НЕ отправлено" });
+        text = r.text;
+      }
+      if (text.length > 2000) return sendResponse({ done: true, state: "done", result: "error", detail: "некорректное задание" });
       const c = await dmCount();
       const lim = t.limit === 0 || t.limit === "0" ? Infinity : Number(t.limit) > 0 ? Number(t.limit) : 20;
       if ((c[net] || 0) >= lim) return sendResponse({ done: true, state: "done", result: "limit" });
       const id = "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       const tasks = await getDmTasks();
-      tasks[id] = { id, net, text, follow: !!t.follow, salonId: String(t.salonId || ""), state: "running", startedAt: Date.now() };
+      tasks[id] = { id, net, text, follow: !!t.follow && net !== "vk", salonId: String(t.salonId || ""), state: "running", startedAt: Date.now() };
       await saveDmTasks(tasks);
       try {
         const w = await chrome.windows.create({ url: url + "#lp-dm=" + id, type: "popup", focused: false, width: 1000, height: 820 });
@@ -669,7 +756,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const t2 = await getDmTasks();
         if (t2[id]) { t2[id].state = "done"; t2[id].result = "error"; t2[id].detail = "не удалось открыть окно"; t2[id].finishedAt = Date.now(); t2[id].closed = true; await saveDmTasks(t2); }
       }
-      return sendResponse({ id, started: true });
+      return sendResponse({ id, started: true, text });
     }
     if (msg.type === "dmMine") {
       // вкладка спрашивает, не открыта ли она для задания (Facebook мог стереть метку из адреса)
