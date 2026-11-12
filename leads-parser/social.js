@@ -341,12 +341,29 @@
     const el = ph || (box && visible(box) ? box : null);
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    return { x: Math.round(r.left + Math.min(r.width / 2, 60)), y: Math.round(r.top + r.height / 2), how: ph ? "подсказка «Сообщение»" : "поле" };
+    return { x: Math.round(r.left + Math.min(r.width / 2, 60)), y: Math.round(r.top + r.height / 2), how: ph ? "подсказка «Сообщение»" : "поле", top: r.top, left: r.left };
+  }
+  // Есть ли в открытом чате переписка: у каждого сообщения ВК стоит время «14:22». Смотрим только колонку чата над полем ввода
+  // (список чатов слева и страница за окном не считаются). Пустой новый чат времени сообщений не содержит.
+  function vkHasHistory(t) {
+    const TIME = /^\d{1,2}:\d{2}$/;
+    return Array.from(document.querySelectorAll("span, div, time, a")).some((e) => {
+      if (e.children.length || !visible(e) || !TIME.test((e.textContent || "").trim())) return false;
+      const r = e.getBoundingClientRect();
+      if (!(r.bottom <= t.top + 4 && r.left >= t.left - 40 && r.top >= 0)) return false;
+      // элемент действительно виден сверху, а не лежит под окном чата (время в постах на странице за ним)
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!top && (top === e || e.contains(top) || top.contains(e));
+    });
   }
   const activeText = () => { const a = deepActive(); return isEditable(a) ? normText(textOf(a)) : ""; };
   async function vkTypeAndSend(id, box, text) {
     const t = vkComposerTarget(box);
     if (!t) return ["composer_missing", "не нашёл поле «Сообщение»; " + snapshot()];
+    // уже переписывались с этим клиентом (вы или он): не пишем повторно
+    step(id, "проверяю, была ли уже переписка");
+    await sleep(rnd(1000, 1600)); // история чата подгружается не сразу
+    if (vkHasHistory(vkComposerTarget(box) || t)) return ["already", "в чате уже есть переписка — пропускаю"];
     step(id, "нажимаю на поле сообщения (" + t.how + ")");
     let r = await send({ type: "cdpInput", id, actions: [{ click: [t.x, t.y] }] });
     if (!r || !r.ok) return ["error", "Chrome не дал нажать в поле: " + ((r && r.error) || "нет ответа фона") + ". Обновите расширение (нужно разрешение «отладчик»)"];
@@ -411,17 +428,7 @@
       // ВК мог уже перейти в переписку (страница перезагрузилась после нажатия «Написать сообщение»)
       const inChat = vkInChat();
       step(id, inChat ? "уже в переписке" : "ищу, как открыть переписку");
-      if (net === "vk" && !inChat) {
-        // открываем переписку с сообществом отдельной страницей; после перехода расширение продолжит с того же задания
-        const gid = vkGroupId();
-        let tried = ""; try { tried = sessionStorage.getItem("lpVkNav") || ""; } catch (e) {}
-        if (gid && tried !== id) {
-          try { sessionStorage.setItem("lpVkNav", id); } catch (e) {}
-          step(id, "открываю переписку vk.com/im?sel=-" + gid);
-          location.assign("https://vk.com/im?sel=-" + gid);
-          return;
-        }
-      }
+      // ВК: переписку открываем только кнопкой «Написать сообщение» (прямой адрес vk.com/im?sel=… на живом ВК чат не открывает)
       const mbtn = inChat ? null : await waitFor(findMessageBtn, net === "vk" ? 3000 : 6000);
       if (!mbtn && !inChat) return report("cannot_message", followRes);
       await sleep(net === "vk" ? rnd(300, 800) : rnd(1500, 4000));
@@ -441,6 +448,7 @@
         dismissDialogs();
         const b = findBox();
         if (b) return b;
+        if (net === "vk" && vkComposerTarget(null)) return "PH"; // поле не распознали, но видна подсказка «Сообщение»
         // чат мог свернуться в кружок: раскрываем кружок с названием этой страницы
         if (net === "facebook" && (++ticks === 10 || ticks === 50)) viaHead = expandChatHead(pageName) || viaHead;
         return blockedDialog() ? "BLOCK" : pinDialog() ? "PIN" : cannotDialog() ? "CANNOT" : null;
@@ -449,12 +457,12 @@
       if (found === "PIN" || (!found && pinDialog())) return report("pin_required", followRes);
       if (found === "CANNOT" || (!found && cannotDialog())) return report("cannot_message", followRes);
       if (!found) return report("composer_missing", snapshot());
-      const box = found;
+      const box = found === "PH" ? null : found;
       if (viaHead && !composerBelongsTo(box, pageName)) return report("composer_missing", "в раскрытом чате не подтверждён получатель, сообщение НЕ отправлено; " + snapshot());
 
       // это сообщение уже есть в чате: второй раз не отправляем
       step(id, "поле найдено, проверяю, не писали ли раньше");
-      if (chatHasSent(box, task.text)) return report("already", followRes);
+      if (box && chatHasSent(box, task.text)) return report("already", followRes);
       // ВКонтакте не принимает программную вставку (поле остаётся пустым): печатаем «настоящей клавиатурой» через Chrome
       if (net === "vk") { const [r, d] = await vkTypeAndSend(id, box, task.text); toast(r === "sent" ? "сообщение отправлено" : "результат: " + r, r === "sent"); return report(r, d); }
       step(id, "вставляю текст");

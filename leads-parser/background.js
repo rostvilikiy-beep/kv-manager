@@ -773,9 +773,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       tasks[id] = { id, net, text, follow: !!t.follow && net !== "vk", salonId: String(t.salonId || ""), state: "running", startedAt: Date.now() };
       await saveDmTasks(tasks);
       try {
-        // ВК: у сообщества с адресом club123 / public123 сразу открываем переписку, без захода на страницу
-        const gm = net === "vk" && url.match(/^https:\/\/vk\.com\/(?:club|public|event)(\d+)\/?$/);
-        const openUrl = gm ? "https://vk.com/im?sel=-" + gm[1] : url;
+        const openUrl = url; // ВК: открываем страницу и жмём «Написать сообщение» (прямой адрес чата на живом ВК не работает)
         const w = await chrome.windows.create({ url: openUrl + "#lp-dm=" + id, type: "popup", focused: false, width: 1000, height: 820 });
         const t2 = await getDmTasks();
         if (t2[id]) { t2[id].windowId = w.id; t2[id].tabId = w.tabs && w.tabs[0] && w.tabs[0].id; await saveDmTasks(t2); }
