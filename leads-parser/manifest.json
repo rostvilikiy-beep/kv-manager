@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Leads Parser: Google Maps + Booksy + 2ГИС",
-  "version": "4.9.3",
+  "version": "4.10.0",
   "description": "Собирает телефоны, соцсети, рейтинг и отзывы заведений из Google Maps, Booksy и 2ГИС, отправляет их в программу рассылки, рассылает сообщения в Instagram, Facebook и ВКонтакте и собирает данные салона для конструктора сайтов.",
   "permissions": [
     "storage",
     "unlimitedStorage",
     "tabs",
-    "alarms"
+    "alarms",
+    "debugger"
   ],
   "host_permissions": [
     "http://127.0.0.1/*",

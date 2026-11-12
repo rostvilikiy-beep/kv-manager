@@ -823,6 +823,42 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }, 2500);
       return sendResponse({});
     }
+    // ВКонтакте: настоящие клик и нажатия клавиш во вкладке задания (через отладчик Chrome).
+    // Только для вкладки, которую расширение само открыло под задание ВК и пока оно идёт.
+    if (msg.type === "cdpInput") {
+      const tabId = sender.tab && sender.tab.id;
+      const tasks = await getDmTasks();
+      const t = tasks[msg.id];
+      if (!tabId || !t || t.state !== "running" || t.net !== "vk" || t.tabId !== tabId) return sendResponse({ ok: false, error: "нет задания для этой вкладки" });
+      const target = { tabId };
+      try {
+        try { await chrome.debugger.attach(target, "1.3"); } catch (e) { if (!/already attached/i.test(String(e && e.message))) throw e; }
+        const cmd = (m, p) => chrome.debugger.sendCommand(target, m, p);
+        const KEYS = { Enter: [13, "\r"], Backspace: [8, ""], a: [65, "a"] };
+        for (const a of Array.isArray(msg.actions) ? msg.actions.slice(0, 200) : []) {
+          if (a.click) {
+            const [x, y] = a.click.map((n) => Math.max(0, Math.round(Number(n) || 0)));
+            await cmd("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+            await cmd("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", clickCount: 1 });
+            await cmd("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 });
+          } else if (typeof a.text === "string") {
+            for (let i = 0; i < a.text.length; i += 40) { await cmd("Input.insertText", { text: a.text.slice(i, i + 40) }); await sleep(rnd(60, 160)); }
+          } else if (KEYS[a.key]) {
+            const [code, txt] = KEYS[a.key], mod = Number(a.mod) || 0;
+            const base = { key: a.key, code: a.key === "a" ? "KeyA" : a.key, windowsVirtualKeyCode: code, nativeVirtualKeyCode: code, modifiers: mod };
+            await cmd("Input.dispatchKeyEvent", { ...base, type: txt && !(mod & 2) ? "keyDown" : "rawKeyDown", ...(txt && !(mod & 2) ? { text: txt, unmodifiedText: txt } : {}), ...(a.key === "a" && mod & 2 ? { commands: ["selectAll"] } : {}) });
+            await cmd("Input.dispatchKeyEvent", { ...base, type: "keyUp" });
+          }
+          await sleep(rnd(40, 120));
+        }
+        sendResponse({ ok: true });
+      } catch (e) {
+        sendResponse({ ok: false, error: String((e && e.message) || e).slice(0, 120) });
+      } finally {
+        try { await chrome.debugger.detach(target); } catch (e) {}
+      }
+      return;
+    }
     if (msg.type === "dmStep") {
       const tasks = await getDmTasks();
       const t = tasks[msg.id];

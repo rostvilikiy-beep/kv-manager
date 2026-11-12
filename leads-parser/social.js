@@ -324,6 +324,69 @@
     send({ type: "dmStep", id, step: text });
   }
 
+  // ---------- ВКонтакте: ввод текста как с клавиатуры ----------
+  // Фон расширения подключается к этой вкладке через отладчик Chrome и передаёт настоящие клик и нажатия клавиш:
+  // сайт не отличает их от ваших. Пока это идёт, Chrome показывает полоску «Leads Parser отлаживает этот браузер».
+  function deepActive() {
+    let a = document.activeElement;
+    while (a && a.shadowRoot && a.shadowRoot.activeElement) a = a.shadowRoot.activeElement;
+    return a;
+  }
+  const isEditable = (el) => !!el && (el.isContentEditable || el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && /^(text|search|)$/i.test(el.type || "")));
+  const PH_RE = /^(сообщение|напишите сообщение|написать сообщение|message|write a message)[.…]*$/i;
+  // куда кликнуть: надпись-подсказка «Сообщение» внизу чата, иначе найденное поле
+  function vkComposerTarget(box) {
+    const ph = Array.from(document.querySelectorAll("div, span, p, label")).filter((e) => !e.children.length && visible(e) && PH_RE.test((e.textContent || "").trim()))
+      .sort((a, b) => b.getBoundingClientRect().top - a.getBoundingClientRect().top)[0];
+    const el = ph || (box && visible(box) ? box : null);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { x: Math.round(r.left + Math.min(r.width / 2, 60)), y: Math.round(r.top + r.height / 2), how: ph ? "подсказка «Сообщение»" : "поле" };
+  }
+  const activeText = () => { const a = deepActive(); return isEditable(a) ? normText(textOf(a)) : ""; };
+  async function vkTypeAndSend(id, box, text) {
+    const t = vkComposerTarget(box);
+    if (!t) return ["composer_missing", "не нашёл поле «Сообщение»; " + snapshot()];
+    step(id, "нажимаю на поле сообщения (" + t.how + ")");
+    let r = await send({ type: "cdpInput", id, actions: [{ click: [t.x, t.y] }] });
+    if (!r || !r.ok) return ["error", "Chrome не дал нажать в поле: " + ((r && r.error) || "нет ответа фона") + ". Обновите расширение (нужно разрешение «отладчик»)"];
+    await sleep(rnd(500, 900));
+    if (!isEditable(deepActive())) return ["composer_missing", "после нажатия курсор не в поле ввода; " + snapshot()];
+    if (activeText()) { // в поле уже что-то есть (черновик): очищаем
+      await send({ type: "cdpInput", id, actions: [{ key: "a", mod: 2 }, { key: "Backspace" }] });
+      await sleep(300);
+    }
+    step(id, "печатаю текст");
+    const lines = String(text).split(/\r?\n/);
+    const acts = [];
+    lines.forEach((ln, i) => { if (i) acts.push({ key: "Enter", mod: 8 }); if (ln) acts.push({ text: ln }); }); // Shift+Enter — новая строка
+    r = await send({ type: "cdpInput", id, actions: acts });
+    if (!r || !r.ok) return ["send_failed", "не удалось напечатать текст: " + ((r && r.error) || "")];
+    await sleep(rnd(900, 1500));
+    const want = normText(text), got = activeText();
+    if (!got || !got.includes(want.slice(0, Math.min(40, want.length)))) {
+      await send({ type: "cdpInput", id, actions: [{ key: "a", mod: 2 }, { key: "Backspace" }] });
+      return ["send_failed", `текст не появился в поле (в поле ${got.length} знаков из ${want.length}), сообщение НЕ отправлено`];
+    }
+    step(id, "текст в поле, отправляю (Enter)");
+    const failBefore = failCount();
+    await sleep(rnd(800, 1600));
+    await send({ type: "cdpInput", id, actions: [{ key: "Enter" }] });
+    step(id, "проверяю, что сообщение ушло");
+    const snippet = normText(lines.find((l) => l.trim()) || "").slice(0, 30);
+    const t0 = Date.now();
+    while (Date.now() - t0 < (FAST ? 3000 : 10000)) {
+      if (blockedDialog()) return ["blocked", ""];
+      if (failCount() > failBefore) return ["not_delivered", ""];
+      if (!activeText() && normText(document.body.innerText).includes(snippet)) {
+        await sleep(FAST ? 300 : 3000);
+        return failCount() > failBefore ? ["not_delivered", ""] : ["sent", ""];
+      }
+      await sleep(400);
+    }
+    return activeText() ? ["send_failed", "после Enter текст остался в поле, сообщение не ушло"] : ["unconfirmed", "поле очистилось, но сообщения в чате не видно — проверьте вручную"];
+  }
+
   async function runDm(id) {
     step(id, "задание получено, страница " + location.pathname.slice(0, 40));
     const task = await send({ type: "dmGet", id });
@@ -387,6 +450,8 @@
       // это сообщение уже есть в чате: второй раз не отправляем
       step(id, "поле найдено, проверяю, не писали ли раньше");
       if (chatHasSent(box, task.text)) return report("already", followRes);
+      // ВКонтакте не принимает программную вставку (поле остаётся пустым): печатаем «настоящей клавиатурой» через Chrome
+      if (net === "vk") { const [r, d] = await vkTypeAndSend(id, box, task.text); toast(r === "sent" ? "сообщение отправлено" : "результат: " + r, r === "sent"); return report(r, d); }
       step(id, "вставляю текст");
 
       const fill = await fillComposer(findBox, task.text);
