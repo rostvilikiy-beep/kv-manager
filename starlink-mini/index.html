@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starlink Mini оптом від 50 шт — 18 000 грн</title>
+<meta name="description" content="Оптовий продаж терміналів Starlink Mini по Україні. Обладнання вже в Україні, офіційно придбане та розмитнене. Ціна 18 000 грн за шт при замовленні від 50 шт.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Шрифти. Щоб замінити шрифт — змініть посилання тут і змінні --font-sans / --font-mono нижче -->
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/hero.webp">
+<style>
+:root{
+  --font-sans:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --black:#0a0a0a;
+  --ink:#141414;
+  --line:#2a2a2a;
+  --white:#ffffff;
+  --paper:#f5f5f2;
+  --muted:#a3a3a3;
+  --muted-dark:#5c5c5c;
+  --yellow:#ffd400;
+  --yellow-hover:#ffe14d;
+  --radius:999px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --wrap:1240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font-sans);background:var(--black);color:var(--white);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--font-mono);letter-spacing:.04em}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--yellow);flex:none}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--yellow);color:var(--black);padding:10px 16px;z-index:100}
+.skip:focus{left:8px}
+
+/* ---------- Кнопки ---------- */
+.btn{--h:56px;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:var(--h);padding:0 28px;border-radius:var(--radius);font:600 16px/1 var(--font-sans);text-decoration:none;cursor:pointer;border:2px solid transparent;overflow:hidden;isolation:isolate;transition:color .3s var(--ease),border-color .3s var(--ease),transform .2s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn .arr{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;transition:transform .35s var(--ease),background .3s}
+.btn:hover .arr{transform:translateX(4px) rotate(-45deg)}
+.btn--accent{background:var(--yellow);color:var(--black)}
+.btn--accent .arr{background:var(--black);color:var(--yellow)}
+.btn--accent::after{content:"";position:absolute;inset:0;background:var(--white);transform:translateY(101%);transition:transform .4s var(--ease);z-index:-1;border-radius:inherit}
+.btn--accent:hover::after{transform:translateY(0)}
+.btn--ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.45);backdrop-filter:blur(6px)}
+.btn--ghost .arr{background:var(--white);color:var(--black)}
+.btn--ghost::after{content:"";position:absolute;inset:0;background:var(--white);transform:translateY(101%);transition:transform .4s var(--ease);z-index:-1;border-radius:inherit}
+.btn--ghost:hover{color:var(--black);border-color:var(--white)}
+.btn--ghost:hover .arr{background:var(--black);color:var(--white)}
+.btn--ghost:hover::after{transform:translateY(0)}
+.btn--dark{background:var(--black);color:var(--white)}
+.btn--dark .arr{background:var(--yellow);color:var(--black)}
+.btn--dark::after{content:"";position:absolute;inset:0;background:#333;transform:translateY(101%);transition:transform .4s var(--ease);z-index:-1;border-radius:inherit}
+.btn--dark:hover::after{transform:translateY(0)}
+.btn svg{width:16px;height:16px}
+
+/* ---------- Шапка ---------- */
+.header{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,backdrop-filter .3s,border-color .3s;border-bottom:1px solid transparent}
+.header.is-scrolled{background:rgba(10,10,10,.82);backdrop-filter:blur(14px);border-color:var(--line)}
+.header .wrap{display:flex;align-items:center;justify-content:space-between;height:76px;gap:16px}
+/* TODO: замінити на логотип компанії, коли буде */
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;text-decoration:none;letter-spacing:-.01em}
+.logo-mark{width:34px;height:34px;border-radius:8px;background:var(--yellow);color:var(--black);display:grid;place-items:center;font:700 12px var(--font-mono)}
+.nav{display:flex;gap:28px}
+.nav a{font-size:15px;text-decoration:none;color:#d4d4d4;position:relative;padding:6px 0}
+.nav a::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--yellow);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.nav a:hover{color:var(--white)}
+.nav a:hover::after{transform:scaleX(1)}
+.header .btn{--h:44px;padding:0 20px;font-size:14px}
+@media (max-width:860px){.nav{display:none}}
+@media (max-width:420px){.header .btn{display:none}}
+
+/* ---------- Головний екран ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;padding:120px 0 56px}
+.hero-bg{position:absolute;inset:0;z-index:-2}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:62% center;transform:scale(1.08);animation:heroZoom 14s var(--ease) forwards}
+@keyframes heroZoom{to{transform:scale(1)}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.6) 42%,rgba(0,0,0,.05) 75%),linear-gradient(0deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,0) 45%)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:48px;align-items:end}
+.hero h1{font-weight:900;font-size:clamp(52px,9vw,128px);line-height:.9;letter-spacing:-.045em;margin:20px 0 24px}
+.hero h1 span{color:var(--yellow)}
+.hero-lead{max-width:600px;font-size:clamp(16px,1.4vw,19px);color:#e5e5e5}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.price-card{background:rgba(10,10,10,.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:28px;max-width:380px;justify-self:end;width:100%}
+.price-card .lbl{font:500 12px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.price{display:flex;align-items:baseline;gap:10px;margin:10px 0 4px;flex-wrap:wrap}
+.price b{font-size:52px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.price span{font-size:20px;font-weight:600}
+.price-note{display:inline-flex;margin-top:14px;background:var(--yellow);color:var(--black);font:700 13px var(--font-mono);letter-spacing:.06em;padding:8px 12px;border-radius:6px;text-transform:uppercase}
+.price-card ul{list-style:none;margin-top:20px;border-top:1px dashed rgba(255,255,255,.18)}
+.price-card li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px dashed rgba(255,255,255,.18);font-size:14px;color:#d4d4d4}
+.price-card li b{font:500 14px var(--font-mono);color:var(--white);text-align:right}
+@media (max-width:960px){
+  .hero-grid{grid-template-columns:1fr}
+  .price-card{justify-self:start;max-width:none}
+  .hero::before{background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.7) 50%,rgba(0,0,0,.1) 100%)}
+  .hero-bg img{object-position:78% 20%}
+}
+@media (max-width:520px){.hero-actions .btn{width:100%}}
+
+/* ---------- Біжуча стрічка ---------- */
+.ticker{background:var(--yellow);color:var(--black);overflow:hidden;border-block:1px solid var(--black)}
+.ticker-track{display:flex;width:max-content;animation:ticker 32s linear infinite}
+.ticker-track span{font:700 14px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;padding:16px 28px;display:flex;align-items:center;gap:28px;white-space:nowrap}
+.ticker-track span::after{content:"";width:8px;height:8px;background:var(--black)}
+@keyframes ticker{to{transform:translateX(-50%)}}
+
+/* ---------- Оптовий блок ---------- */
+.opt{position:relative;padding:140px 0;overflow:hidden;isolation:isolate}
+.opt-bg{position:absolute;inset:-10% 0;z-index:-2}
+.opt-bg img{width:100%;height:100%;object-fit:cover}
+.opt::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(10,10,10,1) 0%,rgba(10,10,10,.78) 18%,rgba(10,10,10,.72) 80%,rgba(10,10,10,1) 100%)}
+.opt-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:56px;align-items:center}
+h2{font-weight:900;font-size:clamp(36px,5vw,68px);line-height:.98;letter-spacing:-.035em;margin:18px 0 24px}
+h2 em{font-style:normal;color:var(--yellow)}
+.opt p{color:#e0e0e0;max-width:600px;margin-bottom:16px}
+.opt p strong{color:var(--white)}
+.stat-big{background:var(--yellow);color:var(--black);border-radius:24px;padding:36px;position:relative;overflow:hidden}
+.stat-big .lbl{font:700 12px var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
+.stat-big .num{font-weight:900;font-size:clamp(64px,9vw,112px);line-height:.9;letter-spacing:-.05em;margin:18px 0 8px;font-variant-numeric:tabular-nums}
+.stat-big .unit{font-size:20px;font-weight:600}
+.stat-big::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border:2px solid rgba(0,0,0,.15);border-radius:50%}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.fact{background:rgba(20,20,20,.75);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:18px;transition:border-color .3s,transform .3s var(--ease)}
+.fact:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.fact svg{width:22px;height:22px;color:var(--yellow);margin-bottom:12px}
+.fact b{display:block;font-size:15px;line-height:1.3}
+.clients{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.clients span{font-size:13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 14px;color:#e5e5e5;background:rgba(0,0,0,.35)}
+@media (max-width:960px){.opt-grid{grid-template-columns:1fr}.opt{padding:96px 0}}
+@media (max-width:520px){.facts{grid-template-columns:1fr}}
+
+/* ---------- Характеристики ---------- */
+.specs{background:var(--paper);color:var(--black);padding:120px 0;border-radius:32px 32px 0 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+.section-head h2{margin-bottom:0}
+.section-head p{max-width:380px;color:var(--muted-dark)}
+.specs .eyebrow{color:var(--muted-dark)}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.spec-card{background:var(--white);border:1px solid #e4e4e0;border-radius:18px;overflow:hidden;transition:box-shadow .3s,transform .3s var(--ease)}
+.spec-card:hover{box-shadow:0 18px 40px -24px rgba(0,0,0,.35);transform:translateY(-2px)}
+.spec-card header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#fafaf8;border-bottom:1px solid #e4e4e0}
+.spec-card h3{font:700 12px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.spec-card h3::before{content:"";width:9px;height:9px;background:var(--yellow);outline:1px solid var(--black)}
+.spec-card header span{font:500 12px var(--font-mono);color:#8a8a8a}
+.spec-card dl{padding:4px 22px}
+.spec-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;padding:13px 0;border-bottom:1px dashed #dcdcd6;font-size:14.5px}
+.spec-row:last-child{border-bottom:0}
+.spec-row dt{color:#5c5c5c}
+.spec-row dd{font-weight:600}
+.spec-row dd small{font:400 12px var(--font-mono);color:#8a8a8a;margin-left:6px}
+.spec-card--wide{grid-column:span 2}
+.spec-card--wide dl{display:grid;grid-template-columns:1fr 1fr;column-gap:40px}
+.spec-card--wide .spec-row:nth-last-child(2){border-bottom:0}
+@media (max-width:900px){.spec-grid{grid-template-columns:1fr}.spec-card--wide{grid-column:auto}.spec-card--wide dl{grid-template-columns:1fr}.spec-card--wide .spec-row:nth-last-child(2){border-bottom:1px dashed #dcdcd6}}
+@media (max-width:460px){.spec-row{grid-template-columns:1fr;gap:2px}}
+
+/* ---------- FAQ ---------- */
+.faq{background:var(--paper);color:var(--black);padding:40px 0 120px}
+.faq-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:56px;align-items:start}
+.faq .eyebrow{color:var(--muted-dark)}
+.faq-aside{position:sticky;top:100px}
+.faq-aside p{color:var(--muted-dark);margin-bottom:24px;max-width:360px}
+.faq-list{border-top:1px solid var(--black)}
+.faq-item{border-bottom:1px solid #cfcfca}
+.faq-item summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:22px 0;font-weight:700;font-size:clamp(17px,1.6vw,20px);letter-spacing:-.01em}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary .n{font:500 13px var(--font-mono);color:#8a8a8a}
+.faq-item summary .pm{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--black);position:relative;flex:none;transition:background .3s,transform .4s var(--ease)}
+.faq-item summary .pm::before,.faq-item summary .pm::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%)}
+.faq-item summary .pm::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .4s var(--ease)}
+.faq-item summary:hover .pm{background:var(--yellow)}
+.faq-item[open] summary .pm{background:var(--black);color:var(--yellow);transform:rotate(180deg)}
+.faq-item[open] summary .pm::after{transform:translate(-50%,-50%) rotate(0)}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}
+.faq-item[open] .faq-body{grid-template-rows:1fr}
+.faq-body > div{overflow:hidden}
+.faq-body p{padding:0 54px 24px 49px;color:#3d3d3d;max-width:680px}
+.faq-body p + p{margin-top:-14px}
+.faq-body .row{display:flex;gap:10px;align-items:baseline}
+.faq-body .row b{font:700 13px var(--font-mono);background:var(--yellow);padding:3px 8px;border-radius:4px;white-space:nowrap}
+@media (max-width:900px){.faq-grid{grid-template-columns:1fr;gap:32px}.faq-aside{position:static}}
+@media (max-width:520px){.faq-body p{padding:0 0 22px}.faq-item summary{grid-template-columns:1fr auto}.faq-item summary .n{display:none}}
+
+/* ---------- Контакти ---------- */
+.contact{padding:120px 0;position:relative;overflow:hidden}
+.contact::before{content:"";position:absolute;width:700px;height:700px;right:-250px;top:-250px;border-radius:50%;background:radial-gradient(circle,rgba(255,212,0,.16),transparent 65%);pointer-events:none}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:start}
+.contact-lead{color:#cfcfcf;max-width:460px;margin-bottom:32px}
+.contact-actions{display:grid;gap:12px;max-width:460px}
+.contact-tile{display:flex;align-items:center;gap:18px;padding:20px 22px;border:1px solid var(--line);border-radius:18px;text-decoration:none;background:var(--ink);transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.contact-tile:hover{border-color:var(--yellow);transform:translateX(6px)}
+.contact-tile .ic{width:52px;height:52px;border-radius:14px;background:var(--yellow);color:var(--black);display:grid;place-items:center;flex:none}
+.contact-tile .ic svg{width:24px;height:24px}
+.contact-tile b{display:block;font-size:18px}
+.contact-tile small{color:var(--muted);font-size:14px}
+.contact-tile .go{margin-left:auto;color:var(--yellow);transition:transform .3s var(--ease)}
+.contact-tile:hover .go{transform:translateX(4px)}
+
+.form-card{background:var(--white);color:var(--black);border-radius:24px;padding:36px}
+.form-card h3{font-size:28px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.form-card > p{color:var(--muted-dark);margin-bottom:24px;font-size:15px}
+.field{margin-bottom:16px}
+.field label{display:block;font:500 12px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;color:#3d3d3d}
+.field input{width:100%;height:56px;border:1.5px solid #d6d6d0;border-radius:14px;padding:0 18px;font:500 17px var(--font-sans);background:#fafaf8;color:var(--black);transition:border-color .2s,box-shadow .2s,background .2s}
+.field input:hover{border-color:#a8a8a0}
+.field input:focus{outline:none;border-color:var(--black);background:var(--white);box-shadow:0 0 0 4px rgba(255,212,0,.55)}
+.field .err{display:none;color:#c81e1e;font-size:13px;margin-top:6px}
+.field.invalid input{border-color:#c81e1e}
+.field.invalid .err{display:block}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-note{font-size:12.5px;color:#7a7a7a;margin-top:14px}
+form .btn{width:100%;margin-top:6px}
+.form-ok{display:none;text-align:center;padding:24px 0}
+.form-ok .tick{width:64px;height:64px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;margin:0 auto 16px}
+.form-ok b{font-size:22px;display:block;margin-bottom:6px}
+.form-ok p{color:var(--muted-dark)}
+.is-sent form{display:none}
+.is-sent .form-ok{display:block}
+@media (max-width:960px){.contact-grid{grid-template-columns:1fr}}
+@media (max-width:460px){.row2{grid-template-columns:1fr;gap:0}.form-card{padding:26px 20px}}
+
+/* ---------- Підвал ---------- */
+.footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:14px}
+.footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footer small{font-size:12px;color:#6b6b6b;max-width:640px}
+
+/* ---------- Модальне вікно ---------- */
+dialog{border:0;padding:0;background:transparent;margin:auto;width:min(460px,calc(100% - 32px));color:inherit}
+dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}
+dialog[open]{animation:pop .35s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.dlg-close{position:absolute;right:16px;top:16px;width:44px;height:44px;border-radius:50%;border:0;background:#f0f0ec;cursor:pointer;display:grid;place-items:center;transition:background .2s}
+.dlg-close:hover{background:var(--yellow)}
+dialog .form-card{position:relative}
+.dlg-price{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--black);color:var(--white);border-radius:14px;padding:14px 18px;margin-bottom:20px;font-size:14px}
+.dlg-price b{color:var(--yellow);font:700 16px var(--font-mono)}
+
+/* ---------- Мобільна липка кнопка ---------- */
+.sticky-cta{display:none}
+@media (max-width:640px){
+  .sticky-cta{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:40;gap:8px;transform:translateY(140%);transition:transform .4s var(--ease)}
+  .sticky-cta.show{transform:none}
+  .sticky-cta .btn{flex:1;--h:52px;padding:0 14px;font-size:15px;box-shadow:0 10px 30px -10px rgba(0,0,0,.6)}
+  .sticky-cta .btn--dark{flex:0 0 52px;padding:0}
+  .footer{padding-bottom:88px}
+}
+
+/* ---------- Поява при скролі ---------- */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+.no-js .reveal{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+  .hero-bg img{transform:none}
+}
+</style>
+</head>
+<body class="no-js">
+<a class="skip" href="#main">Перейти до змісту</a>
+
+<!-- ============ Шапка ============ -->
+<header class="header" id="header">
+  <div class="wrap">
+    <!-- TODO: назва та логотип компанії (надішлють пізніше) -->
+    <a href="#top" class="logo" aria-label="На головну">
+      <span class="logo-mark">LOGO</span>
+      <span>Назва компанії</span>
+    </a>
+    <nav class="nav" aria-label="Основне меню">
+      <a href="#opt">Опт</a>
+      <a href="#specs">Характеристики</a>
+      <a href="#faq">Питання</a>
+      <a href="#contact">Контакти</a>
+    </nav>
+    <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ Головний екран ============ -->
+<section class="hero" id="top">
+  <div class="hero-bg"><img src="img/hero.webp" alt="Термінал Starlink Mini у полі на світанку" width="1672" height="941" fetchpriority="high"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow reveal">Оптові поставки по Україні</span>
+      <h1 class="reveal d1">Starlink<br><span>Mini</span></h1>
+      <p class="hero-lead reveal d2">Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
+      <div class="hero-actions reveal d3">
+        <button class="btn btn--accent" type="button" data-open-order>
+          Купити в 1 клік
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </button>
+        <!-- TODO: посилання на месенджер -->
+        <a class="btn btn--ghost" href="#" data-messenger target="_blank" rel="noopener">
+          Написати в месенджер
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </a>
+      </div>
+    </div>
+
+    <aside class="price-card reveal d2" aria-label="Ціна">
+      <div class="lbl">Оптова ціна</div>
+      <div class="price"><b>18&nbsp;000</b><span>грн / шт</span></div>
+      <div class="price-note">Опт від 50 шт</div>
+      <ul>
+        <li>Наявність<b>Київ · Черкаси</b></li>
+        <li>Партія до 100 шт<b>зі складу</b></li>
+        <li>Документи<b>з ПДВ</b></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Офіційно розмитнено</span><span>Опт від 50 шт</span><span>До 10 000 шт / місяць</span><span>Робота з ПДВ</span><span>Склади Київ · Черкаси</span>
+    <span>Офіційно розмитнено</span><span>Опт від 50 шт</span><span>До 10 000 шт / місяць</span><span>Робота з ПДВ</span><span>Склади Київ · Черкаси</span>
+  </div>
+</div>
+
+<!-- ============ Оптовий продаж ============ -->
+<section class="opt" id="opt">
+  <div class="opt-bg"><img src="img/warehouse.webp" alt="" loading="lazy" width="1672" height="941" data-parallax></div>
+  <div class="wrap opt-grid">
+    <div>
+      <span class="eyebrow reveal">Для бізнесу</span>
+      <h2 class="reveal d1">Оптовий продаж терміналів <em>Starlink</em> по Україні</h2>
+      <p class="reveal d2"><strong>Обладнання вже знаходиться в Україні, офіційно придбане та розмитнене.</strong></p>
+      <p class="reveal d2">Ми працюємо з підприємцями, інтернет-магазинами, торговими компаніями, корпоративними клієнтами та організаціями, яким потрібна не одна система, а регулярні поставки або партія терміналів.</p>
+      <div class="clients reveal d3">
+        <span>Підприємці</span><span>Інтернет-магазини</span><span>Торгові компанії</span><span>Корпоративні клієнти</span><span>Організації</span>
+      </div>
+    </div>
+    <div>
+      <div class="stat-big reveal">
+        <div class="lbl">Можемо завозити в Україну</div>
+        <div class="num" data-count="10000">10&nbsp;000</div>
+        <div class="unit">штук на місяць</div>
+      </div>
+      <div class="facts">
+        <div class="fact reveal d1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <b>Офіційно придбане та розмитнене</b>
+        </div>
+        <div class="fact reveal d2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <b>Склади в Києві та Черкасах</b>
+        </div>
+        <div class="fact reveal d3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+          <b>Повний пакет документів з ПДВ</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Характеристики ============ -->
+<section class="specs" id="specs">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow reveal">Технічні характеристики</span>
+        <h2 class="reveal d1">Starlink Mini</h2>
+      </div>
+    </div>
+
+    <div class="spec-grid">
+      <article class="spec-card reveal">
+        <header><h3>Радіо &amp; мережа</h3><span>01 / 05</span></header>
+        <dl>
+          <div class="spec-row"><dt>Швидкість завантаження</dt><dd>50–100 Mbps<small>пік до 220 Mbps</small></dd></div>
+          <div class="spec-row"><dt>Швидкість вивантаження</dt><dd>10–25 Mbps</dd></div>
+          <div class="spec-row"><dt>Затримка (latency)</dt><dd>25–50 мс<small>RTT до Києва</small></dd></div>
+          <div class="spec-row"><dt>Діапазон частот</dt><dd>Ku-band · 10.7–12.7 ГГц ↓ / 14.0–14.5 ГГц ↑</dd></div>
+          <div class="spec-row"><dt>Антена</dt><dd>Фазована решітка, електронне сканування</dd></div>
+          <div class="spec-row"><dt>Поле зору</dt><dd>110° огляд неба</dd></div>
+          <div class="spec-row"><dt>Орієнтація</dt><dd>Ручна, з програмною підказкою нахилу</dd></div>
+        </dl>
+      </article>
+
+      <article class="spec-card reveal d1">
+        <header><h3>Wi-Fi роутер</h3><span>02 / 05</span></header>
+        <dl>
+          <div class="spec-row"><dt>Стандарт</dt><dd>Wi-Fi 5 · 802.11a/b/g/n/ac · 2.4 + 5 ГГц</dd></div>
+          <div class="spec-row"><dt>Одночасні підключення</dt><dd>до 128 пристроїв</dd></div>
+          <div class="spec-row"><dt>Покриття</dt><dd>~112 м² в приміщенні</dd></div>
+          <div class="spec-row"><dt>Ethernet</dt><dd>1× LAN<small>вбудований, з фіксатором</small></dd></div>
+        </dl>
+      </article>
+
+      <article class="spec-card reveal">
+        <header><h3>Живлення</h3><span>03 / 05</span></header>
+        <dl>
+          <div class="spec-row"><dt>Вхідна напруга</dt><dd>12–48 В DC · 60 Вт</dd></div>
+          <div class="spec-row"><dt>USB-C PD</dt><dd>100 Вт<small>мін. 20 В / 5 А</small></dd></div>
+          <div class="spec-row"><dt>Споживання · середнє</dt><dd>25–40 Вт</dd></div>
+          <div class="spec-row"><dt>Споживання · пік</dt><dd>60–75 Вт<small>запуск / прогрів від снігу</small></dd></div>
+          <div class="spec-row"><dt>Кабель живлення</dt><dd>15 м · DC (в комплекті)</dd></div>
+        </dl>
+      </article>
+
+      <article class="spec-card reveal d1">
+        <header><h3>Фізичні параметри</h3><span>04 / 05</span></header>
+        <dl>
+          <div class="spec-row"><dt>Розміри</dt><dd>298,5 × 259 × 38,5 мм</dd></div>
+          <div class="spec-row"><dt>Вага терміналу</dt><dd>1,10 кг</dd></div>
+          <div class="spec-row"><dt>Вага з підставкою</dt><dd>1,16 кг</dd></div>
+          <div class="spec-row"><dt>Вага з кабелем 15 м</dt><dd>1,53 кг</dd></div>
+          <div class="spec-row"><dt>Вага набору в коробці</dt><dd>2,72 кг</dd></div>
+        </dl>
+      </article>
+
+      <article class="spec-card spec-card--wide reveal">
+        <header><h3>Умови експлуатації</h3><span>05 / 05</span></header>
+        <dl>
+          <div class="spec-row"><dt>Клас захисту</dt><dd>IP67<small>пил, занурення до 1 м</small></dd></div>
+          <div class="spec-row"><dt>Робоча температура</dt><dd>−30 °C … +50 °C</dd></div>
+          <div class="spec-row"><dt>Вітрове навантаження</dt><dd>96 км/год+ у роботі</dd></div>
+          <div class="spec-row"><dt>Танення снігу</dt><dd>до 25 мм/год</dd></div>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-aside">
+      <span class="eyebrow reveal">FAQ</span>
+      <h2 class="reveal d1">Часті питання</h2>
+      <p class="reveal d2">Не знайшли відповідь? Напишіть нам — відповімо на питання щодо партії, доставки та документів.</p>
+      <a class="btn btn--dark reveal d3" href="#" data-messenger target="_blank" rel="noopener">
+        Написати в месенджер
+        <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </a>
+    </div>
+
+    <div class="faq-list reveal d1">
+      <details class="faq-item" open>
+        <summary><span class="n">01</span>Скільки триває доставка?<span class="pm" aria-hidden="true"></span></summary>
+        <div class="faq-body"><div>
+          <p class="row"><b>до 100 шт</b> Партія зазвичай є в наявності на складі Київ або Черкаси.</p>
+          <p class="row"><b>500+ шт</b> 14 робочих днів.</p>
+        </div></div>
+      </details>
+      <details class="faq-item">
+        <summary><span class="n">02</span>Які документи ви надаєте?<span class="pm" aria-hidden="true"></span></summary>
+        <div class="faq-body"><div><p>Повний пакет документів: рахунок-фактура, договір та видаткова накладна. Ми працюємо офіційно з ПДВ.</p></div></div>
+      </details>
+      <details class="faq-item">
+        <summary><span class="n">03</span>Чи працює Starlink Mini без електромережі?<span class="pm" aria-hidden="true"></span></summary>
+        <div class="faq-body"><div><p>Так! Пристрій можна підключити до сумісної портативної зарядної станції або джерела живлення 12&nbsp;В за відповідних технічних параметрів.</p></div></div>
+      </details>
+      <details class="faq-item">
+        <summary><span class="n">04</span>Чи можна використовувати Starlink Mini в автомобілі?<span class="pm" aria-hidden="true"></span></summary>
+        <div class="faq-body"><div><p>Так, пристрій підходить для використання в автомобілях, кемперах та під час подорожей за умови правильного підключення живлення та встановлення з відкритим оглядом неба.</p></div></div>
+      </details>
+      <details class="faq-item">
+        <summary><span class="n">05</span>Чи потрібна SIM-картка для роботи Starlink?<span class="pm" aria-hidden="true"></span></summary>
+        <div class="faq-body"><div><p>Ні, Starlink використовує супутниковий зв'язок, тому звичайна SIM-картка не потрібна. Для доступу до інтернету необхідна активна підписка.</p></div></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Контакти ============ -->
+<section class="contact" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <span class="eyebrow reveal">Контакти</span>
+      <h2 class="reveal d1">Зв’яжіться <em>з нами</em></h2>
+      <p class="contact-lead reveal d2">Залиште заявку або напишіть у месенджер — підготуємо пропозицію на вашу партію Starlink Mini.</p>
+      <div class="contact-actions">
+        <!-- TODO: номер телефону (надішлють пізніше) -->
+        <a class="contact-tile reveal d2" href="#" data-phone>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+          <span><b>Зв’язатися</b><small>Зателефонувати менеджеру</small></span>
+          <svg class="go" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+        <!-- TODO: посилання на месенджер -->
+        <a class="contact-tile reveal d3" href="#" data-messenger target="_blank" rel="noopener">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg></span>
+          <span><b>Месенджер</b><small>Напишіть нам — відповімо швидко</small></span>
+          <svg class="go" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="form-card reveal d1" id="lead">
+      <form novalidate data-form="lead">
+        <h3>Форма заявки</h3>
+        <p>Залиште контакти — менеджер зв’яжеться з вами.</p>
+        <div class="row2">
+          <div class="field">
+            <label for="l-name">Ім’я</label>
+            <input id="l-name" name="name" type="text" autocomplete="given-name" required>
+            <div class="err">Вкажіть ім’я</div>
+          </div>
+          <div class="field">
+            <label for="l-surname">Прізвище</label>
+            <input id="l-surname" name="surname" type="text" autocomplete="family-name" required>
+            <div class="err">Вкажіть прізвище</div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="l-phone">Телефон</label>
+          <input id="l-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+380 __ ___ __ __" required>
+          <div class="err">Вкажіть номер у форматі +380 XX XXX XX XX</div>
+        </div>
+        <button class="btn btn--accent" type="submit">
+          Надіслати заявку
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+        </button>
+        <p class="form-note">Натискаючи кнопку, ви погоджуєтесь на обробку персональних даних.</p>
+      </form>
+      <div class="form-ok" role="status" aria-live="polite">
+        <div class="tick"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></div>
+        <b>Дякуємо! Заявку прийнято</b>
+        <p>Менеджер зв’яжеться з вами найближчим часом.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Назва компанії</span>
+    <small>Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</small>
+  </div>
+</footer>
+
+<!-- Липкі кнопки на мобільному -->
+<div class="sticky-cta" id="stickyCta">
+  <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
+  <a class="btn btn--dark" href="#" data-messenger target="_blank" rel="noopener" aria-label="Написати в месенджер">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>
+  </a>
+</div>
+
+<!-- ============ Купити в 1 клік ============ -->
+<dialog id="orderDialog" aria-labelledby="orderTitle">
+  <div class="form-card">
+    <button class="dlg-close" type="button" data-close aria-label="Закрити">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>
+    </button>
+    <form novalidate data-form="order">
+      <h3 id="orderTitle">Купити в 1 клік</h3>
+      <p>Залиште ім’я та телефон — менеджер зв’яжеться з вами для оформлення.</p>
+      <div class="dlg-price"><span>Starlink Mini · опт від 50 шт</span><b>18 000 грн/шт</b></div>
+      <div class="field">
+        <label for="o-name">Ім’я</label>
+        <input id="o-name" name="name" type="text" autocomplete="given-name" required>
+        <div class="err">Вкажіть ім’я</div>
+      </div>
+      <div class="field">
+        <label for="o-phone">Телефон</label>
+        <input id="o-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+380 __ ___ __ __" required>
+        <div class="err">Вкажіть номер у форматі +380 XX XXX XX XX</div>
+      </div>
+      <button class="btn btn--accent" type="submit">
+        Надіслати заявку
+        <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </button>
+    </form>
+    <div class="form-ok" role="status" aria-live="polite">
+      <div class="tick"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></div>
+      <b>Дякуємо! Заявку прийнято</b>
+      <p>Менеджер зв’яжеться з вами найближчим часом.</p>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ===== НАЛАШТУВАННЯ (заповнити, коли будуть дані) ===== */
+const CONFIG = {
+  messengerUrl: "",   // TODO: посилання на месенджер, напр. https://t.me/username
+  phone: "",          // TODO: номер телефону, напр. +380XXXXXXXXX
+  formEndpoint: ""    // TODO: адреса, куди надсилати заявки на пошту (напр. Formspree / власний сервер)
+};
+
+document.body.classList.remove("no-js");
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Посилання на месенджер і телефон
+document.querySelectorAll("[data-messenger]").forEach(a => {
+  if (CONFIG.messengerUrl) a.href = CONFIG.messengerUrl;
+  else a.addEventListener("click", e => e.preventDefault());
+});
+document.querySelectorAll("[data-phone]").forEach(a => {
+  if (CONFIG.phone) { a.href = "tel:" + CONFIG.phone; a.querySelector("small").textContent = CONFIG.phone; }
+  else a.addEventListener("click", e => { e.preventDefault(); document.getElementById("l-name").focus(); });
+});
+
+// Шапка при скролі + липкі кнопки на мобільному
+const header = document.getElementById("header"), sticky = document.getElementById("stickyCta");
+const onScroll = () => {
+  const y = scrollY;
+  header.classList.toggle("is-scrolled", y > 20);
+  sticky.classList.toggle("show", y > innerHeight * .7 && y < document.body.scrollHeight - innerHeight * 1.6);
+};
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+// Поява блоків
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { threshold: .12, rootMargin: "0px 0px -40px 0px" });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+// Лічильник 10 000
+const num = document.querySelector("[data-count]");
+if (num && !reduce) {
+  const target = +num.dataset.count, fmt = n => n.toLocaleString("uk-UA");
+  num.textContent = "0";
+  new IntersectionObserver((es, o) => {
+    if (!es[0].isIntersecting) return; o.disconnect();
+    const t0 = performance.now(), dur = 1600;
+    const tick = t => { const p = Math.min((t - t0) / dur, 1); num.textContent = fmt(Math.round(target * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }, { threshold: .5 }).observe(num);
+}
+
+// Паралакс фону складу
+const par = document.querySelector("[data-parallax]");
+if (par && !reduce) {
+  const sec = par.closest("section");
+  addEventListener("scroll", () => {
+    const r = sec.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) return;
+    par.style.transform = `translateY(${(r.top / innerHeight) * -40}px)`;
+  }, { passive: true });
+}
+
+// FAQ: відкритий лише один пункт
+const items = document.querySelectorAll(".faq-item");
+items.forEach(d => d.addEventListener("toggle", () => { if (d.open) items.forEach(o => o !== d && (o.open = false)); }));
+
+// Модальне вікно «Купити в 1 клік»
+const dlg = document.getElementById("orderDialog");
+document.querySelectorAll("[data-open-order]").forEach(b => b.addEventListener("click", () => {
+  dlg.querySelector(".form-card").classList.remove("is-sent");
+  dlg.querySelector("form").reset();
+  dlg.showModal();
+  setTimeout(() => dlg.querySelector("input").focus(), 50);
+}));
+dlg.querySelector("[data-close]").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+// Телефон: маска +380 XX XXX XX XX
+document.querySelectorAll('input[type="tel"]').forEach(inp => {
+  inp.addEventListener("focus", () => { if (!inp.value) inp.value = "+380 "; });
+  inp.addEventListener("input", () => {
+    let d = inp.value.replace(/\D/g, "");
+    if (!d.startsWith("380")) d = "380" + d.replace(/^3?8?0?/, "");
+    d = d.slice(0, 12);
+    const p = [d.slice(0,3), d.slice(3,5), d.slice(5,8), d.slice(8,10), d.slice(10,12)].filter(Boolean);
+    inp.value = "+" + p.join(" ");
+  });
+});
+
+// Відправка форм
+const validPhone = v => v.replace(/\D/g, "").length === 12;
+document.querySelectorAll("form[data-form]").forEach(form => {
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    let firstBad = null;
+    form.querySelectorAll(".field").forEach(f => {
+      const inp = f.querySelector("input");
+      const ok = inp.type === "tel" ? validPhone(inp.value) : inp.value.trim().length > 1;
+      f.classList.toggle("invalid", !ok);
+      inp.setAttribute("aria-invalid", !ok);
+      if (!ok && !firstBad) firstBad = inp;
+    });
+    if (firstBad) { firstBad.focus(); return; }
+
+    const btn = form.querySelector('[type="submit"]');
+    btn.disabled = true; btn.firstChild.textContent = "Надсилаємо… ";
+    const data = Object.fromEntries(new FormData(form));
+    data.type = form.dataset.form === "order" ? "Купити в 1 клік" : "Форма заявки";
+    try {
+      if (CONFIG.formEndpoint) {
+        const r = await fetch(CONFIG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) });
+        if (!r.ok) throw new Error(r.status);
+      } else {
+        console.warn("Відправку заявок ще не підключено (CONFIG.formEndpoint). Дані:", data);
+      }
+      form.closest(".form-card").classList.add("is-sent");
+    } catch (err) {
+      alert("Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у месенджер.");
+    } finally {
+      btn.disabled = false; btn.firstChild.textContent = "Надіслати заявку ";
+    }
+  });
+  form.querySelectorAll("input").forEach(i => i.addEventListener("input", () => i.closest(".field").classList.remove("invalid")));
+});
+</script>
+</body>
+</html>
