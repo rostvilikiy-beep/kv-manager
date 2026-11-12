@@ -8,12 +8,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Шрифти. Щоб замінити шрифт — змініть посилання тут і змінні --font-sans / --font-mono нижче -->
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800;900&family=Tektur:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="img/hero.webp">
 <style>
 :root{
   --font-sans:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --font-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --font-mono:"Tektur",ui-monospace,Menlo,monospace;
   --black:#0a0a0a;
   --ink:#141414;
   --line:#2a2a2a;
@@ -91,7 +91,7 @@ a{color:inherit}
 .price-card{background:rgba(10,10,10,.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:28px;max-width:380px;justify-self:end;width:100%}
 .price-card .lbl{font:500 12px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .price{display:flex;align-items:baseline;gap:10px;margin:10px 0 4px;flex-wrap:wrap}
-.price b{font-size:52px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.price b{font:700 52px/1 var(--font-mono);letter-spacing:-.01em}
 .price span{font-size:20px;font-weight:600}
 .price-note{display:inline-flex;margin-top:14px;background:var(--yellow);color:var(--black);font:700 13px var(--font-mono);letter-spacing:.06em;padding:8px 12px;border-radius:6px;text-transform:uppercase}
 .price-card ul{list-style:none;margin-top:20px;border-top:1px dashed rgba(255,255,255,.18)}
@@ -124,7 +124,7 @@ h2 em{font-style:normal;color:var(--yellow)}
 .opt p strong{color:var(--white)}
 .stat-big{background:var(--yellow);color:var(--black);border-radius:24px;padding:36px;position:relative;overflow:hidden}
 .stat-big .lbl{font:700 12px var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
-.stat-big .num{font-weight:900;font-size:clamp(64px,9vw,112px);line-height:.9;letter-spacing:-.05em;margin:18px 0 8px;font-variant-numeric:tabular-nums}
+.stat-big .num{font-family:var(--font-mono);font-weight:800;font-size:clamp(64px,9vw,112px);line-height:.9;letter-spacing:-.02em;margin:18px 0 8px;font-variant-numeric:tabular-nums}
 .stat-big .unit{font-size:20px;font-weight:600}
 .stat-big::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border:2px solid rgba(0,0,0,.15);border-radius:50%}
 .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
