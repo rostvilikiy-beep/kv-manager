@@ -110,6 +110,17 @@
     : Array.from(document.querySelectorAll('button, a, [role="button"]')).filter(visible).find((b) => MSG_RE.test(labelOf(b)))
       || Array.from(document.querySelectorAll('a[href*="/im?sel="], a[href*="/im/convo/"], a[href*="/write"]')).filter(visible)[0] || null;
   const vkInChat = () => net === "vk" && /^\/(im|write)/.test(location.pathname);
+  // ID сообщества ВК: из адреса (club123, public123) или из ссылки «Написать сообщение» на странице.
+  // С ним открываем переписку напрямую (vk.com/im?sel=-ID): там поле сообщения на самой странице, а не во всплывающем окне.
+  function vkGroupId() {
+    const m = location.pathname.match(/^\/(?:club|public|event)(\d+)\/?$/);
+    if (m) return m[1];
+    for (const a of Array.from(document.querySelectorAll('a[href*="sel=-"], a[href*="/convo/-"], a[href*="/write-"]')).filter((x) => MSG_RE.test(labelOf(x)))) {
+      const x = (a.getAttribute("href") || "").match(/(?:sel=|\/convo\/|\/write)-(\d+)/);
+      if (x) return x[1];
+    }
+    return ""; // по коду страницы не ищем: там бывают ID чужих сообществ, а писать нужно точно этому
+  }
   // Поле сообщения. Ищем по подписи («Message», «Wiadomość», «Сообщение»), а если подпись другая (в Facebook поле часто
   // подписано просто «Aa»), берём поле, которого на странице не было до нажатия «Message» (параметр before).
   function findComposer(before) {
@@ -144,7 +155,8 @@
       .map((e) => `${e.tagName.toLowerCase()}[${e.getAttribute("role") || "-"}|${(e.getAttribute("aria-label") || e.getAttribute("placeholder") || "-").slice(0, 28)}]`).slice(0, 5).join(", ");
     const dlg = dialogsText().map((t) => t.replace(/\s+/g, " ").slice(0, 70)).slice(0, 2).join(" || ");
     const heads = chatHeads().map((e) => (e.getAttribute("aria-label") || "-").slice(0, 22)).slice(0, 4).join(", ");
-    return `страница ${location.pathname.slice(0, 40)}; поля: ${fields || "нет"}; окна: ${dlg || "нет"}; кружки чатов: ${heads || "нет"}`;
+    const frames = net === "vk" ? `; кадры: ${Array.from(document.querySelectorAll("iframe")).filter(visible).map((f) => { try { return new URL(f.src).hostname + new URL(f.src).pathname.slice(0, 15); } catch (e) { return "?"; } }).slice(0, 3).join(", ") || "нет"}` : "";
+    return `страница ${location.pathname.slice(0, 40)}; поля: ${fields || "нет"}; окна: ${dlg || "нет"}; кружки чатов: ${heads || "нет"}${frames}`;
   }
   const textOf = (el) => String(el.value !== undefined ? el.value : el.innerText || "").trim();
   const normText = (t) => String(t || "").replace(/[\u200b\u200c\u200d\ufeff]/g, "").replace(/\s+/g, " ").trim();
@@ -311,6 +323,16 @@
 
       // ВК мог уже перейти в переписку (страница перезагрузилась после нажатия «Написать сообщение»)
       const inChat = vkInChat();
+      if (net === "vk" && !inChat) {
+        // открываем переписку с сообществом отдельной страницей; после перехода расширение продолжит с того же задания
+        const gid = await waitFor(vkGroupId, 6000);
+        let tried = ""; try { tried = sessionStorage.getItem("lpVkNav") || ""; } catch (e) {}
+        if (gid && tried !== id) {
+          try { sessionStorage.setItem("lpVkNav", id); } catch (e) {}
+          location.assign("https://vk.com/im?sel=-" + gid);
+          return;
+        }
+      }
       const mbtn = inChat ? null : await waitFor(findMessageBtn, 6000);
       if (!mbtn && !inChat) return report("cannot_message", followRes);
       await sleep(rnd(1500, 4000));
@@ -332,7 +354,7 @@
         // чат мог свернуться в кружок: раскрываем кружок с названием этой страницы
         if (net === "facebook" && (++ticks === 10 || ticks === 50)) viaHead = expandChatHead(pageName) || viaHead;
         return blockedDialog() ? "BLOCK" : pinDialog() ? "PIN" : cannotDialog() ? "CANNOT" : null;
-      }, net === "facebook" ? 22000 : 12000);
+      }, net === "facebook" || net === "vk" ? 22000 : 12000);
       if (found === "BLOCK" || (!found && blockedDialog())) return report("blocked", followRes);
       if (found === "PIN" || (!found && pinDialog())) return report("pin_required", followRes);
       if (found === "CANNOT" || (!found && cannotDialog())) return report("cannot_message", followRes);
