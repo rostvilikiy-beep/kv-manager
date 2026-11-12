@@ -773,7 +773,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       tasks[id] = { id, net, text, follow: !!t.follow && net !== "vk", salonId: String(t.salonId || ""), state: "running", startedAt: Date.now() };
       await saveDmTasks(tasks);
       try {
-        const w = await chrome.windows.create({ url: url + "#lp-dm=" + id, type: "popup", focused: false, width: 1000, height: 820 });
+        // ВК: у сообщества с адресом club123 / public123 сразу открываем переписку, без захода на страницу
+        const gm = net === "vk" && url.match(/^https:\/\/vk\.com\/(?:club|public|event)(\d+)\/?$/);
+        const openUrl = gm ? "https://vk.com/im?sel=-" + gm[1] : url;
+        const w = await chrome.windows.create({ url: openUrl + "#lp-dm=" + id, type: "popup", focused: false, width: 1000, height: 820 });
         const t2 = await getDmTasks();
         if (t2[id]) { t2[id].windowId = w.id; t2[id].tabId = w.tabs && w.tabs[0] && w.tabs[0].id; await saveDmTasks(t2); }
       } catch (e) {
@@ -820,7 +823,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           await saveDmTasks(ts);
           try { if (x.windowId) await chrome.windows.remove(x.windowId); } catch (e) {}
         }
-      }, 2500);
+      }, t.net === "vk" ? 800 : 2500);
       return sendResponse({});
     }
     // ВКонтакте: настоящие клик и нажатия клавиш во вкладке задания (через отладчик Chrome).
@@ -874,7 +877,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         t.detail = t.step ? "остановилось на шаге: " + t.step : "окно не начало работу (расширение не запустилось на странице)";
         await saveDmTasks(tasks);
       }
-      if (t.state === "done" && !t.closed && Date.now() - (t.finishedAt || 0) > 2500) {
+      if (t.state === "done" && !t.closed && Date.now() - (t.finishedAt || 0) > (t.net === "vk" ? 800 : 2500)) {
         t.closed = true;
         await saveDmTasks(tasks);
         try { if (t.windowId) await chrome.windows.remove(t.windowId); } catch (e) {}

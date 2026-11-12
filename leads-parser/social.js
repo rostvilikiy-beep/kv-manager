@@ -379,7 +379,7 @@
       if (blockedDialog()) return ["blocked", ""];
       if (failCount() > failBefore) return ["not_delivered", ""];
       if (!activeText() && normText(document.body.innerText).includes(snippet)) {
-        await sleep(FAST ? 300 : 3000);
+        await sleep(FAST ? 300 : 1200);
         return failCount() > failBefore ? ["not_delivered", ""] : ["sent", ""];
       }
       await sleep(400);
@@ -394,8 +394,13 @@
     const report = (result, detail) => { step(id, "готово: " + result + (detail ? " — " + String(detail).slice(0, 80) : "")); return send({ type: "dmResult", id, result, detail: detail || "" }); };
     try {
       step(id, "жду загрузку страницы");
-      await waitFor(() => document.querySelector("header, [role='main']"), 15000);
-      await sleep(rnd(1500, 3000));
+      if (net === "vk") { // ВК: ждём только то, что нужно дальше (переписка, кнопка «Написать сообщение»), без лишних пауз
+        await waitFor(() => vkInChat() || vkGroupId() || findMessageBtn() || loginWall(), 12000, 150);
+        await sleep(rnd(300, 700));
+      } else {
+        await waitFor(() => document.querySelector("header, [role='main']"), 15000);
+        await sleep(rnd(1500, 3000));
+      }
       if (loginWall()) return report("not_logged_in");
       if (blockedDialog()) return report("blocked");
 
@@ -408,7 +413,7 @@
       step(id, inChat ? "уже в переписке" : "ищу, как открыть переписку");
       if (net === "vk" && !inChat) {
         // открываем переписку с сообществом отдельной страницей; после перехода расширение продолжит с того же задания
-        const gid = await waitFor(vkGroupId, 6000);
+        const gid = vkGroupId();
         let tried = ""; try { tried = sessionStorage.getItem("lpVkNav") || ""; } catch (e) {}
         if (gid && tried !== id) {
           try { sessionStorage.setItem("lpVkNav", id); } catch (e) {}
@@ -417,9 +422,9 @@
           return;
         }
       }
-      const mbtn = inChat ? null : await waitFor(findMessageBtn, 6000);
+      const mbtn = inChat ? null : await waitFor(findMessageBtn, net === "vk" ? 3000 : 6000);
       if (!mbtn && !inChat) return report("cannot_message", followRes);
-      await sleep(rnd(1500, 4000));
+      await sleep(net === "vk" ? rnd(300, 800) : rnd(1500, 4000));
       const pageName = ((document.querySelector("h1") || {}).innerText || document.title || "").trim();
       if (net === "facebook") await closeOpenChats(); // чтобы новый чат открылся окном, а не свернулся в кружок
       // запоминаем поля, которые уже были на странице: поле чата потом узнаем по тому, что оно появилось после нажатия
@@ -427,7 +432,7 @@
       const findBox = () => findComposer(inChat ? null : before);
       if (mbtn) { step(id, "нажимаю «" + (labelOf(mbtn) || "Написать сообщение").slice(0, 30) + "»"); mbtn.click(); }
       step(id, "ищу поле сообщения");
-      await sleep(rnd(2000, 4000));
+      await sleep(net === "vk" ? rnd(500, 900) : rnd(2000, 4000));
       dismissDialogs();
       // ждём поле сообщения (в Facebook чат грузится медленно), попутно нажимая «Начать» и замечая окна с причиной
       let ticks = 0, viaHead = false;
