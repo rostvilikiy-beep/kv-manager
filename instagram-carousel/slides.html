@@ -1,0 +1,82 @@
+<!doctype html><meta charset=utf-8><style>@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-latin-500-normal.woff') format('woff');font-weight:500;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-cyrillic-500-normal.woff') format('woff');font-weight:500;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-latin-500-italic.woff') format('woff');font-weight:500;font-style:italic;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-cyrillic-500-italic.woff') format('woff');font-weight:500;font-style:italic;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-latin-600-normal.woff') format('woff');font-weight:600;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-cyrillic-600-normal.woff') format('woff');font-weight:600;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-latin-600-italic.woff') format('woff');font-weight:600;font-style:italic;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Corm';src:url('fonts/cormorant-garamond-cyrillic-600-italic.woff') format('woff');font-weight:600;font-style:italic;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Mont';src:url('fonts/montserrat-latin-300-normal.woff') format('woff');font-weight:300;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Mont';src:url('fonts/montserrat-cyrillic-300-normal.woff') format('woff');font-weight:300;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Mont';src:url('fonts/montserrat-latin-400-normal.woff') format('woff');font-weight:400;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Mont';src:url('fonts/montserrat-cyrillic-400-normal.woff') format('woff');font-weight:400;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Mont';src:url('fonts/montserrat-latin-500-normal.woff') format('woff');font-weight:500;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Mont';src:url('fonts/montserrat-cyrillic-500-normal.woff') format('woff');font-weight:500;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Mont';src:url('fonts/montserrat-latin-600-normal.woff') format('woff');font-weight:600;font-style:normal;unicode-range:U+0000-00FF,U+2000-206F;}@font-face{font-family:'Mont';src:url('fonts/montserrat-cyrillic-600-normal.woff') format('woff');font-weight:600;font-style:normal;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--cream:#FBF1EC;--blush:#F2C7CB;--rose:#E7A9B3;--plum:#2F1D26}
+body{background:#222;font-family:'Mont',sans-serif}
+.slide{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--plum);color:var(--cream)}
+.slide img{position:absolute;left:0;width:1080px;height:auto;filter:saturate(.92) contrast(.97) brightness(1.03)}
+.warm{position:absolute;inset:0;background:linear-gradient(160deg,rgba(242,199,203,.28),rgba(231,169,179,.10) 55%,rgba(120,70,85,.18));mix-blend-mode:soft-light}
+.shade{position:absolute;inset:0}
+.blur{position:absolute;left:0;right:0;bottom:0;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.frame{position:absolute;inset:34px;border:1.5px solid rgba(251,241,236,.38);border-radius:6px;pointer-events:none}
+.num{position:absolute;top:66px;right:78px;font:500 22px 'Mont';letter-spacing:.28em;color:rgba(251,241,236,.9)}
+.swipe{position:absolute;bottom:66px;right:78px;font:400 22px 'Mont';letter-spacing:.2em;color:rgba(251,241,236,.85)}
+.top{position:absolute;left:84px;right:84px;top:130px}
+.bot{position:absolute;left:84px;right:84px;bottom:112px}
+h1{font:600 104px/1.0 'Corm';letter-spacing:.03em;text-shadow:0 4px 40px rgba(47,29,38,.45)}
+h1 em,h2 em{font-style:italic;font-weight:500;color:var(--blush);letter-spacing:.01em}
+h2{font:600 62px/1.04 'Corm';letter-spacing:.025em;margin-bottom:26px}
+.lead{font:500 40px/1.25 'Corm';font-style:italic;color:var(--blush);margin-bottom:18px}
+.sub{font:300 29px/1.5 'Mont';color:rgba(251,241,236,.95);margin-bottom:22px}
+.cap{font:500 24px/1.2 'Mont';letter-spacing:.2em;text-transform:uppercase;color:var(--blush);margin:6px 0 14px}
+ul,ol{list-style:none}
+li{font:400 29px/1.35 'Mont';padding:7px 0 7px 46px;position:relative}
+ul li:before{content:'';position:absolute;left:0;top:50%;width:26px;height:1.5px;background:var(--rose)}
+ol li{padding-left:70px}
+ol b{position:absolute;left:0;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1.5px solid var(--rose);font:600 26px/43px 'Corm';text-align:center;color:var(--blush)}
+.lead2{font:500 38px/1.25 'Corm';font-style:italic;color:var(--blush);margin:4px 0 24px}
+.cta{display:inline-block;padding:20px 34px;border-radius:60px;background:rgba(251,241,236,.16);border:1.5px solid rgba(251,241,236,.65);font:500 26px/1.35 'Mont';backdrop-filter:blur(6px)}
+.glass{left:60px;right:60px;bottom:96px;padding:38px 44px 26px;border-radius:28px;background:linear-gradient(135deg,rgba(251,241,236,.30),rgba(242,199,203,.16));border:1.5px solid rgba(251,241,236,.45);backdrop-filter:blur(26px) brightness(.62);-webkit-backdrop-filter:blur(26px) brightness(.62);box-shadow:0 20px 60px rgba(47,29,38,.25)}.glass .sub{margin-bottom:12px}</style><section class="slide" id="s1">
+ <img src="IMG_7441.jpg" style="top:0px"><div class="warm"></div>
+ 
+ <div class="shade" style="background:linear-gradient(to bottom,rgba(60,36,48,.78),rgba(60,36,48,.35) 30%,rgba(60,36,48,0) 48%)"></div>
+ <div class="frame"></div><div class="num">01 / 05</div>
+ 
+   <div class="top"><h1>ОБУЧЕНИЕ<br><em>РЕКОНСТРУКЦИИ</em><br>ВОЛОС</h1></div>
+   <div class="bot glass"><p class="lead">От первых знаний до уверенной работы с клиентами.</p>
+   <p class="sub">Очный курс для тех, кто хочет освоить профессию с нуля или расширить перечень своих услуг.</p></div>
+ <div class="swipe">→</div>
+</section><section class="slide" id="s2">
+ <img src="IMG_9024.jpg" style="top:-120px"><div class="warm"></div>
+ <div class="blur" style="top:50%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 19%);mask-image:linear-gradient(to bottom,transparent,#000 19%)"></div>
+ <div class="shade" style="background:linear-gradient(to bottom,rgba(47,29,38,0) 44%,rgba(78,46,60,.78) 58%,rgba(70,40,54,.90) 100%)"></div>
+ <div class="frame"></div><div class="num">02 / 05</div>
+ 
+   <div class="bot"><h2>НЕ ПРОСТО ТЕОРИЯ, А <em>ПОЛНОЦЕННАЯ ПРАКТИКА</em></h2>
+   <p class="sub">Обучение построено так, чтобы ты понимала не только принцип работы составов, но и умела самостоятельно выполнять процедуры.</p>
+   <p class="cap">В программе:</p>
+   <ul><li>Разбор теоретической базы</li><li>Особенности работы с разными типами волос</li><li>Техники выполнения процедур</li><li>Практическая отработка на 4 моделях</li></ul></div>
+ <div class="swipe">→</div>
+</section><section class="slide" id="s3">
+ <img src="IMG_9027.jpg" style="top:-100px"><div class="warm"></div>
+ <div class="blur" style="top:48%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 19%);mask-image:linear-gradient(to bottom,transparent,#000 19%)"></div>
+ <div class="shade" style="background:linear-gradient(to bottom,rgba(47,29,38,0) 42%,rgba(78,46,60,.78) 56%,rgba(70,40,54,.90) 100%)"></div>
+ <div class="frame"></div><div class="num">03 / 05</div>
+ 
+   <div class="bot"><h2><em>4 НАПРАВЛЕНИЯ,</em> КОТОРЫЕ ТЫ ОСВОИШЬ</h2>
+   <p class="cap">В рамках обучения подробно разберём:</p>
+   <ol><li><b>1</b>Холодное восстановление волос</li><li><b>2</b>SPA-уход</li><li><b>3</b>Кератиновое выпрямление</li><li><b>4</b>Ботокс для волос</li></ol>
+   <p class="sub">Ты получишь знания о каждой процедуре и научишься работать с разными запросами клиентов.</p></div>
+ <div class="swipe">→</div>
+</section><section class="slide" id="s4">
+ <img src="IMG_9025.jpg" style="top:0px"><div class="warm"></div>
+ <div class="blur" style="top:52%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 16%);mask-image:linear-gradient(to bottom,transparent,#000 16%)"></div>
+ <div class="shade" style="background:linear-gradient(to bottom,rgba(47,29,38,0) 46%,rgba(78,46,60,.78) 58%,rgba(70,40,54,.90) 100%)"></div>
+ <div class="frame"></div><div class="num">04 / 05</div>
+ 
+   <div class="bot"><h2>РЕЗУЛЬТАТ, КОТОРЫЙ МОЖНО <em>ПОДТВЕРДИТЬ ПРАКТИКОЙ</em></h2>
+   <p class="sub">За время обучения ты пройдёшь все этапы работы: от подготовки волос до выполнения процедуры.</p>
+   <p class="cap">В завершение:</p>
+   <ul><li>Практический экзамен</li><li>Проверка освоенных техник</li><li>Сертификат о прохождении обучения</li></ul></div>
+ <div class="swipe">→</div>
+</section><section class="slide" id="s5">
+ <img src="IMG_3204.jpg" style="top:-60px"><div class="warm"></div>
+ <div class="blur" style="top:46%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 22%);mask-image:linear-gradient(to bottom,transparent,#000 22%)"></div>
+ <div class="shade" style="background:linear-gradient(to bottom,rgba(47,29,38,0) 40%,rgba(78,46,60,.78) 56%,rgba(70,40,54,.90) 100%)"></div>
+ <div class="frame"></div><div class="num">05 / 05</div>
+ 
+   <div class="bot"><h2>ИНВЕСТИРУЙ В <em>ПРОФЕССИОНАЛЬНЫЕ НАВЫКИ</em></h2>
+   <p class="sub">Освой сразу несколько востребованных процедур и получи базу для дальнейшей работы в сфере реконструкции волос.</p>
+   <p class="lead2">Количество мест на обучение ограничено.</p>
+   <div class="cta">Для программы, стоимости и записи — пиши в Direct.</div></div>
+ 
+</section>
