@@ -5,7 +5,7 @@ let state = { running: false, text: "", visited: 0, saved: 0, last: "", other: f
 
 const HINTS = {
   maps: "Введите в Google Maps поиск (например «салон красоты Вроцлав»), дождитесь списка и нажмите «Старт».",
-  dgis: "Откройте 2gis.ru, введите поиск (например «салон красоты» в нужном городе) и нажмите «Старт». Расширение пройдёт по всем организациям и страницам выдачи и сохранит телефон, ВК, Telegram, WhatsApp, почту, рейтинг и количество отзывов.",
+  dgis: "Откройте 2gis.ru, введите поиск (например «салон красоты» в нужном городе) и нажмите «Старт». Расширение пройдёт по всем организациям и страницам выдачи и сохранит телефон, ВК, Telegram, WhatsApp, почту, рейтинг и количество отзывов. Список и рассылка ВК — в программе, вкладка «2ГИС».",
   booksy: "Откройте на booksy.com список салонов и нажмите «Старт». Расширение зайдёт в каждый салон и соберёт телефон, Instagram, Facebook, сайт, показатели для оценки клиента и (по галочке) почту. Если появится капча, решите её сами, расширение продолжит.",
 };
 
@@ -31,7 +31,6 @@ async function setSource(s, remember = true) {
   $("optBox").style.display = s === "booksy" ? "none" : "flex";
   $("optText").textContent = s === "dgis" ? "Только бизнесы без сайта" : "Пропускать заведения, у которых есть сайт";
   $("skipSite").checked = s === "dgis" ? dgisSkip : mapsSkip;
-  $("panel").style.display = s === "dgis" ? "block" : "none";
   $("emailBox").style.display = s === "booksy" ? "flex" : "none";
   if (remember) await chrome.storage.local.set({ src: s });
   refresh();
@@ -82,7 +81,6 @@ async function refresh() {
 $("srcMaps").onclick = () => setSource("maps");
 $("srcBooksy").onclick = () => setSource("booksy");
 $("srcDgis").onclick = () => setSource("dgis");
-$("panel").onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL("panel.html") });
 // галочка «без сайта» у Google Maps и 2ГИС своя (в 2ГИС по умолчанию включена)
 let mapsSkip = false, dgisSkip = true;
 const saveOpts = () => chrome.storage.local.set({ opts: { skipWebsite: mapsSkip, dgisSkip, email: $("emailOpt").checked } });

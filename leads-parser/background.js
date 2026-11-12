@@ -484,6 +484,25 @@ async function profileData(url) {
 }
 
 // ---------- 2ГИС: база организаций ----------
+// Организации уходят в программу (вкладка «2ГИС»: выбор и рассылка ВК); если программа не запущена, копятся и уходят позже
+async function postDgis(firms) {
+  for (const base of BASES) {
+    try {
+      const r = await fetch(base + "/api/dgis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ firms }) });
+      if (r.ok) return await r.json();
+    } catch (e) {}
+  }
+  return null;
+}
+async function flushPendingDgis() {
+  const { pendingDgis = [] } = await chrome.storage.local.get("pendingDgis");
+  if (!pendingDgis.length) return { ok: true, added: 0 };
+  const r = await postDgis(pendingDgis);
+  if (!r) return { ok: false };
+  const { pendingDgis: now = [] } = await chrome.storage.local.get("pendingDgis");
+  await chrome.storage.local.set({ pendingDgis: now.slice(pendingDgis.length) }); // пока отправляли, могли прийти новые
+  return { ok: true, added: r.added };
+}
 const S = (v) => String(v || "").slice(0, 300);
 function saveDgisFirm(f) {
   return withLock(async () => {
@@ -498,7 +517,9 @@ function saveDgisFirm(f) {
     };
     const old = dgisFirms.find((x) => x.id === id);
     if (old) Object.assign(old, rec); else dgisFirms.push({ ...rec, addedAt: Date.now() });
-    await chrome.storage.local.set({ dgisFirms });
+    const { pendingDgis = [] } = await chrome.storage.local.get("pendingDgis");
+    pendingDgis.push(rec);
+    await chrome.storage.local.set({ dgisFirms, pendingDgis: pendingDgis.slice(-5000) });
     return { saved: !old, phone: rec.phone, rec };
   });
 }
@@ -518,6 +539,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (r) await chrome.storage.local.set({ pending: [] });
       const r2 = socials.length ? await postSocials(socials) : { added: 0 };
       if (r2) await chrome.storage.local.set({ pendingSocial: [] });
+      const { dgisFirms = [] } = await chrome.storage.local.get("dgisFirms");
+      if (dgisFirms.length && (await postDgis(dgisFirms))) await chrome.storage.local.set({ pendingDgis: [] });
       return sendResponse(r && r2 ? { ok: true, added: r.added, addedSocial: r2.added } : { ok: false });
     }
     // от окна расширения: импорт салонов из CSV (выгрузка «Скачать CSV») в открытую в программе папку
@@ -541,9 +564,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         await saveLead({ name: f.name, phone: r.phone, url: r.rec.url, note: "2ГИС", email: r.rec.email, website: r.rec.website, siteChecked: true,
           hasSocial: !!(r.rec.vk || r.rec.instagram || r.rec.telegram), rating: r.rec.rating, reviews: r.rec.reviews, metricsChecked: r.rec.rating !== null || r.rec.reviews !== null });
       }
+      withLock(flushPendingDgis);
       return sendResponse({ saved: r.saved });
     }
-    // от панели 2ГИС: пометка о рассылке ВК
+    // пометка о рассылке ВК (старая панель расширения; сейчас рассылка ведётся из программы)
     if (msg.type === "dgisMark") {
       return withLock(async () => {
         const { dgisFirms = [] } = await chrome.storage.local.get("dgisFirms");
