@@ -18,7 +18,7 @@
     else return;
   }
   window.__lpFollow = true;
-  const net = /instagram\.com$/.test(location.hostname) ? "instagram" : /(^|\.)vk\.(com|ru)$/.test(location.hostname) ? "vk" : "facebook";
+  const net = /instagram\.com$/.test(location.hostname) ? "instagram" : /(^|\.)vk\.(com|ru|me)$/.test(location.hostname) ? "vk" : "facebook";
   if (net === "vk" && !md) return; // во ВКонтакте только рассылка
   try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} // убираем метку из адреса
 
@@ -47,8 +47,9 @@
   }
   const loginWall = () =>
     /\/accounts\/login|\/login/.test(location.pathname) ||
-    (net === "vk" && !!document.querySelector('a[href*="/join"], a[href*="id.vk.com"]') && !document.querySelector('a[href^="/im"], a[href*="/im?"]')) ||
-    !!document.querySelector('input[name="username"], input[name="email"], input[type="password"]');
+    // ВК: только явная страница входа (ссылка «Управление аккаунтом» на id.vk.com есть и у вошедших — по ней не судим)
+    (net === "vk" ? /(^|\.)id\.vk\.(com|ru)$/.test(location.hostname) || !!document.querySelector('input[type="password"]')
+      : !!document.querySelector('input[name="username"], input[name="email"], input[type="password"]'));
   const BLOCK_RE = /(try again later|action blocked|we restrict certain activity|temporarily blocked|spróbuj ponownie później|tymczasowo zablokowan|ta czynność została zablokowana|повторите попытку позже|временно заблокирован)/i;
   const blockedDialog = () => Array.from(document.querySelectorAll('div[role="dialog"], div[role="alertdialog"]')).some((d) => BLOCK_RE.test(d.innerText || ""));
   function dismissDialogs() {
@@ -109,7 +110,7 @@
   const findMessageBtn = () => net !== "vk" ? buttons().find((b) => MSG_RE.test(labelOf(b)))
     : Array.from(document.querySelectorAll('button, a, [role="button"]')).filter(visible).find((b) => MSG_RE.test(labelOf(b)))
       || Array.from(document.querySelectorAll('a[href*="/im?sel="], a[href*="/im/convo/"], a[href*="/write"]')).filter(visible)[0] || null;
-  const vkInChat = () => net === "vk" && /^\/(im|write)/.test(location.pathname);
+  const vkInChat = () => net === "vk" && (/^\/(im|write)/.test(location.pathname) || /(^|\.)vk\.me$/.test(location.hostname));
   // ID сообщества ВК: из адреса (club123, public123) или из ссылки «Написать сообщение» на странице.
   // С ним открываем переписку напрямую (vk.com/im?sel=-ID): там поле сообщения на самой странице, а не во всплывающем окне.
   function vkGroupId() {
@@ -126,7 +127,8 @@
   function findComposer(before) {
     const BAD = /comment|komentar|коммент|search|szukaj|поиск|what'?s on your mind|co słychać|о чём вы думаете|о чем вы думаете|что у вас нового|что-нибудь|запись/i;
     const label = (el) => el.getAttribute("aria-label") || el.getAttribute("placeholder") || "";
-    const cands = Array.from(document.querySelectorAll('div[role="textbox"][contenteditable="true"], div[contenteditable="true"], textarea')).filter(visible);
+    // поле сообщения: contenteditable="true", "plaintext-only" (новый ВК) или пустой атрибут
+    const cands = Array.from(document.querySelectorAll('div[role="textbox"], div[contenteditable]:not([contenteditable="false"]), textarea')).filter(visible).filter((el) => el.tagName === "TEXTAREA" || el.isContentEditable);
     const ok = cands.filter((el) => !BAD.test(label(el)));
     const named = ok.find((el) => /message|wiadomo|сообщени/i.test(label(el)));
     if (named) return named;
@@ -135,7 +137,7 @@
       if (fresh) return fresh;
     }
     if (net === "instagram") return ok.find((el) => el.matches('div[role="textbox"]')) || null;
-    if (net === "vk") return ok.find((el) => el.matches('[role="textbox"], [contenteditable="true"]')) || null;
+    if (net === "vk") return ok.find((el) => el.isContentEditable || el.tagName === "TEXTAREA") || null;
     return null;
   }
   // Окна, которые мешают отправке: просьба ввести PIN Messenger, запрет писать этому аккаунту
@@ -151,7 +153,7 @@
   }
   // Краткая «справка» о том, что видно на странице: показывается в журнале, если поле не нашлось
   function snapshot() {
-    const fields = Array.from(document.querySelectorAll('[contenteditable="true"], textarea')).filter(visible)
+    const fields = Array.from(document.querySelectorAll('[contenteditable]:not([contenteditable="false"]), textarea')).filter(visible)
       .map((e) => `${e.tagName.toLowerCase()}[${e.getAttribute("role") || "-"}|${(e.getAttribute("aria-label") || e.getAttribute("placeholder") || "-").slice(0, 28)}]`).slice(0, 5).join(", ");
     const dlg = dialogsText().map((t) => t.replace(/\s+/g, " ").slice(0, 70)).slice(0, 2).join(" || ");
     const heads = chatHeads().map((e) => (e.getAttribute("aria-label") || "-").slice(0, 22)).slice(0, 4).join(", ");
@@ -339,7 +341,7 @@
       const pageName = ((document.querySelector("h1") || {}).innerText || document.title || "").trim();
       if (net === "facebook") await closeOpenChats(); // чтобы новый чат открылся окном, а не свернулся в кружок
       // запоминаем поля, которые уже были на странице: поле чата потом узнаем по тому, что оно появилось после нажатия
-      const before = new Set(document.querySelectorAll('[contenteditable="true"], textarea'));
+      const before = new Set(document.querySelectorAll('[contenteditable]:not([contenteditable="false"]), textarea'));
       const findBox = () => findComposer(inChat ? null : before);
       if (mbtn) mbtn.click();
       await sleep(rnd(2000, 4000));
