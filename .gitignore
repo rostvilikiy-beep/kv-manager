@@ -33,3 +33,6 @@ dist-ssr
 
 # D1 local database
 .mf/
+
+# Python cache
+__pycache__/
