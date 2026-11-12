@@ -9,8 +9,8 @@
   if (!mf && !md && !mi) {
     // Facebook иногда стирает метку из адреса раньше, чем запускается расширение: спрашиваем у фона, не открыта ли эта вкладка для задания
     let r = null;
-    for (let i = 0; i < 2 && !(r && (r.dm || r.inbox)); i++) {
-      if (i) await new Promise((x) => setTimeout(x, 1200));
+    for (let i = 0; i < 3 && !(r && (r.dm || r.inbox)); i++) {
+      if (i) await new Promise((x) => setTimeout(x, 1500));
       r = await new Promise((res) => { try { chrome.runtime.sendMessage({ type: "dmMine" }, (x) => res(chrome.runtime.lastError ? null : x)); } catch (e) { res(null); } });
     }
     if (r && r.dm) md = [null, r.dm];
@@ -309,11 +309,28 @@
     return false;
   }
 
-  async function runDm(id) {
-    const task = await send({ type: "dmGet", id });
-    if (!task || !task.ok) return;
-    const report = (result, detail) => send({ type: "dmResult", id, result, detail: detail || "" });
+  // Строка состояния в окне задания: видно, на каком шаге расширение сейчас (и где остановилось). Последний шаг уходит в программу.
+  let stepEl = null;
+  function step(id, text) {
     try {
+      if (!stepEl) {
+        stepEl = document.createElement("div");
+        stepEl.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2147483647;max-width:90vw;padding:8px 14px;border-radius:10px;font:13px system-ui,sans-serif;color:#fff;background:rgba(40,60,90,.95);box-shadow:0 4px 18px rgba(0,0,0,.4);pointer-events:none";
+        (document.body || document.documentElement).appendChild(stepEl);
+      }
+      if (!stepEl.isConnected) (document.body || document.documentElement).appendChild(stepEl);
+      stepEl.textContent = "Leads Parser: " + text;
+    } catch (e) {}
+    send({ type: "dmStep", id, step: text });
+  }
+
+  async function runDm(id) {
+    step(id, "задание получено, страница " + location.pathname.slice(0, 40));
+    const task = await send({ type: "dmGet", id });
+    if (!task || !task.ok) { step(id, "задание не найдено или уже завершено — ничего не делаю"); return; }
+    const report = (result, detail) => { step(id, "готово: " + result + (detail ? " — " + String(detail).slice(0, 80) : "")); return send({ type: "dmResult", id, result, detail: detail || "" }); };
+    try {
+      step(id, "жду загрузку страницы");
       await waitFor(() => document.querySelector("header, [role='main']"), 15000);
       await sleep(rnd(1500, 3000));
       if (loginWall()) return report("not_logged_in");
@@ -325,12 +342,14 @@
 
       // ВК мог уже перейти в переписку (страница перезагрузилась после нажатия «Написать сообщение»)
       const inChat = vkInChat();
+      step(id, inChat ? "уже в переписке" : "ищу, как открыть переписку");
       if (net === "vk" && !inChat) {
         // открываем переписку с сообществом отдельной страницей; после перехода расширение продолжит с того же задания
         const gid = await waitFor(vkGroupId, 6000);
         let tried = ""; try { tried = sessionStorage.getItem("lpVkNav") || ""; } catch (e) {}
         if (gid && tried !== id) {
           try { sessionStorage.setItem("lpVkNav", id); } catch (e) {}
+          step(id, "открываю переписку vk.com/im?sel=-" + gid);
           location.assign("https://vk.com/im?sel=-" + gid);
           return;
         }
@@ -343,7 +362,8 @@
       // запоминаем поля, которые уже были на странице: поле чата потом узнаем по тому, что оно появилось после нажатия
       const before = new Set(document.querySelectorAll('[contenteditable]:not([contenteditable="false"]), textarea'));
       const findBox = () => findComposer(inChat ? null : before);
-      if (mbtn) mbtn.click();
+      if (mbtn) { step(id, "нажимаю «" + (labelOf(mbtn) || "Написать сообщение").slice(0, 30) + "»"); mbtn.click(); }
+      step(id, "ищу поле сообщения");
       await sleep(rnd(2000, 4000));
       dismissDialogs();
       // ждём поле сообщения (в Facebook чат грузится медленно), попутно нажимая «Начать» и замечая окна с причиной
@@ -365,7 +385,9 @@
       if (viaHead && !composerBelongsTo(box, pageName)) return report("composer_missing", "в раскрытом чате не подтверждён получатель, сообщение НЕ отправлено; " + snapshot());
 
       // это сообщение уже есть в чате: второй раз не отправляем
+      step(id, "поле найдено, проверяю, не писали ли раньше");
       if (chatHasSent(box, task.text)) return report("already", followRes);
+      step(id, "вставляю текст");
 
       const fill = await fillComposer(findBox, task.text);
       if (!fill.ok) {
@@ -376,7 +398,9 @@
       const live = findBox() || fill.box;
       if (normText(textOf(live)) !== normText(task.text)) return report("send_failed", "перед отправкой текст в поле изменился, сообщение НЕ отправлено");
       const failBefore = failCount();
+      step(id, "текст вставлен, отправляю");
       await sendNow(live);
+      step(id, "проверяю, что сообщение ушло");
       const v = await verifySent(task.text, findBox, failBefore);
       toast(v === "sent" ? "сообщение отправлено" : "результат: " + v, v === "sent");
       return report(v, followRes);

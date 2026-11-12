@@ -823,12 +823,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }, 2500);
       return sendResponse({});
     }
+    if (msg.type === "dmStep") {
+      const tasks = await getDmTasks();
+      const t = tasks[msg.id];
+      if (t && t.state === "running") { t.step = String(msg.step || "").slice(0, 160); t.stepAt = Date.now(); await saveDmTasks(tasks); }
+      return sendResponse({});
+    }
     if (msg.type === "dmPoll") {
       const tasks = await getDmTasks();
       const t = tasks[msg.id];
       if (!t) return sendResponse({ state: "done", result: "error", detail: "задание не найдено" });
       if (t.state === "running" && Date.now() - t.startedAt > 180000) {
         t.state = "done"; t.result = "timeout"; t.finishedAt = Date.now();
+        t.detail = t.step ? "остановилось на шаге: " + t.step : "окно не начало работу (расширение не запустилось на странице)";
         await saveDmTasks(tasks);
       }
       if (t.state === "done" && !t.closed && Date.now() - (t.finishedAt || 0) > 2500) {
