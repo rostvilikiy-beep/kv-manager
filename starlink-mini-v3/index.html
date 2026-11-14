@@ -131,7 +131,8 @@ h2 em{font-style:normal;color:var(--yellow)}
 .is-slides body,.is-slides{overflow:hidden;height:100%}
 .is-slides .slide{position:fixed;inset:0;min-height:0;height:100%;visibility:hidden;pointer-events:none}
 .is-slides .slide.is-active{visibility:visible;pointer-events:auto}
-.is-slides .slide-inner{max-height:calc(100vh - var(--head) - 90px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.is-slides body{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none}
+.is-slides .slide-inner{max-height:calc(100vh - var(--head) - 90px);max-height:calc(100dvh - var(--head) - 90px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 .is-slides .slide-inner::-webkit-scrollbar{display:none}
 /* Режим «прокрутка» (мобільний) */
 html:not(.is-slides){scroll-behavior:smooth}
@@ -311,7 +312,7 @@ dialog[open]{animation:pop .35s var(--ease)}
   #s-link{align-items:flex-end;padding-top:calc(var(--head) + 20px)}
   .header.is-scrolled{background:rgba(7,7,7,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
   /* Головна: фото видно у верхній половині, текст компактно внизу */
-  .shade--hero{background:linear-gradient(0deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.9) 40%,rgba(0,0,0,.4) 50%,rgba(0,0,0,0) 58%),linear-gradient(180deg,rgba(0,0,0,.35),transparent 16%)}
+  .shade--hero{background:linear-gradient(0deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.9) 40%,rgba(0,0,0,.4) 50%,rgba(0,0,0,0) 58%)}
   .shade--sky{background:linear-gradient(0deg,rgba(0,0,0,.95) 0%,rgba(0,0,0,.8) 26%,rgba(0,0,0,0) 44%)}
   #s-home h1{font-size:clamp(40px,12vw,58px);margin:10px 0 12px}
   #s-home .tag{font-size:10.5px}
@@ -343,6 +344,18 @@ dialog[open]{animation:pop .35s var(--ease)}
   .sticky-cta .btn{flex:1;--h:52px;padding:0 14px;font-size:12.5px}
   .sticky-cta .btn--line{flex:0 0 56px;padding:0;background:rgba(7,7,7,.9)}
   .slide:last-child{padding-bottom:96px}
+  /* Слайди на телефоні */
+  .is-slides .slide--panel{align-items:flex-start;padding:calc(var(--head) + 8px) 0 0}
+  .is-slides .slide-inner{max-height:calc(100vh - var(--head) - 16px);max-height:calc(100dvh - var(--head) - 16px);padding-bottom:84px}
+  .is-slides #s-home .slide-inner,.is-slides #s-link .slide-inner{padding-bottom:0}
+  .is-slides .slide:last-child{padding-bottom:0}
+  .is-slides .slide > .wrap{padding-right:38px}
+  .dots{right:4px;gap:0}
+  .dots button{width:26px;height:24px}
+  .dots button::before{width:4px;height:4px}
+  .dots button.is-active::before{height:16px}
+  .dots button span{display:none}
+  .counter,.hint{display:none}
 }
 @media (max-width:520px){
   .actions .btn{width:100%}
@@ -459,7 +472,7 @@ dialog[open]{animation:pop .35s var(--ease)}
     <p class="lead" data-a>Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
     <div class="actions" data-a>
       <!-- TODO: посилання на месенджер -->
-      <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener"><span class="hide-m">Написати в&nbsp;</span>месенджер
+      <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener"><span><span class="hide-m">Написати в </span>месенджер</span>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
       <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
@@ -759,7 +772,7 @@ function camFor(state) {
     const k = Math.max(vw / CLOSE.w, vh * .5 / CLOSE.h);
     let tx = vw / 2 - 867 * k;
     tx = Math.min(-CLOSE.x * k, Math.max(vw - (CLOSE.x + CLOSE.w) * k, tx));
-    return { k, tx, ty: -CLOSE.y * k + Math.min(40, vh * .04) };
+    return { k, tx, ty: -CLOSE.y * k };   // фото притиснуте до верху екрана, без смуги
   }
   if (state === "close") { r = CLOSE; fx = m ? 888 : CLOSE.x + CLOSE.w * .56; fy = m ? 526 : CLOSE.y + CLOSE.h * .5; if (m) sy = .27; }
   else if (state === "wide") { r = { x: 0, y: 0, w: W0, h: H0 }; fx = m ? DISH.x - 30 : 836; fy = m ? 380 : 470; if (m) sy = .42; }
@@ -863,7 +876,7 @@ function setScene(state, instant) {
 
 /* ================= НАВІГАЦІЯ ================= */
 let idx = -1, locked = false;
-const mqSlides = matchMedia("(min-width: 901px) and (min-height: 600px)");
+const mqSlides = matchMedia("(min-height: 420px)");   // слайди і на ПК, і на телефоні (окрім телефона, поверненого горизонтально)
 const slideMode = () => root.classList.contains("is-slides");
 const navLinks = $$("#nav a"), pill = $("#navPill");
 const seen = new Set();
@@ -949,12 +962,19 @@ addEventListener("keydown", e => {
   if (e.key === "Home") go(0);
   if (e.key === "End") go(N - 1);
 });
-let ty0 = null;
-addEventListener("touchstart", e => { ty0 = e.touches[0].clientY; }, { passive: true });
+// Свайп: якщо текст слайда прокручується — спершу гортаємо його, а на наступний слайд переходимо
+// тільки коли текст уже був догорнутий до кінця на початку жесту
+let ty0 = null, tx0 = 0, edgeDown = true, edgeUp = true;
+addEventListener("touchstart", e => {
+  ty0 = e.touches[0].clientY; tx0 = e.touches[0].clientX;
+  edgeDown = !canScroll(e.target, 1); edgeUp = !canScroll(e.target, -1);
+}, { passive: true });
 addEventListener("touchend", e => {
   if (!slideMode() || ty0 === null || modalOpen()) return;
-  const dy = ty0 - e.changedTouches[0].clientY; ty0 = null;
-  if (Math.abs(dy) > 50 && !canScroll(e.target, dy)) go(idx + (dy > 0 ? 1 : -1));
+  const dy = ty0 - e.changedTouches[0].clientY, dx = tx0 - e.changedTouches[0].clientX; ty0 = null;
+  if (Math.abs(dy) < 50 || Math.abs(dx) > Math.abs(dy)) return;
+  if (dy > 0 && edgeDown) go(idx + 1);
+  if (dy < 0 && edgeUp) go(idx - 1);
 }, { passive: true });
 
 // Посилання меню, точки, логотип
