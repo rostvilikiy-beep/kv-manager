@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Starlink Mini оптом від 50 шт — 18 000 грн</title>
+<meta name="description" content="Оптові поставки терміналів Starlink Mini по всій Україні. Обладнання вже в Україні, офіційно закуплене та розмитнене. Ціна 18 000 грн за шт при замовленні від 50 шт.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Шрифт. Щоб замінити — змініть посилання тут і змінну --font нижче -->
+<link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/close.webp">
+<link rel="preload" as="image" href="img/wide.webp">
+<style>
+:root{
+  --font:"Tektur",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#070707;
+  --panel:#0f0f0f;
+  --panel-2:#151515;
+  --line:#262626;
+  --white:#fff;
+  --text:#e6e6e6;
+  --muted:#9a9a9a;
+  --yellow:#ffd400;
+  --yellow-dim:rgba(255,212,0,.35);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --wrap:1280px;
+  --cut:12px;
+  --head:76px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font-family:inherit}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 32px}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--yellow);color:#000;padding:10px 16px;z-index:200}
+.skip:focus{left:8px}
+
+/* ================= Сцена з фото (фон усіх слайдів) ================= */
+.scene{position:fixed;inset:0;overflow:hidden;z-index:0;background:#0b0b0b}
+.stage{position:absolute;left:0;top:0;width:1672px;height:941px;transform-origin:0 0;will-change:transform}
+.stage .wide{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.stage .close{position:absolute;left:572px;top:365px;width:484px;height:312px;max-width:none;will-change:opacity;-webkit-mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);mask-composite:intersect}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.shade{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0}
+.shade--hero{background:linear-gradient(90deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.7) 34%,rgba(0,0,0,0) 62%),linear-gradient(0deg,rgba(0,0,0,.6),transparent 35%);opacity:1}
+.shade--sky{background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 36%,rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.55),transparent 40%)}
+.shade--dim{background:rgba(7,7,7,.86)}
+.shade--dim::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,212,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,212,0,.06) 1px,transparent 1px);background-size:56px 56px}
+
+/* Супутник і сигнал (SVG у координатах фото) */
+#satLayer{opacity:0}
+.orbit{fill:none;stroke:rgba(255,255,255,.35);stroke-width:1.4;stroke-dasharray:4 7}
+.beam{stroke:url(#beamGrad);stroke-width:3;stroke-linecap:round}
+.beam-dash{stroke:var(--yellow);stroke-width:1.6;stroke-dasharray:6 10;opacity:.9}
+.wave{fill:none;stroke:var(--yellow);stroke-width:2}
+.pulse{fill:#fff}
+.sat-body{fill:#e9e9e9}
+.sat-panel{fill:#1d2a44;stroke:#9fb2d6;stroke-width:.8}
+.sat-line{stroke:#9fb2d6;stroke-width:.6}
+
+/* ================= Шапка ================= */
+.header{position:fixed;inset:0 0 auto;z-index:60;height:var(--head);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.header .wrap{display:flex;align-items:center;justify-content:space-between;height:100%;gap:16px;max-width:none;padding:0 32px}
+/* TODO: замінити на логотип компанії, коли буде */
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;text-decoration:none;color:var(--white);letter-spacing:.02em;flex:none}
+.logo-mark{width:36px;height:36px;background:var(--yellow);color:#000;display:grid;place-items:center;font-size:11px;font-weight:800;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.nav{display:flex;gap:4px;padding:5px;background:rgba(10,10,10,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:999px}
+.nav a{position:relative;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:#cfcfcf;padding:10px 16px;border-radius:999px;transition:color .3s;z-index:1;white-space:nowrap}
+.nav a:hover{color:var(--white)}
+.nav a.is-active{color:#000}
+.nav-pill{position:absolute;top:5px;left:0;height:calc(100% - 10px);background:var(--yellow);border-radius:999px;z-index:0;transition:transform .5s var(--ease),width .5s var(--ease);box-shadow:0 0 24px rgba(255,212,0,.45)}
+.nav{position:relative}
+.head-right{display:flex;align-items:center;gap:10px}
+.burger{display:none;width:48px;height:48px;border:1px solid rgba(255,255,255,.25);background:rgba(10,10,10,.55);backdrop-filter:blur(10px);color:var(--white);cursor:pointer;position:relative}
+.burger i{position:absolute;left:13px;right:13px;height:2px;background:currentColor;transition:transform .35s var(--ease),opacity .2s}
+.burger i:nth-child(1){top:17px}.burger i:nth-child(2){top:23px}.burger i:nth-child(3){top:29px}
+.menu-open .burger i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-open .burger i:nth-child(2){opacity:0}
+.menu-open .burger i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+@media (max-width:1180px){.nav a{padding:10px 11px;font-size:11px;letter-spacing:.08em}}
+@media (max-width:1020px){.nav{display:none}.burger{display:block}}
+@media (max-width:420px){.header .btn--accent{display:none}}
+
+/* Мобільне меню */
+.mmenu{position:fixed;inset:0;z-index:55;background:rgba(7,7,7,.97);display:flex;flex-direction:column;justify-content:center;padding:100px 28px 40px;opacity:0;visibility:hidden;transition:opacity .35s var(--ease),visibility .35s}
+.mmenu::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,212,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,212,0,.06) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.menu-open .mmenu{opacity:1;visibility:visible}
+.mmenu a.mlink{position:relative;display:flex;align-items:baseline;gap:16px;font-size:clamp(28px,8vw,44px);font-weight:900;text-transform:uppercase;text-decoration:none;color:var(--white);padding:8px 0;border-bottom:1px solid var(--line);transform:translateY(20px);opacity:0;transition:transform .5s var(--ease),opacity .5s,color .2s}
+.mmenu a.mlink small{font-size:12px;color:var(--yellow);letter-spacing:.1em;font-weight:600}
+.mmenu a.mlink.is-active{color:var(--yellow)}
+.menu-open .mmenu a.mlink{transform:none;opacity:1}
+.mmenu .mactions{position:relative;display:grid;gap:10px;margin-top:28px}
+
+/* ================= Кнопки ================= */
+.btn{--h:56px;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:var(--h);padding:0 26px;font:700 14px/1 var(--font);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:0;transition:background .3s var(--ease),color .3s var(--ease),border-color .3s,transform .2s var(--ease);overflow:hidden;isolation:isolate}
+.btn:active{transform:scale(.97)}
+.btn svg{width:18px;height:18px;transition:transform .35s var(--ease)}
+.btn:hover svg{transform:translateX(5px)}
+.btn--accent{background:var(--yellow);color:#000;clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,var(--cut) 100%,0 calc(100% - var(--cut)))}
+.btn--accent::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.7) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease);z-index:-1}
+.btn--accent:hover::before{transform:translateX(120%)}
+.btn--accent:hover{background:#ffe14d}
+.btn--line{background:rgba(7,7,7,.4);color:var(--white);border:1.5px solid rgba(255,255,255,.55);backdrop-filter:blur(6px)}
+.btn--line::after{content:"";position:absolute;inset:0;background:var(--white);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease);z-index:-1}
+.btn--line:hover{color:#000;border-color:var(--white)}
+.btn--line:hover::after{transform:scaleX(1)}
+.header .btn{--h:46px;--cut:10px;padding:0 18px;font-size:12px}
+
+/* ================= Слайди ================= */
+.slides{position:relative;z-index:2}
+.slide{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--head) + 24px) 0 64px}
+.slide > .wrap{position:relative}
+.tag{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--yellow)}
+.tag b{color:#000;background:var(--yellow);padding:3px 7px;letter-spacing:.06em}
+h1,h2{color:var(--white);text-transform:uppercase;font-weight:900;letter-spacing:-.01em}
+h1{font-size:clamp(52px,7.6vw,118px);line-height:.88;margin:18px 0 22px}
+h1 span{display:block;color:var(--yellow)}
+h2{font-size:clamp(32px,4.2vw,60px);line-height:.98;margin:14px 0 20px}
+h2 em{font-style:normal;color:var(--yellow)}
+.lead{max-width:480px;color:#e0e0e0;font-size:clamp(15px,1.15vw,17px)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+
+/* Режим «слайди» (десктоп) */
+.is-slides body,.is-slides{overflow:hidden;height:100%}
+.is-slides .slide{position:fixed;inset:0;min-height:0;height:100%;visibility:hidden;pointer-events:none}
+.is-slides .slide.is-active{visibility:visible;pointer-events:auto}
+.is-slides .slide-inner{max-height:calc(100vh - var(--head) - 90px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--yellow) transparent}
+/* Режим «прокрутка» (мобільний) */
+html:not(.is-slides){scroll-snap-type:y proximity}
+html:not(.is-slides) .slide{scroll-snap-align:start}
+html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
+
+/* Слайд 1 */
+.price-strip{display:flex;flex-wrap:wrap;align-items:stretch;margin-top:30px;border:1px solid rgba(255,255,255,.14);background:rgba(7,7,7,.55);backdrop-filter:blur(10px);max-width:540px}
+.price-strip > div{padding:14px 18px;border-left:1px solid rgba(255,255,255,.14)}
+.price-strip > div:first-child{border-left:0}
+.price-strip small{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.price-strip b{font-size:26px;font-weight:900;color:var(--white);line-height:1.15}
+.price-strip b i{font-style:normal;font-size:13px;color:var(--yellow);margin-left:6px}
+.price-strip .badge{display:flex;align-items:center;background:var(--yellow);color:#000;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+
+/* Слайд 2: зв'язок */
+#s-link{align-items:flex-start;padding-top:calc(var(--head) + 56px)}
+#s-link h2{max-width:600px}
+.link-card{margin-top:26px;max-width:440px;background:rgba(7,7,7,.62);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);position:relative}
+.link-card::before,.link-card::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--yellow)}
+.link-card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.link-card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.status{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--white)}
+.status i{width:10px;height:10px;border-radius:50%;background:#ff9f1a;box-shadow:0 0 0 0 rgba(255,159,26,.6);animation:blink 1s infinite;flex:none}
+.status.is-on i{background:#3ddc84;animation:ping 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,220,132,.6)}100%{box-shadow:0 0 0 12px rgba(61,220,132,0)}}
+.link-rows{display:grid;grid-template-columns:repeat(3,1fr)}
+.link-rows div{padding:14px 18px;border-left:1px solid rgba(255,255,255,.12)}
+.link-rows div:first-child{border-left:0}
+.link-rows small{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.link-rows b{font-size:17px;color:var(--white)}
+.link-note{font-size:13px;color:#cfcfcf;margin-top:14px;max-width:440px}
+
+/* Слайд 3: опт */
+.opt-bg{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0}
+.opt-bg img{width:100%;height:100%;object-fit:cover;filter:grayscale(.4)}
+.opt-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,7,7,.94) 0%,rgba(7,7,7,.82) 55%,rgba(7,7,7,.7) 100%)}
+.opt-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
+.opt-grid p{color:#d9d9d9;margin-bottom:12px;max-width:620px;font-size:15px}
+.opt-grid p strong{color:var(--yellow)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chips span{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.22);padding:7px 11px;color:#e5e5e5;background:rgba(0,0,0,.4)}
+.stat{background:var(--panel);border:1px solid var(--line);padding:30px;position:relative}
+.stat::before,.stat::after{content:"";position:absolute;width:22px;height:22px;border:2px solid var(--yellow)}
+.stat::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.stat::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.stat small{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.stat .num{font-size:clamp(60px,7.4vw,108px);font-weight:900;color:var(--yellow);line-height:.92;margin:14px 0 6px;font-variant-numeric:tabular-nums}
+.stat .unit{font-size:17px;color:var(--white);font-weight:600}
+.meter{margin-top:22px}
+.meter-head{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.meter-bar{height:10px;background:repeating-linear-gradient(90deg,#222 0 6px,transparent 6px 8px);position:relative;overflow:hidden}
+.meter-bar i{position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--yellow) 0 6px,transparent 6px 8px);transform-origin:left;transform:scaleX(0)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-top:0}
+.fact{background:var(--panel);padding:16px}
+.fact svg{width:20px;height:20px;color:var(--yellow);margin-bottom:8px}
+.fact b{display:block;font-size:12.5px;line-height:1.35;color:var(--white);font-weight:600}
+
+/* Слайд 4: характеристики */
+.specs-grid{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:48px;align-items:start}
+.tabs{display:grid;gap:8px;margin-top:26px}
+.tab{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:transparent;border:1px solid var(--line);color:#cfcfcf;padding:15px 18px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:border-color .3s,background .3s,color .3s}
+.tab span{font-size:11px;color:var(--muted);letter-spacing:.1em}
+.tab:hover{border-color:var(--yellow-dim);color:var(--white)}
+.tab[aria-selected="true"]{background:var(--yellow);border-color:var(--yellow);color:#000}
+.tab[aria-selected="true"] span{color:#000}
+.spec-panel{background:var(--panel);border:1px solid var(--line);position:relative;min-height:420px}
+.spec-panel header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.spec-panel h3{font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:10px}
+.spec-panel h3::before{content:"";width:9px;height:9px;background:var(--yellow)}
+.spec-panel header span{font-size:12px;color:var(--yellow);letter-spacing:.1em}
+.spec-panel dl{padding:8px 24px 14px}
+.spec-row{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:14px;padding:13px 0;border-bottom:1px dashed #2c2c2c;font-size:14.5px}
+.spec-row:last-child{border-bottom:0}
+.spec-row dt{color:var(--muted)}
+.spec-row dd{color:var(--white);font-weight:600}
+.spec-row dd small{font-size:11.5px;color:#7d7d7d;margin-left:6px;font-weight:400}
+.spec-panel [role=tabpanel][hidden]{display:none}
+
+/* Слайд 5: FAQ */
+.faq-grid{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:48px;align-items:start}
+.faq-grid > div:first-child p{color:var(--muted);margin-bottom:22px;max-width:360px}
+.faq-list{border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line);transition:background .3s}
+.faq-item[open]{background:linear-gradient(90deg,rgba(255,212,0,.07),transparent 70%)}
+.faq-item summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:19px 14px 19px 0;font-weight:700;font-size:clamp(15px,1.3vw,18px);color:var(--white)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary .n{font-size:12px;color:var(--yellow);letter-spacing:.1em;padding-left:14px}
+.faq-item summary .pm{width:32px;height:32px;border:1.5px solid #444;position:relative;flex:none;transition:border-color .3s,background .3s,transform .4s var(--ease)}
+.faq-item summary .pm::before,.faq-item summary .pm::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;background:var(--white);transform:translate(-50%,-50%)}
+.faq-item summary .pm::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .4s var(--ease)}
+.faq-item summary:hover .pm{border-color:var(--yellow)}
+.faq-item[open] summary .pm{background:var(--yellow);border-color:var(--yellow);transform:rotate(180deg)}
+.faq-item[open] summary .pm::before,.faq-item[open] summary .pm::after{background:#000}
+.faq-item[open] summary .pm::after{transform:translate(-50%,-50%) rotate(0)}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}
+.faq-item[open] .faq-body{grid-template-rows:1fr}
+.faq-body > div{overflow:hidden}
+.faq-body p{padding:0 50px 20px 48px;color:#cfcfcf;max-width:660px;font-size:15px}
+.faq-body p + p{margin-top:-10px}
+.faq-body .row{display:flex;gap:10px;align-items:baseline}
+.faq-body .row b{font-size:12px;background:var(--yellow);color:#000;padding:3px 8px;white-space:nowrap}
+
+/* Слайд 6: контакти */
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.contact-lead{color:var(--muted);max-width:440px;margin-bottom:26px}
+.contact-actions{display:grid;gap:10px;max-width:460px}
+.contact-tile{display:flex;align-items:center;gap:16px;padding:16px 18px;border:1px solid var(--line);background:var(--panel);text-decoration:none;transition:border-color .3s,transform .3s var(--ease)}
+.contact-tile:hover{border-color:var(--yellow);transform:translateX(6px)}
+.contact-tile .ic{width:48px;height:48px;background:var(--yellow);color:#000;display:grid;place-items:center;flex:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.contact-tile .ic svg{width:22px;height:22px}
+.contact-tile b{display:block;font-size:16px;color:var(--white);letter-spacing:.04em;text-transform:uppercase}
+.contact-tile small{color:var(--muted);font-size:13px}
+.contact-tile .go{margin-left:auto;color:var(--yellow)}
+.legal{margin-top:24px;font-size:11px;color:#6a6a6a;max-width:460px}
+
+.form-card{background:var(--panel);border:1px solid var(--line);padding:30px;position:relative}
+.form-card::before,.form-card::after{content:"";position:absolute;width:22px;height:22px;border:2px solid var(--yellow)}
+.form-card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.form-card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.form-card h3{font-size:22px;font-weight:900;color:var(--white);text-transform:uppercase;margin-bottom:4px}
+.form-card form > p{color:var(--muted);margin-bottom:18px;font-size:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-bottom:7px;color:#bdbdbd}
+.field input{width:100%;height:52px;border:1px solid #333;padding:0 16px;font:500 16px var(--font);background:#0a0a0a;color:var(--white);transition:border-color .2s,box-shadow .2s;border-radius:0}
+.field input::placeholder{color:#5c5c5c}
+.field input:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 3px rgba(255,212,0,.25)}
+.field .err{display:none;color:#ff6b6b;font-size:13px;margin-top:6px}
+.field.invalid input{border-color:#ff6b6b}
+.field.invalid .err{display:block}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-note{font-size:11.5px;color:#6f6f6f;margin-top:12px}
+form .btn{width:100%;margin-top:4px}
+.form-ok{display:none;text-align:center;padding:24px 0}
+.form-ok .tick{width:60px;height:60px;background:var(--yellow);display:grid;place-items:center;margin:0 auto 14px}
+.form-ok b{font-size:19px;display:block;margin-bottom:6px;color:var(--white);text-transform:uppercase}
+.form-ok p{color:var(--muted)}
+.is-sent form{display:none}
+.is-sent .form-ok{display:block}
+
+/* ================= Навігація слайдів ================= */
+.dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:6px}
+.dots button{width:28px;height:28px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center;position:relative}
+.dots button::before{content:"";width:6px;height:6px;background:rgba(255,255,255,.45);transition:height .4s var(--ease),background .3s}
+.dots button.is-active::before{height:22px;background:var(--yellow)}
+.dots button span{position:absolute;right:34px;white-space:nowrap;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--white);background:rgba(7,7,7,.8);padding:5px 9px;opacity:0;transform:translateX(6px);transition:opacity .25s,transform .25s;pointer-events:none}
+.dots button:hover span{opacity:1;transform:none}
+.counter{position:fixed;left:32px;bottom:22px;z-index:50;font-size:13px;letter-spacing:.14em;color:var(--muted);display:flex;align-items:center;gap:12px}
+.counter b{color:var(--yellow);font-size:20px;font-weight:800}
+.counter .bar{width:90px;height:2px;background:rgba(255,255,255,.18);position:relative}
+.counter .bar i{position:absolute;inset:0;background:var(--yellow);transform-origin:left;transform:scaleX(.16);transition:transform .6s var(--ease)}
+.hint{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#d0d0d0;transition:opacity .4s}
+.hint .mouse{width:20px;height:30px;border:1.5px solid rgba(255,255,255,.6);border-radius:10px;position:relative}
+.hint .mouse::after{content:"";position:absolute;left:50%;top:6px;width:2px;height:6px;background:var(--yellow);transform:translateX(-50%);animation:wheel 1.6s infinite}
+@keyframes wheel{0%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,9px)}}
+html:not(.is-slides) .dots,html:not(.is-slides) .counter,html:not(.is-slides) .hint{display:none}
+
+/* ================= Модальне вікно ================= */
+dialog{border:0;padding:0;background:transparent;margin:auto;width:min(460px,calc(100% - 32px));color:inherit}
+dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+dialog[open]{animation:pop .35s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(16px)}}
+.dlg-close{position:absolute;right:14px;top:14px;width:44px;height:44px;border:1px solid #333;background:transparent;color:var(--white);cursor:pointer;display:grid;place-items:center;z-index:2}
+.dlg-close:hover{border-color:var(--yellow);color:var(--yellow)}
+.dlg-price{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);background:#0a0a0a;padding:13px 16px;margin-bottom:18px;font-size:13px;color:#cfcfcf}
+.dlg-price b{color:var(--yellow);font-size:15px}
+
+/* ================= Мобільна версія ================= */
+.sticky-cta{display:none}
+@media (max-width:900px){
+  :root{--head:68px}
+  .wrap,.header .wrap{padding:0 20px}
+  .slide{align-items:flex-end;padding:calc(var(--head) + 20px) 0 40px}
+  .slide--panel{align-items:center}
+  #s-link{align-items:flex-end;padding-top:calc(var(--head) + 20px)}
+  .shade--hero{background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.72) 48%,rgba(0,0,0,.05) 78%)}
+  .shade--sky{background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.7) 38%,rgba(0,0,0,0) 62%)}
+  .opt-grid,.specs-grid,.faq-grid,.contact-grid{grid-template-columns:minmax(0,1fr);gap:28px}
+  .slide > .wrap,.slide-inner{min-width:0;max-width:100%}
+  .tabs{display:flex;overflow-x:auto;gap:8px;margin:20px -20px 0;padding:0 20px 6px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;width:auto;padding:12px 14px;font-size:11.5px}
+  .tab span{display:none}
+  .spec-panel{min-height:0}
+  .spec-panel dl{padding:4px 18px 10px}
+  .spec-panel header{padding:14px 18px}
+  .sticky-cta{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:45;gap:8px;transform:translateY(140%);transition:transform .4s var(--ease)}
+  .sticky-cta.show{transform:none}
+  .sticky-cta .btn{flex:1;--h:52px;padding:0 14px;font-size:12.5px}
+  .sticky-cta .btn--line{flex:0 0 56px;padding:0;background:rgba(7,7,7,.9)}
+  .slide:last-child{padding-bottom:96px}
+}
+@media (max-width:520px){
+  .actions .btn{width:100%}
+  .price-strip > div{padding:12px 14px}
+  .price-strip b{font-size:21px}
+  .link-rows b{font-size:14px}
+  .link-rows div{padding:12px}
+  .facts{grid-template-columns:1fr}
+  .stat{padding:22px}
+  .row2{grid-template-columns:1fr;gap:0}
+  .form-card{padding:24px 18px}
+  .spec-row{grid-template-columns:1fr;gap:2px}
+  .faq-body p{padding:0 14px 18px}
+  .faq-item summary{grid-template-columns:1fr auto;padding-left:14px}
+  .faq-item summary .n{display:none}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#s-contact">Перейти до заявки</a>
+
+<!-- ============ Сцена: фото + супутник ============ -->
+<div class="scene" aria-hidden="true">
+  <div class="stage" id="stage">
+    <img class="wide" src="img/wide.webp" alt="" width="1672" height="941">
+    <img class="close" id="closeImg" src="img/close.webp" alt="" width="1562" height="1007">
+    <svg viewBox="0 0 1672 941" id="satSvg">
+      <defs>
+        <linearGradient id="beamGrad" gradientUnits="userSpaceOnUse" x1="915" y1="522" x2="1030" y2="150">
+          <stop offset="0" stop-color="#ffd400" stop-opacity="1"/>
+          <stop offset="1" stop-color="#fff6c2" stop-opacity=".9"/>
+        </linearGradient>
+        <radialGradient id="glow"><stop offset="0" stop-color="#ffd400" stop-opacity=".9"/><stop offset="1" stop-color="#ffd400" stop-opacity="0"/></radialGradient>
+        <radialGradient id="satGlow"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <g id="satLayer">
+        <path class="orbit" id="orbit" d="M 470 120 Q 760 -60 1030 150"/>
+        <g id="waves">
+          <ellipse class="wave" cx="915" cy="522" rx="10" ry="4"/>
+          <ellipse class="wave" cx="915" cy="522" rx="10" ry="4"/>
+          <ellipse class="wave" cx="915" cy="522" rx="10" ry="4"/>
+        </g>
+        <circle cx="915" cy="522" r="26" fill="url(#glow)" id="dishGlow" opacity="0"/>
+        <line class="beam" id="beam" x1="915" y1="522" x2="915" y2="522"/>
+        <line class="beam-dash" id="beamDash" x1="915" y1="522" x2="1030" y2="150" opacity="0"/>
+        <circle class="pulse" id="p1" r="3.2" opacity="0"/>
+        <circle class="pulse" id="p2" r="3.2" opacity="0"/>
+        <g id="sat" transform="translate(470 120)">
+          <circle r="34" fill="url(#satGlow)" opacity=".55"/>
+          <g transform="rotate(-18)">
+            <rect class="sat-panel" x="-46" y="-7" width="30" height="14"/>
+            <line class="sat-line" x1="-36" y1="-7" x2="-36" y2="7"/><line class="sat-line" x1="-26" y1="-7" x2="-26" y2="7"/>
+            <rect class="sat-panel" x="16" y="-7" width="30" height="14"/>
+            <line class="sat-line" x1="26" y1="-7" x2="26" y2="7"/><line class="sat-line" x1="36" y1="-7" x2="36" y2="7"/>
+            <line x1="-16" y1="0" x2="16" y2="0" stroke="#cfcfcf" stroke-width="1.4"/>
+            <rect class="sat-body" x="-9" y="-6" width="18" height="12" rx="1.5"/>
+            <circle cx="0" cy="0" r="2.2" fill="#ffd400"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
+<div class="shade shade--hero" id="shHero"></div>
+<div class="shade shade--sky" id="shSky"></div>
+<div class="opt-bg" id="optBg"><img src="img/warehouse.webp" alt="" loading="lazy" width="1672" height="941"></div>
+<div class="shade shade--dim" id="shDim"></div>
+
+<!-- ============ Шапка ============ -->
+<header class="header" id="header">
+  <div class="wrap">
+    <!-- TODO: назва та логотип компанії (надішлють пізніше) -->
+    <a href="#s-home" class="logo" data-go="0" aria-label="На головну">
+      <span class="logo-mark">LOGO</span>
+      <span>Назва компанії</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Основне меню">
+      <span class="nav-pill" id="navPill" aria-hidden="true"></span>
+      <a href="#s-home" data-go="0">Головна</a>
+      <a href="#s-link" data-go="1">Зв’язок</a>
+      <a href="#s-opt" data-go="2">Опт</a>
+      <a href="#s-specs" data-go="3">Характеристики</a>
+      <a href="#s-faq" data-go="4">FAQ</a>
+      <a href="#s-contact" data-go="5">Контакти</a>
+    </nav>
+    <div class="head-right">
+      <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
+      <button class="burger" type="button" id="burger" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mmenu"><i></i><i></i><i></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="mmenu" id="mmenu" aria-hidden="true">
+  <a class="mlink" href="#s-home" data-go="0"><small>01</small>Головна</a>
+  <a class="mlink" href="#s-link" data-go="1"><small>02</small>Зв’язок</a>
+  <a class="mlink" href="#s-opt" data-go="2"><small>03</small>Опт</a>
+  <a class="mlink" href="#s-specs" data-go="3"><small>04</small>Характеристики</a>
+  <a class="mlink" href="#s-faq" data-go="4"><small>05</small>FAQ</a>
+  <a class="mlink" href="#s-contact" data-go="5"><small>06</small>Контакти</a>
+  <div class="mactions">
+    <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener">Написати в месенджер</a>
+    <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
+  </div>
+</div>
+
+<main class="slides" id="slides">
+
+<!-- 01 Головна -->
+<section class="slide" id="s-home" data-state="close" aria-label="Головна">
+  <div class="wrap"><div class="slide-inner">
+    <span class="tag" data-a><b>Опт</b> Поставки по Україні</span>
+    <h1 data-a>Starlink<span>Mini</span></h1>
+    <p class="lead" data-a>Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
+    <div class="actions" data-a>
+      <!-- TODO: посилання на месенджер -->
+      <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener">Написати в месенджер
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+      <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
+    </div>
+    <div class="price-strip" data-a>
+      <div><small>Ціна, опт</small><b>18 000<i>грн/шт</i></b></div>
+      <div class="badge">Опт від 50 шт</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 02 Зв'язок -->
+<section class="slide" id="s-link" data-state="wide" aria-label="Зв’язок">
+  <div class="wrap"><div class="slide-inner">
+    <span class="tag" data-a><b>02</b> Супутниковий зв’язок</span>
+    <h2 data-a>Інтернет <em>із супутника</em> будь-де</h2>
+    <div class="link-card" data-a>
+      <div class="status" id="status" role="status" aria-live="polite"><i></i><span id="statusTxt">Пошук супутника…</span></div>
+      <div class="link-rows">
+        <div><small>Затримка</small><b>25–50 мс</b></div>
+        <div><small>Швидкість</small><b>до 220 Mbps</b></div>
+        <div><small>Огляд неба</small><b>110°</b></div>
+      </div>
+    </div>
+    <p class="link-note" data-a>Достатньо встановити термінал з відкритим оглядом неба та підключити живлення 12&nbsp;В.</p>
+  </div></div>
+</section>
+
+<!-- 03 Опт -->
+<section class="slide slide--panel" id="s-opt" data-state="opt" aria-label="Опт">
+  <div class="wrap"><div class="slide-inner">
+    <div class="opt-grid">
+      <div>
+        <span class="tag" data-a><b>03</b> Для бізнесу</span>
+        <h2 data-a>Оптові поставки терміналів <em>Starlink</em> по всій Україні</h2>
+        <p data-a>Пропонуємо оптовий продаж терміналів Starlink з наявністю обладнання безпосередньо в Україні. Уся продукція офіційно закуплена та пройшла митне оформлення.</p>
+        <p data-a>Співпрацюємо з підприємцями, інтернет-магазинами, торговельними мережами, корпоративними замовниками та організаціями, які зацікавлені у закупівлі великих партій обладнання або регулярних оптових поставках.</p>
+        <p data-a>Маємо можливість забезпечувати імпорт в Україну обсягом до <strong>10&nbsp;000 терміналів щомісяця</strong>, що дозволяє підтримувати стабільні поставки для партнерів.</p>
+        <div class="chips" data-a><span>Підприємці</span><span>Інтернет-магазини</span><span>Торговельні мережі</span><span>Корпоративні замовники</span><span>Організації</span></div>
+      </div>
+      <div data-a>
+        <div class="stat">
+          <small>Імпорт в Україну</small>
+          <div class="num"><span data-count="10000">10 000</span></div>
+          <div class="unit">терміналів щомісяця</div>
+          <div class="meter"><div class="meter-head"><span>Потужність поставок</span><span>до 10 000 / міс</span></div><div class="meter-bar"><i data-bar="1"></i></div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><b>Офіційно закуплено та розмитнено</b></div>
+          <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><b>Склади в Києві та Черкасах</b></div>
+          <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><b>Повний пакет документів з ПДВ</b></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 04 Характеристики -->
+<section class="slide slide--panel" id="s-specs" data-state="dim" aria-label="Характеристики">
+  <div class="wrap"><div class="slide-inner">
+    <div class="specs-grid">
+      <div>
+        <span class="tag" data-a><b>04</b> Технічні характеристики</span>
+        <h2 data-a>Starlink <em>Mini</em></h2>
+        <div class="tabs" role="tablist" aria-label="Групи характеристик" data-a>
+          <button class="tab" role="tab" id="t1" aria-controls="p1x" aria-selected="true">Радіо &amp; мережа<span>01</span></button>
+          <button class="tab" role="tab" id="t2" aria-controls="p2x" aria-selected="false" tabindex="-1">Wi-Fi роутер<span>02</span></button>
+          <button class="tab" role="tab" id="t3" aria-controls="p3x" aria-selected="false" tabindex="-1">Живлення<span>03</span></button>
+          <button class="tab" role="tab" id="t4" aria-controls="p4x" aria-selected="false" tabindex="-1">Фізичні параметри<span>04</span></button>
+          <button class="tab" role="tab" id="t5" aria-controls="p5x" aria-selected="false" tabindex="-1">Умови експлуатації<span>05</span></button>
+        </div>
+      </div>
+      <div class="spec-panel" data-a>
+        <div role="tabpanel" id="p1x" aria-labelledby="t1">
+          <header><h3>Радіо &amp; мережа</h3><span>01 / 05</span></header>
+          <dl>
+            <div class="spec-row"><dt>Швидкість завантаження</dt><dd>50–100 Mbps<small>пік до 220 Mbps</small></dd></div>
+            <div class="spec-row"><dt>Швидкість вивантаження</dt><dd>10–25 Mbps</dd></div>
+            <div class="spec-row"><dt>Затримка (latency)</dt><dd>25–50 мс<small>RTT до Києва</small></dd></div>
+            <div class="spec-row"><dt>Діапазон частот</dt><dd>Ku-band · 10.7–12.7 ГГц ↓ / 14.0–14.5 ГГц ↑</dd></div>
+            <div class="spec-row"><dt>Антена</dt><dd>Фазована решітка, електронне сканування</dd></div>
+            <div class="spec-row"><dt>Поле зору</dt><dd>110° огляд неба</dd></div>
+            <div class="spec-row"><dt>Орієнтація</dt><dd>Ручна, з програмною підказкою нахилу</dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p2x" aria-labelledby="t2" hidden>
+          <header><h3>Wi-Fi роутер</h3><span>02 / 05</span></header>
+          <dl>
+            <div class="spec-row"><dt>Стандарт</dt><dd>Wi-Fi 5 · 802.11a/b/g/n/ac · 2.4 + 5 ГГц</dd></div>
+            <div class="spec-row"><dt>Одночасні підключення</dt><dd>до 128 пристроїв</dd></div>
+            <div class="spec-row"><dt>Покриття</dt><dd>~112 м² в приміщенні</dd></div>
+            <div class="spec-row"><dt>Ethernet</dt><dd>1× LAN<small>вбудований, з фіксатором</small></dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p3x" aria-labelledby="t3" hidden>
+          <header><h3>Живлення</h3><span>03 / 05</span></header>
+          <dl>
+            <div class="spec-row"><dt>Вхідна напруга</dt><dd>12–48 В DC · 60 Вт</dd></div>
+            <div class="spec-row"><dt>USB-C PD</dt><dd>100 Вт<small>мін. 20 В / 5 А</small></dd></div>
+            <div class="spec-row"><dt>Споживання · середнє</dt><dd>25–40 Вт</dd></div>
+            <div class="spec-row"><dt>Споживання · пік</dt><dd>60–75 Вт<small>запуск / прогрів від снігу</small></dd></div>
+            <div class="spec-row"><dt>Кабель живлення</dt><dd>15 м · DC (в комплекті)</dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p4x" aria-labelledby="t4" hidden>
+          <header><h3>Фізичні параметри</h3><span>04 / 05</span></header>
+          <dl>
+            <div class="spec-row"><dt>Розміри</dt><dd>298,5 × 259 × 38,5 мм</dd></div>
+            <div class="spec-row"><dt>Вага терміналу</dt><dd>1,10 кг</dd></div>
+            <div class="spec-row"><dt>Вага з підставкою</dt><dd>1,16 кг</dd></div>
+            <div class="spec-row"><dt>Вага з кабелем 15 м</dt><dd>1,53 кг</dd></div>
+            <div class="spec-row"><dt>Вага набору в коробці</dt><dd>2,72 кг</dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p5x" aria-labelledby="t5" hidden>
+          <header><h3>Умови експлуатації</h3><span>05 / 05</span></header>
+          <dl>
+            <div class="spec-row"><dt>Клас захисту</dt><dd>IP67<small>пил, занурення до 1 м</small></dd></div>
+            <div class="spec-row"><dt>Робоча температура</dt><dd>−30 °C … +50 °C</dd></div>
+            <div class="spec-row"><dt>Вітрове навантаження</dt><dd>96 км/год+ у роботі</dd></div>
+            <div class="spec-row"><dt>Танення снігу</dt><dd>до 25 мм/год</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 05 FAQ -->
+<section class="slide slide--panel" id="s-faq" data-state="dim" aria-label="Часті питання">
+  <div class="wrap"><div class="slide-inner">
+    <div class="faq-grid">
+      <div>
+        <span class="tag" data-a><b>05</b> FAQ</span>
+        <h2 data-a>Часті питання</h2>
+        <p data-a>Не знайшли відповідь? Напишіть нам — відповімо на питання щодо партії, доставки та документів.</p>
+        <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener" data-a>Написати в месенджер
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+      </div>
+      <div class="faq-list" data-a>
+        <details class="faq-item" open>
+          <summary><span class="n">01</span>Скільки триває доставка?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="faq-body"><div>
+            <p class="row"><b>до 100 шт</b> Партія зазвичай є в наявності на складі Київ або Черкаси.</p>
+            <p class="row"><b>500+ шт</b> 14 робочих днів.</p>
+          </div></div>
+        </details>
+        <details class="faq-item">
+          <summary><span class="n">02</span>Які документи ви надаєте?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="faq-body"><div><p>Повний пакет документів: рахунок-фактура, договір та видаткова накладна. Ми працюємо офіційно з ПДВ.</p></div></div>
+        </details>
+        <details class="faq-item">
+          <summary><span class="n">03</span>Чи працює Starlink Mini без електромережі?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="faq-body"><div><p>Так! Пристрій можна підключити до сумісної портативної зарядної станції або джерела живлення 12&nbsp;В за відповідних технічних параметрів.</p></div></div>
+        </details>
+        <details class="faq-item">
+          <summary><span class="n">04</span>Чи можна використовувати Starlink Mini в автомобілі?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="faq-body"><div><p>Так, пристрій підходить для використання в автомобілях, кемперах та під час подорожей за умови правильного підключення живлення та встановлення з відкритим оглядом неба.</p></div></div>
+        </details>
+        <details class="faq-item">
+          <summary><span class="n">05</span>Чи потрібна SIM-картка для роботи Starlink?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="faq-body"><div><p>Ні, Starlink використовує супутниковий зв'язок, тому звичайна SIM-картка не потрібна. Для доступу до інтернету необхідна активна підписка.</p></div></div>
+        </details>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 06 Контакти -->
+<section class="slide slide--panel" id="s-contact" data-state="dim" aria-label="Контакти">
+  <div class="wrap"><div class="slide-inner">
+    <div class="contact-grid">
+      <div>
+        <span class="tag" data-a><b>06</b> Контакти</span>
+        <h2 data-a>Зв’яжіться <em>з нами</em></h2>
+        <p class="contact-lead" data-a>Залиште заявку або напишіть у месенджер — підготуємо пропозицію на вашу партію Starlink Mini.</p>
+        <div class="contact-actions" data-a>
+          <!-- TODO: номер телефону (надішлють пізніше) -->
+          <a class="contact-tile" href="#" data-phone>
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+            <span><b>Зв’язатися</b><small>Зателефонувати менеджеру</small></span>
+            <svg class="go" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+          </a>
+          <!-- TODO: посилання на месенджер -->
+          <a class="contact-tile" href="#" data-messenger target="_blank" rel="noopener">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg></span>
+            <span><b>Месенджер</b><small>Напишіть нам — відповімо швидко</small></span>
+            <svg class="go" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+          </a>
+        </div>
+        <p class="legal" data-a>© <span id="year">2026</span> Назва компанії. Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</p>
+      </div>
+      <div class="form-card" data-a>
+        <form novalidate data-form="lead">
+          <h3>Форма заявки</h3>
+          <p>Залиште контакти — менеджер зв’яжеться з вами.</p>
+          <div class="row2">
+            <div class="field"><label for="l-name">Ім’я</label><input id="l-name" name="name" type="text" autocomplete="given-name" required><div class="err">Вкажіть ім’я</div></div>
+            <div class="field"><label for="l-surname">Прізвище</label><input id="l-surname" name="surname" type="text" autocomplete="family-name" required><div class="err">Вкажіть прізвище</div></div>
+          </div>
+          <div class="field"><label for="l-phone">Телефон</label><input id="l-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+380 __ ___ __ __" required><div class="err">Вкажіть номер у форматі +380 XX XXX XX XX</div></div>
+          <button class="btn btn--accent" type="submit"><span class="lbl">Надіслати заявку</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
+          <p class="form-note">Натискаючи кнопку, ви погоджуєтесь на обробку персональних даних.</p>
+        </form>
+        <div class="form-ok" role="status" aria-live="polite">
+          <div class="tick"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></div>
+          <b>Дякуємо! Заявку прийнято</b><p>Менеджер зв’яжеться з вами найближчим часом.</p>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+</main>
+
+<!-- Навігація слайдів (десктоп) -->
+<div class="dots" id="dots" aria-label="Слайди">
+  <button type="button" data-go="0" aria-label="Головна"><span>Головна</span></button>
+  <button type="button" data-go="1" aria-label="Зв’язок"><span>Зв’язок</span></button>
+  <button type="button" data-go="2" aria-label="Опт"><span>Опт</span></button>
+  <button type="button" data-go="3" aria-label="Характеристики"><span>Характеристики</span></button>
+  <button type="button" data-go="4" aria-label="FAQ"><span>FAQ</span></button>
+  <button type="button" data-go="5" aria-label="Контакти"><span>Контакти</span></button>
+</div>
+<div class="counter" aria-hidden="true"><b id="cNow">01</b>/ 06<span class="bar"><i id="cBar"></i></span></div>
+<div class="hint" id="hint" aria-hidden="true"><span class="mouse"></span>Гортайте</div>
+
+<!-- Липкі кнопки на мобільному -->
+<div class="sticky-cta" id="stickyCta">
+  <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener" aria-label="Написати в месенджер">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>
+  </a>
+  <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
+</div>
+
+<!-- Купити в 1 клік -->
+<dialog id="orderDialog" aria-labelledby="orderTitle">
+  <div class="form-card">
+    <button class="dlg-close" type="button" data-close aria-label="Закрити">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>
+    </button>
+    <form novalidate data-form="order">
+      <h3 id="orderTitle">Купити в 1 клік</h3>
+      <p>Залиште ім’я та телефон — менеджер зв’яжеться з вами для оформлення.</p>
+      <div class="dlg-price"><span>Starlink Mini · опт від 50 шт</span><b>18 000 грн/шт</b></div>
+      <div class="field"><label for="o-name">Ім’я</label><input id="o-name" name="name" type="text" autocomplete="given-name" required><div class="err">Вкажіть ім’я</div></div>
+      <div class="field"><label for="o-phone">Телефон</label><input id="o-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+380 __ ___ __ __" required><div class="err">Вкажіть номер у форматі +380 XX XXX XX XX</div></div>
+      <button class="btn btn--accent" type="submit"><span class="lbl">Надіслати заявку</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
+    </form>
+    <div class="form-ok" role="status" aria-live="polite">
+      <div class="tick"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg></div>
+      <b>Дякуємо! Заявку прийнято</b><p>Менеджер зв’яжеться з вами найближчим часом.</p>
+    </div>
+  </div>
+</dialog>
+
+<script src="js/gsap.min.js"></script>
+<script>
+/* ===== НАЛАШТУВАННЯ (заповнити, коли будуть дані) ===== */
+const CONFIG = {
+  messengerUrl: "",   // TODO: посилання на месенджер, напр. https://t.me/username
+  phone: "",          // TODO: номер телефону, напр. +380XXXXXXXXX
+  formEndpoint: ""    // TODO: адреса, куди надсилати заявки на пошту
+};
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const root = document.documentElement;
+const hasGsap = !!window.gsap;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const slides = $$(".slide");
+const N = slides.length;
+$("#year").textContent = new Date().getFullYear();
+
+/* ---------- Посилання ---------- */
+$$("[data-messenger]").forEach(a => {
+  if (CONFIG.messengerUrl) a.href = CONFIG.messengerUrl;
+  else a.addEventListener("click", e => e.preventDefault());
+});
+$$("[data-phone]").forEach(a => {
+  if (CONFIG.phone) { a.href = "tel:" + CONFIG.phone; a.querySelector("small").textContent = CONFIG.phone; }
+  else a.addEventListener("click", e => { e.preventDefault(); $("#l-name").focus(); });
+});
+
+/* ================= КАМЕРА: наближення / віддалення фото ================= */
+const stage = $("#stage"), closeImg = $("#closeImg");
+const W0 = 1672, H0 = 941;
+const CLOSE = { x: 572, y: 365, w: 484, h: 312 };   // де крупне фото лежить на загальному
+const DISH = { x: 915, y: 522 };                      // центр тарілки на загальному фото
+const cam = { k: 1, tx: 0, ty: 0 };
+const isMobile = () => innerWidth <= 900;
+
+function camFor(state) {
+  const vw = innerWidth, vh = innerHeight, m = isMobile();
+  let r, fx, fy, sx = .5, sy = .5;
+  if (state === "close") { r = CLOSE; fx = m ? 880 : CLOSE.x + CLOSE.w * .5; fy = m ? 505 : CLOSE.y + CLOSE.h * .5; if (m) sy = .36; }
+  else if (state === "wide") { r = { x: 0, y: 0, w: W0, h: H0 }; fx = m ? DISH.x - 30 : 836; fy = m ? 380 : 470; if (m) sy = .42; }
+  else { r = { x: 70, y: 40, w: W0 - 140, h: H0 - 80 }; fx = 836; fy = 470; }
+  const k = Math.max(vw / r.w, vh / r.h);
+  let tx = vw * sx - fx * k, ty = vh * sy - fy * k;
+  tx = Math.min(-r.x * k, Math.max(vw - (r.x + r.w) * k, tx));
+  ty = Math.min(-r.y * k, Math.max(vh - (r.y + r.h) * k, ty));
+  return { k, tx, ty };
+}
+const applyCam = () => stage.style.transform = `translate3d(${cam.tx}px,${cam.ty}px,0) scale(${cam.k})`;
+
+/* ================= СУПУТНИК: пошук і з'єднання ================= */
+const sat = $("#sat"), beam = $("#beam"), beamDash = $("#beamDash"), p1 = $("#p1"), p2 = $("#p2");
+const satLayer = $("#satLayer"), dishGlow = $("#dishGlow"), statusEl = $("#status"), statusTxt = $("#statusTxt");
+const ORB = { a: [470, 120], c: [760, -60], b: [1030, 150] };
+const qb = (t, i) => (1 - t) ** 2 * ORB.a[i] + 2 * (1 - t) * t * ORB.c[i] + t * t * ORB.b[i];
+const satS = { t: 0 }, beamS = { r: 0 };
+let satLoops = [], satTl = null;
+function setSat(t) {
+  const x = qb(t, 0), y = qb(t, 1);
+  sat.setAttribute("transform", `translate(${x} ${y})`);
+  beamDash.setAttribute("x2", x); beamDash.setAttribute("y2", y);
+  drawBeam();
+}
+function drawBeam() {               // промінь «росте» від тарілки до супутника
+  const x = qb(satS.t, 0), y = qb(satS.t, 1), r = beamS.r;
+  beam.setAttribute("x2", DISH.x + (x - DISH.x) * r); beam.setAttribute("y2", DISH.y + (y - DISH.y) * r);
+}
+function pulseAt(el, t) {           // імпульс по промені: від супутника до тарілки
+  const x = qb(satS.t, 0), y = qb(satS.t, 1);
+  el.setAttribute("cx", x + (DISH.x - x) * t); el.setAttribute("cy", y + (DISH.y - y) * t);
+}
+function setStatus(on) {
+  statusEl.classList.toggle("is-on", on);
+  statusTxt.textContent = on ? "З’єднання встановлено" : "Пошук супутника…";
+}
+function satReset() {
+  satTl && satTl.kill(); satLoops.forEach(t => t.kill()); satLoops = [];
+  if (hasGsap) gsap.killTweensOf([satLayer, satS, beamS, beamDash, dishGlow, p1, p2, ".wave"]);
+  satLayer.style.opacity = 0; satS.t = 0; beamS.r = 0; setSat(0);
+  beamDash.setAttribute("opacity", 0);
+  [p1, p2].forEach(p => p.setAttribute("opacity", 0)); dishGlow.setAttribute("opacity", 0);
+  setStatus(false);
+}
+function satPlay(delay) {
+  satReset();
+  if (!hasGsap || reduce) {          // без анімації — одразу кінцевий стан
+    satLayer.style.opacity = 1; beamS.r = 1; setSat(1);
+    beamDash.setAttribute("opacity", .9); dishGlow.setAttribute("opacity", 1); setStatus(true); return;
+  }
+  satTl = gsap.timeline({ delay });
+  satTl.to(satLayer, { opacity: 1, duration: .5 }, 0)
+    .to(satS, { t: 1, duration: 2, ease: "power2.inOut", onUpdate: () => setSat(satS.t) }, 0)
+    .fromTo(".wave", { attr: { rx: 10, ry: 4 }, opacity: .9 }, { attr: { rx: 70, ry: 26 }, opacity: 0, duration: 1.4, stagger: .45, ease: "power1.out" }, .2)
+    .to(beamS, { r: 1, duration: .6, ease: "power2.out", onUpdate: drawBeam }, 1.9)
+    .to(dishGlow, { attr: { opacity: 1 }, duration: .3 }, 2.2)
+    .add(() => {
+      setStatus(true);
+      beamDash.setAttribute("opacity", .9);
+      satLoops.push(gsap.to(beamDash, { attr: { "stroke-dashoffset": -64 }, duration: 1, ease: "none", repeat: -1 }));
+      [p1, p2].forEach((p, i) => {
+        const o = { t: 0 };
+        satLoops.push(gsap.fromTo(o, { t: 0 }, { t: 1, duration: 1.4, ease: "power1.in", repeat: -1, delay: i * .7,
+          onStart: () => p.setAttribute("opacity", 1), onUpdate: () => pulseAt(p, o.t) }));
+      });
+      satLoops.push(gsap.fromTo(".wave", { attr: { rx: 10, ry: 4 }, opacity: .8 }, { attr: { rx: 60, ry: 22 }, opacity: 0, duration: 1.8, stagger: .6, repeat: -1, ease: "power1.out" }));
+      satLoops.push(gsap.to(dishGlow, { attr: { r: 34 }, duration: .9, yoyo: true, repeat: -1, ease: "sine.inOut" }));
+    });
+}
+
+/* ================= СТАН СЦЕНИ ДЛЯ КОЖНОГО СЛАЙДА ================= */
+const shHero = $("#shHero"), shSky = $("#shSky"), shDim = $("#shDim"), optBg = $("#optBg");
+let curState = null;
+function setScene(state, instant) {
+  const prev = curState; curState = state;
+  const c = camFor(state === "opt" ? "dim" : state);
+  const dur = instant || reduce || !hasGsap ? 0 : (prev === "close" && state === "wide") || (prev === "wide" && state === "close") ? 2.2 : 1.2;
+  const op = { hero: state === "close" ? 1 : 0, sky: state === "wide" ? 1 : 0, dim: state === "dim" ? 1 : state === "opt" ? .35 : 0, opt: state === "opt" ? 1 : 0, close: state === "close" ? 1 : 0 };
+  if (!hasGsap || dur === 0) {
+    Object.assign(cam, c); applyCam();
+    shHero.style.opacity = op.hero; shSky.style.opacity = op.sky; shDim.style.opacity = op.dim; optBg.style.opacity = op.opt; closeImg.style.opacity = op.close;
+  } else {
+    gsap.to(cam, { ...c, duration: dur, ease: "power3.inOut", onUpdate: applyCam, overwrite: true });
+    // крупне фото плавно розчиняється на початку віддалення і з'являється в кінці наближення
+    gsap.to(closeImg, { opacity: op.close, duration: op.close ? dur * .4 : dur * .5, delay: op.close ? dur * .6 : dur * .05, ease: "power1.inOut", overwrite: true });
+    gsap.to(shHero, { opacity: op.hero, duration: dur * .6, overwrite: true });
+    gsap.to(shSky, { opacity: op.sky, duration: dur * .8, delay: op.sky ? dur * .3 : 0, overwrite: true });
+    gsap.to(shDim, { opacity: op.dim, duration: .8, overwrite: true });
+    gsap.to(optBg, { opacity: op.opt, duration: .8, overwrite: true });
+  }
+  if (state === "wide") { if (prev !== "wide") satPlay(dur ? dur * .7 : 0); } else satReset();
+}
+
+/* ================= НАВІГАЦІЯ ================= */
+let idx = -1, locked = false;
+const mqSlides = matchMedia("(min-width: 901px) and (min-height: 600px)");
+const slideMode = () => root.classList.contains("is-slides");
+const navLinks = $$("#nav a"), pill = $("#navPill");
+const seen = new Set();
+
+function movePill() {
+  const a = navLinks[idx]; if (!a || !a.offsetParent) return;
+  pill.style.width = a.offsetWidth + "px"; pill.style.transform = `translateX(${a.offsetLeft}px)`;
+}
+function countUp(slide) {
+  if (seen.has(slide)) return; seen.add(slide);
+  slide.querySelectorAll("[data-count]").forEach(el => {
+    const target = +el.dataset.count;
+    if (!hasGsap || reduce) return;
+    const o = { v: 0 }; el.textContent = "0";
+    gsap.to(o, { v: target, duration: 1.8, delay: .4, ease: "power2.out", onUpdate: () => el.textContent = Math.round(o.v).toLocaleString("uk-UA") });
+  });
+  slide.querySelectorAll("[data-bar]").forEach(el => {
+    if (!hasGsap || reduce) { el.style.transform = `scaleX(${el.dataset.bar})`; return; }
+    gsap.fromTo(el, { scaleX: 0 }, { scaleX: +el.dataset.bar, duration: 1.6, delay: .5, ease: "power3.out" });
+  });
+}
+function updateUI() {
+  navLinks.forEach((a, i) => a.classList.toggle("is-active", i === idx));
+  $$(".mlink").forEach((a, i) => a.classList.toggle("is-active", i === idx));
+  $$("#dots button").forEach((b, i) => { b.classList.toggle("is-active", i === idx); b.setAttribute("aria-current", i === idx ? "true" : "false"); });
+  $("#cNow").textContent = String(idx + 1).padStart(2, "0");
+  $("#cBar").style.transform = `scaleX(${(idx + 1) / N})`;
+  $("#hint").style.opacity = idx === 0 ? 1 : 0;
+  $("#stickyCta").classList.toggle("show", idx > 0 && idx < N - 1);
+  movePill();
+}
+function activate(i, opts = {}) {
+  i = Math.max(0, Math.min(N - 1, i));
+  if (i === idx && !opts.force) return;
+  const prev = idx; idx = i;
+  const next = slides[i];
+  if (slideMode()) {
+    slides.forEach((s, k) => { if (k !== i && k !== prev) s.classList.remove("is-active"); });
+    if (prev >= 0 && prev !== i) {
+      const old = slides[prev];
+      if (hasGsap && !reduce) gsap.to(old.querySelectorAll("[data-a]"), { opacity: 0, y: i > prev ? -24 : 24, duration: .35, stagger: .02, ease: "power2.in", onComplete: () => old.classList.remove("is-active") });
+      else old.classList.remove("is-active");
+    }
+    next.classList.add("is-active");
+    next.querySelector(".slide-inner").scrollTop = 0;
+    if (hasGsap && !reduce) {
+      const d = prev === 0 && i === 1 ? 1.1 : .35;
+      gsap.fromTo(next.querySelectorAll("[data-a]"), { opacity: 0, y: i >= prev ? 34 : -34 }, { opacity: 1, y: 0, duration: .8, stagger: .07, delay: opts.instant ? 0 : d, ease: "power3.out" });
+    }
+  }
+  setScene(next.dataset.state, opts.instant);
+  countUp(next);
+  updateUI();
+  if (!opts.noHash) history.replaceState(null, "", "#" + next.id);
+}
+function go(i) {
+  if (slideMode()) {
+    if (locked || i === idx || i < 0 || i >= N) return;
+    locked = true; setTimeout(() => locked = false, idx === 0 && i === 1 ? 1700 : 1000);
+    activate(i);
+  } else {
+    slides[Math.max(0, Math.min(N - 1, i))].scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+  }
+}
+
+// Колесо, клавіші, свайп (режим слайдів)
+function canScroll(el, dir) {
+  const box = el && el.closest(".slide-inner");
+  if (!box || box.scrollHeight <= box.clientHeight + 2) return false;
+  return dir > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 2 : box.scrollTop > 2;
+}
+const modalOpen = () => $("#orderDialog").open || document.body.classList.contains("menu-open");
+addEventListener("wheel", e => {
+  if (!slideMode() || modalOpen()) return;
+  if (Math.abs(e.deltaY) < 8 || canScroll(e.target, e.deltaY)) return;
+  e.preventDefault();
+  go(idx + (e.deltaY > 0 ? 1 : -1));
+}, { passive: false });
+addEventListener("keydown", e => {
+  if (!slideMode() || modalOpen() || /INPUT|TEXTAREA|SELECT|BUTTON|SUMMARY/.test(document.activeElement.tagName) && e.key === " ") return;
+  if (["ArrowDown", "PageDown", " "].includes(e.key)) { if (canScroll(document.activeElement, 1)) return; e.preventDefault(); go(idx + 1); }
+  if (["ArrowUp", "PageUp"].includes(e.key)) { if (canScroll(document.activeElement, -1)) return; e.preventDefault(); go(idx - 1); }
+  if (e.key === "Home") go(0);
+  if (e.key === "End") go(N - 1);
+});
+let ty0 = null;
+addEventListener("touchstart", e => { ty0 = e.touches[0].clientY; }, { passive: true });
+addEventListener("touchend", e => {
+  if (!slideMode() || ty0 === null || modalOpen()) return;
+  const dy = ty0 - e.changedTouches[0].clientY; ty0 = null;
+  if (Math.abs(dy) > 50 && !canScroll(e.target, dy)) go(idx + (dy > 0 ? 1 : -1));
+}, { passive: true });
+
+// Посилання меню, точки, логотип
+$$("[data-go]").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); closeMenu(); go(+a.dataset.go);
+}));
+
+// Мобільний режим: активний слайд визначаємо за прокруткою
+const io = new IntersectionObserver(es => {
+  if (slideMode()) return;
+  es.forEach(en => { if (en.isIntersecting) activate(slides.indexOf(en.target), { noHash: true }); });
+}, { threshold: .5 });
+slides.forEach(s => io.observe(s));
+
+function setMode() {
+  const on = mqSlides.matches;
+  root.classList.toggle("is-slides", on);
+  slides.forEach(s => {
+    s.classList.remove("is-active");
+    if (hasGsap) gsap.set(s.querySelectorAll("[data-a]"), { clearProps: "opacity,transform" });
+  });
+  const start = Math.max(0, slides.findIndex(s => "#" + s.id === location.hash));
+  idx = -1; curState = null;
+  if (on) { scrollTo(0, 0); activate(start, { instant: true, noHash: true }); }
+  else {
+    const cur = slides.findIndex(s => { const r = s.getBoundingClientRect(); return r.top <= innerHeight / 2 && r.bottom > innerHeight / 2; });
+    activate(cur >= 0 ? cur : 0, { instant: true, noHash: true });
+  }
+}
+mqSlides.addEventListener("change", setMode);
+addEventListener("resize", () => { if (curState) { Object.assign(cam, camFor(curState === "opt" ? "dim" : curState)); applyCam(); } movePill(); });
+setMode();
+if (!slideMode() && location.hash) { const t = $(location.hash); t && t.scrollIntoView(); }
+document.fonts && document.fonts.ready.then(movePill);
+
+/* ---------- Мобільне меню ---------- */
+const burger = $("#burger");
+function closeMenu() { document.body.classList.remove("menu-open"); burger.setAttribute("aria-expanded", "false"); $("#mmenu").setAttribute("aria-hidden", "true"); }
+burger.addEventListener("click", () => {
+  const open = !document.body.classList.contains("menu-open");
+  document.body.classList.toggle("menu-open", open);
+  burger.setAttribute("aria-expanded", open); $("#mmenu").setAttribute("aria-hidden", !open);
+  $$(".mlink").forEach((a, i) => a.style.transitionDelay = open ? (.05 + i * .05) + "s" : "0s");
+});
+addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
+
+/* ---------- Вкладки характеристик ---------- */
+const tabs = $$(".tab");
+function selectTab(t) {
+  tabs.forEach(x => { const on = x === t; x.setAttribute("aria-selected", on); x.tabIndex = on ? 0 : -1; $("#" + x.getAttribute("aria-controls")).hidden = !on; });
+  const panel = $("#" + t.getAttribute("aria-controls"));
+  if (hasGsap && !reduce) gsap.fromTo(panel.querySelectorAll(".spec-row"), { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: .4, stagger: .04, ease: "power2.out" });
+}
+tabs.forEach((t, i) => {
+  t.addEventListener("click", () => selectTab(t));
+  t.addEventListener("keydown", e => {
+    const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+    if (!d) return; e.preventDefault(); e.stopPropagation();
+    const n = tabs[(i + d + tabs.length) % tabs.length]; n.focus(); selectTab(n);
+  });
+});
+
+/* ---------- FAQ: відкритий лише один пункт ---------- */
+const items = $$(".faq-item");
+items.forEach(d => d.addEventListener("toggle", () => { if (d.open) items.forEach(o => o !== d && (o.open = false)); }));
+
+/* ---------- Модальне вікно «Купити в 1 клік» ---------- */
+const dlg = $("#orderDialog");
+$$("[data-open-order]").forEach(b => b.addEventListener("click", () => {
+  closeMenu();
+  dlg.querySelector(".form-card").classList.remove("is-sent");
+  dlg.querySelector("form").reset();
+  dlg.showModal();
+  setTimeout(() => dlg.querySelector("input").focus(), 50);
+}));
+dlg.querySelector("[data-close]").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+/* ---------- Телефон: маска +380 XX XXX XX XX ---------- */
+$$('input[type="tel"]').forEach(inp => {
+  inp.addEventListener("focus", () => { if (!inp.value) inp.value = "+380 "; });
+  inp.addEventListener("input", () => {
+    let d = inp.value.replace(/\D/g, "");
+    if (!d.startsWith("380")) d = "380" + d.replace(/^3?8?0?/, "");
+    d = d.slice(0, 12);
+    inp.value = "+" + [d.slice(0, 3), d.slice(3, 5), d.slice(5, 8), d.slice(8, 10), d.slice(10, 12)].filter(Boolean).join(" ");
+  });
+});
+
+/* ---------- Відправка форм ---------- */
+const validPhone = v => v.replace(/\D/g, "").length === 12;
+$$("form[data-form]").forEach(form => {
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    let firstBad = null;
+    form.querySelectorAll(".field").forEach(f => {
+      const inp = f.querySelector("input");
+      const ok = inp.type === "tel" ? validPhone(inp.value) : inp.value.trim().length > 1;
+      f.classList.toggle("invalid", !ok); inp.setAttribute("aria-invalid", !ok);
+      if (!ok && !firstBad) firstBad = inp;
+    });
+    if (firstBad) { firstBad.focus(); return; }
+    const btn = form.querySelector('[type="submit"]'), lbl = btn.querySelector(".lbl");
+    btn.disabled = true; lbl.textContent = "Надсилаємо…";
+    const data = Object.fromEntries(new FormData(form));
+    data.type = form.dataset.form === "order" ? "Купити в 1 клік" : "Форма заявки";
+    try {
+      if (CONFIG.formEndpoint) {
+        const r = await fetch(CONFIG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) });
+        if (!r.ok) throw new Error(r.status);
+      } else console.warn("Відправку заявок ще не підключено (CONFIG.formEndpoint). Дані:", data);
+      form.closest(".form-card").classList.add("is-sent");
+    } catch (err) {
+      alert("Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у месенджер.");
+    } finally { btn.disabled = false; lbl.textContent = "Надіслати заявку"; }
+  });
+  form.querySelectorAll("input").forEach(i => i.addEventListener("input", () => i.closest(".field").classList.remove("invalid")));
+});
+</script>
+</body>
+</html>
