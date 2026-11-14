@@ -134,8 +134,7 @@ h2 em{font-style:normal;color:var(--yellow)}
 .is-slides .slide-inner{max-height:calc(100vh - var(--head) - 90px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 .is-slides .slide-inner::-webkit-scrollbar{display:none}
 /* Режим «прокрутка» (мобільний) */
-html:not(.is-slides){scroll-snap-type:y proximity}
-html:not(.is-slides) .slide{scroll-snap-align:start}
+html:not(.is-slides){scroll-behavior:smooth}
 html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
 
 /* Слайд 1 */
@@ -305,11 +304,31 @@ dialog[open]{animation:pop .35s var(--ease)}
 @media (max-width:900px){
   :root{--head:68px}
   .wrap,.header .wrap{padding:0 20px}
-  .slide{align-items:flex-end;padding:calc(var(--head) + 20px) 0 40px}
-  .slide--panel{align-items:center}
+  .slide{align-items:flex-end;padding:calc(var(--head) + 20px) 0 28px}
+  /* Розділи з текстом — звичайної висоти, без «прилипання»; головна і зв'язок — на весь екран */
+  .slide--panel{min-height:0;align-items:flex-start;padding:72px 0 64px}
+  #s-home,#s-link{min-height:100svh}
   #s-link{align-items:flex-end;padding-top:calc(var(--head) + 20px)}
-  .shade--hero{background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.72) 48%,rgba(0,0,0,.05) 78%)}
-  .shade--sky{background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.7) 38%,rgba(0,0,0,0) 62%)}
+  .header.is-scrolled{background:rgba(7,7,7,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
+  /* Головна: фото видно у верхній половині, текст компактно внизу */
+  .shade--hero{background:linear-gradient(0deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.9) 40%,rgba(0,0,0,.4) 50%,rgba(0,0,0,0) 58%),linear-gradient(180deg,rgba(0,0,0,.35),transparent 16%)}
+  .shade--sky{background:linear-gradient(0deg,rgba(0,0,0,.95) 0%,rgba(0,0,0,.8) 26%,rgba(0,0,0,0) 44%)}
+  #s-home h1{font-size:clamp(40px,12vw,58px);margin:10px 0 12px}
+  #s-home .tag{font-size:10.5px}
+  #s-home .lead{font-size:13.5px;line-height:1.5}
+  #s-home .actions{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;margin-top:16px}
+  #s-home .actions .btn{width:auto;--h:52px;padding:0 10px;font-size:12px;letter-spacing:.06em}
+  #s-home .actions .btn svg{display:none}
+  .hide-m{display:none}
+  #s-home .price-strip{margin-top:10px;max-width:none}
+  #s-home .price-strip > div{padding:9px 14px}
+  #s-home .price-strip b{font-size:19px}
+  #s-home .price-strip .badge{flex:1;justify-content:center;font-size:11px}
+  /* Зв'язок: коротше, щоб не закривати тарілку */
+  #s-link h2{font-size:clamp(28px,8.4vw,40px);margin:10px 0 0}
+  #s-link .link-card{margin-top:14px}
+  #s-link .link-note{display:none}
+  #s-link .status{padding:12px 14px;font-size:11.5px}
   .opt-grid,.specs-grid,.faq-grid,.contact-grid{grid-template-columns:minmax(0,1fr);gap:28px}
   .slide > .wrap,.slide-inner{min-width:0;max-width:100%}
   .tabs{display:flex;overflow-x:auto;gap:8px;margin:20px -20px 0;padding:0 20px 6px;scrollbar-width:none}
@@ -440,7 +459,7 @@ dialog[open]{animation:pop .35s var(--ease)}
     <p class="lead" data-a>Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
     <div class="actions" data-a>
       <!-- TODO: посилання на месенджер -->
-      <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener">Написати в месенджер
+      <a class="btn btn--line" href="#" data-messenger target="_blank" rel="noopener"><span class="hide-m">Написати в&nbsp;</span>месенджер
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
       <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
@@ -736,7 +755,13 @@ const isMobile = () => innerWidth <= 900;
 function camFor(state) {
   const vw = innerWidth, vh = innerHeight, m = isMobile();
   let r, fx, fy, sx = .5, sy = .5;
-  if (state === "close") { r = CLOSE; fx = m ? 888 : CLOSE.x + CLOSE.w * .56; fy = m ? 526 : CLOSE.y + CLOSE.h * .5; if (m) sy = .36; }
+  if (m && state === "close") {     // телефон: крупне фото у верхній половині екрана, на всю ширину
+    const k = Math.max(vw / CLOSE.w, vh * .5 / CLOSE.h);
+    let tx = vw / 2 - 867 * k;
+    tx = Math.min(-CLOSE.x * k, Math.max(vw - (CLOSE.x + CLOSE.w) * k, tx));
+    return { k, tx, ty: -CLOSE.y * k + Math.min(40, vh * .04) };
+  }
+  if (state === "close") { r = CLOSE; fx = m ? 888 : CLOSE.x + CLOSE.w * .56; fy = m ? 526 : CLOSE.y + CLOSE.h * .5; if (m) sy = .27; }
   else if (state === "wide") { r = { x: 0, y: 0, w: W0, h: H0 }; fx = m ? DISH.x - 30 : 836; fy = m ? 380 : 470; if (m) sy = .42; }
   else { r = { x: 70, y: 40, w: W0 - 140, h: H0 - 80 }; fx = 836; fy = 470; }
   const k = Math.max(vw / r.w, vh / r.h);
@@ -867,7 +892,7 @@ function updateUI() {
   $("#cNow").textContent = String(idx + 1).padStart(2, "0");
   $("#cBar").style.transform = `scaleX(${(idx + 1) / N})`;
   $("#hint").style.opacity = idx === 0 ? 1 : 0;
-  $("#stickyCta").classList.toggle("show", idx > 0 && idx < N - 1);
+  $("#stickyCta").classList.toggle("show", idx > 1 && idx < N - 1);   // з розділу «Опт», щоб не закривати супутник
   movePill();
 }
 function activate(i, opts = {}) {
@@ -941,8 +966,10 @@ $$("[data-go]").forEach(a => a.addEventListener("click", e => {
 const io = new IntersectionObserver(es => {
   if (slideMode()) return;
   es.forEach(en => { if (en.isIntersecting) activate(slides.indexOf(en.target), { noHash: true }); });
-}, { threshold: .5 });
+}, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });   // активний той розділ, що перетинає середину екрана
 slides.forEach(s => io.observe(s));
+const headerEl = $("#header");
+addEventListener("scroll", () => headerEl.classList.toggle("is-scrolled", !slideMode() && scrollY > 20), { passive: true });
 
 function setMode() {
   const on = mqSlides.matches;
