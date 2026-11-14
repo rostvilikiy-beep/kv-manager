@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Starlink Mini оптом від 50 шт — 18 000 грн</title>
+<title>VOMTEX — Starlink Mini оптом від 50 шт, 18 000 грн</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="theme-color" content="#070707">
+<meta property="og:title" content="VOMTEX — оптові поставки Starlink Mini по Україні">
+<meta property="og:description" content="Обладнання вже в Україні, офіційно закуплене та розмитнене. 18 000 грн/шт при замовленні від 50 шт.">
+<meta property="og:image" content="img/close.webp">
 <meta name="description" content="Оптові поставки терміналів Starlink Mini по всій Україні. Обладнання вже в Україні, офіційно закуплене та розмитнене. Ціна 18 000 грн за шт при замовленні від 50 шт.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,10 +73,10 @@ button{font-family:inherit}
 .header{position:fixed;inset:0 0 auto;z-index:60;height:var(--head);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
 .header .wrap{display:flex;align-items:center;justify-content:space-between;height:100%;gap:16px;max-width:none;padding:0 32px}
 /* TODO: замінити на логотип компанії, коли буде */
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;text-decoration:none;color:var(--white);letter-spacing:.02em;flex:none}
-/* TODO: логотип тимчасово приховано — щоб повернути, видаліть цей рядок */
-.logo{visibility:hidden}
-.logo-mark{width:36px;height:36px;background:var(--yellow);color:#000;display:grid;place-items:center;font-size:11px;font-weight:800;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;text-decoration:none;color:var(--white);letter-spacing:.08em;flex:none;transition:opacity .2s}
+.logo:hover{opacity:.85}
+.logo img{width:44px;height:auto;filter:drop-shadow(0 2px 10px rgba(0,0,0,.45))}
+.logo span{text-shadow:0 2px 12px rgba(0,0,0,.5)}
 .nav{display:flex;gap:4px;padding:5px;background:rgba(10,10,10,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:999px}
 .nav a{position:relative;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:#cfcfcf;padding:10px 16px;border-radius:999px;transition:color .3s;z-index:1;white-space:nowrap}
 .nav a:hover{color:var(--white)}
@@ -428,10 +434,9 @@ dialog[open]{animation:pop .35s var(--ease)}
 <!-- ============ Шапка ============ -->
 <header class="header" id="header">
   <div class="wrap">
-    <!-- TODO: назва та логотип компанії (надішлють пізніше) -->
-    <a href="#s-home" class="logo" data-go="0" aria-label="На головну">
-      <span class="logo-mark">LOGO</span>
-      <span>Назва компанії</span>
+    <a href="#s-home" class="logo" data-go="0" aria-label="VOMTEX — на головну">
+      <img src="img/logo.png" alt="" width="256" height="225">
+      <span>VOMTEX</span>
     </a>
     <nav class="nav" id="nav" aria-label="Основне меню">
       <span class="nav-pill" id="navPill" aria-hidden="true"></span>
@@ -663,7 +668,7 @@ dialog[open]{animation:pop .35s var(--ease)}
             <svg class="go" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
           </a>
         </div>
-        <p class="legal" data-a>© <span id="year">2026</span> Назва компанії. Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</p>
+        <p class="legal" data-a>© <span id="year">2026</span> VOMTEX. Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</p>
       </div>
       <div class="form-card" data-a>
         <form novalidate data-form="lead">
