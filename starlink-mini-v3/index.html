@@ -41,10 +41,11 @@ button{font-family:inherit}
 
 /* ================= Сцена з фото (фон усіх слайдів) ================= */
 .scene{position:fixed;inset:0;overflow:hidden;z-index:0;background:#0b0b0b}
-.stage{position:absolute;left:0;top:0;width:1672px;height:941px;transform-origin:0 0;will-change:transform}
-.stage .wide{position:absolute;inset:0;width:100%;height:100%;max-width:none}
-.stage .close{position:absolute;left:572px;top:365px;width:484px;height:312px;max-width:none;will-change:opacity;-webkit-mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);mask-composite:intersect}
-.stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+/* Камера: розмір і позицію фото задає JS (без transform: scale — інакше фото стає піксельним) */
+.stage{position:absolute;inset:0}
+.stage .wide,.stage .close,.stage svg{position:absolute;left:0;top:0;max-width:none}
+.stage .close{-webkit-mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(180deg,transparent,#000 2.5%,#000 97.5%,transparent);mask-composite:intersect}
+.stage svg{overflow:visible;pointer-events:none}
 .shade{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0}
 .shade--hero{background:linear-gradient(90deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.7) 34%,rgba(0,0,0,0) 62%),linear-gradient(0deg,rgba(0,0,0,.6),transparent 35%);opacity:1}
 .shade--sky{background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 36%,rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.55),transparent 40%)}
@@ -741,7 +742,14 @@ function camFor(state) {
   ty = Math.min(-r.y * k, Math.max(vh - (r.y + r.h) * k, ty));
   return { k, tx, ty };
 }
-const applyCam = () => stage.style.transform = `translate3d(${cam.tx}px,${cam.ty}px,0) scale(${cam.k})`;
+const wideImg = stage.querySelector(".wide"), satSvg = $("#satSvg");
+function place(el, x, y, w, h) { const st = el.style; st.left = x + "px"; st.top = y + "px"; st.width = w + "px"; st.height = h + "px"; }
+function applyCam() {               // фото малюється одразу в потрібному розмірі — чітко на будь-якому екрані
+  const { k, tx, ty } = cam;
+  place(wideImg, tx, ty, W0 * k, H0 * k);
+  place(satSvg, tx, ty, W0 * k, H0 * k);
+  place(closeImg, tx + CLOSE.x * k, ty + CLOSE.y * k, CLOSE.w * k, CLOSE.h * k);
+}
 
 /* ================= СУПУТНИК: пошук і з'єднання ================= */
 const sat = $("#sat"), beam = $("#beam"), beamDash = $("#beamDash"), p1 = $("#p1"), p2 = $("#p2");
