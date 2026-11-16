@@ -1094,6 +1094,7 @@ $$("form[data-form]").forEach(form => {
         if (!r.ok) throw new Error(r.status);
       } else console.warn("Відправку заявок ще не підключено (CONFIG.formEndpoint). Дані:", data);
       form.closest(".form-card").classList.add("is-sent");
+      location.href = "thanks.html";   // сторінка «Дякуємо» — для пікселя FB (подія Lead)
     } catch (err) {
       alert("Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у месенджер.");
     } finally { btn.disabled = false; lbl.textContent = "Надіслати заявку"; }
