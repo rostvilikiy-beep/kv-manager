@@ -270,6 +270,10 @@ html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
 .field.invalid input{border-color:#ff6b6b}
 .field.invalid .err{display:block}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn.is-loading{pointer-events:none;cursor:progress}
+.btn.is-loading svg{display:none}
+.btn.is-loading::after{content:"";width:18px;height:18px;border:2.5px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 .form-note{font-size:11.5px;color:#6f6f6f;margin-top:12px}
 form .btn{width:100%;margin-top:4px}
 .form-ok{display:none;text-align:center;padding:24px 0}
@@ -1085,7 +1089,8 @@ $$("form[data-form]").forEach(form => {
     });
     if (firstBad) { firstBad.focus(); return; }
     const btn = form.querySelector('[type="submit"]'), lbl = btn.querySelector(".lbl");
-    btn.disabled = true; lbl.textContent = "Надсилаємо…";
+    btn.disabled = true; btn.classList.add("is-loading"); lbl.textContent = "Надсилаємо…";
+    let leaving = false;
     const data = Object.fromEntries(new FormData(form));
     data.type = form.dataset.form === "order" ? "Купити в 1 клік" : "Форма заявки";
     try {
@@ -1093,11 +1098,13 @@ $$("form[data-form]").forEach(form => {
         const r = await fetch(CONFIG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) });
         if (!r.ok) throw new Error(r.status);
       } else console.warn("Відправку заявок ще не підключено (CONFIG.formEndpoint). Дані:", data);
-      form.closest(".form-card").classList.add("is-sent");
-      location.href = "thanks.html";   // сторінка «Дякуємо» — для пікселя FB (подія Lead)
+      // одразу на сторінку «Дякуємо» (для пікселя FB), кнопка лишається в стані завантаження до переходу
+      leaving = true;
+      await new Promise(r => setTimeout(r, 450));
+      location.href = "thanks.html";
     } catch (err) {
       alert("Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у месенджер.");
-    } finally { btn.disabled = false; lbl.textContent = "Надіслати заявку"; }
+    } finally { if (!leaving) { btn.disabled = false; btn.classList.remove("is-loading"); lbl.textContent = "Надіслати заявку"; } }
   });
   form.querySelectorAll("input").forEach(i => i.addEventListener("input", () => i.closest(".field").classList.remove("invalid")));
 });
