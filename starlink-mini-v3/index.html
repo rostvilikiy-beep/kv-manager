@@ -274,6 +274,7 @@ html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
 .btn.is-loading svg{display:none}
 .btn.is-loading::after{content:"";width:18px;height:18px;border:2.5px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;flex:none}
 @keyframes spin{to{transform:rotate(360deg)}}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
 .form-note{font-size:11.5px;color:#6f6f6f;margin-top:12px}
 form .btn{width:100%;margin-top:4px}
 .form-ok{display:none;text-align:center;padding:24px 0}
@@ -676,6 +677,7 @@ dialog[open]{animation:pop .35s var(--ease)}
       </div>
       <div class="form-card" data-a>
         <form novalidate data-form="lead">
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <h3>Форма заявки</h3>
           <p>Залиште контакти — менеджер зв’яжеться з вами.</p>
           <div class="row2">
@@ -724,6 +726,7 @@ dialog[open]{animation:pop .35s var(--ease)}
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>
     </button>
     <form novalidate data-form="order">
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <h3 id="orderTitle">Купити в 1 клік</h3>
       <p>Залиште ім’я та телефон — менеджер зв’яжеться з вами для оформлення.</p>
       <div class="dlg-price"><span>Starlink Mini · опт від 50 шт</span><b>18 000 грн/шт</b></div>
@@ -745,7 +748,7 @@ dialog[open]{animation:pop .35s var(--ease)}
 const CONFIG = {
   messengerUrl: "",   // TODO: посилання на месенджер, напр. https://t.me/username
   phone: "",          // TODO: номер телефону, напр. +380XXXXXXXXX
-  formEndpoint: ""    // TODO: адреса, куди надсилати заявки на пошту
+  formEndpoint: "/api/lead"   // заявки йдуть у Telegram (див. api/lead.js, functions/api/lead.js і README)
 };
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -1101,6 +1104,7 @@ $$("form[data-form]").forEach(form => {
       // одразу на сторінку «Дякуємо» (для пікселя FB), кнопка лишається в стані завантаження до переходу
       leaving = true;
       await new Promise(r => setTimeout(r, 450));
+      try { sessionStorage.setItem("vomtex_lead", "1"); } catch (_) {}   // для пікселя: подія Lead лише після справжньої заявки
       location.href = "thanks.html";
     } catch (err) {
       alert("Не вдалося надіслати заявку. Спробуйте ще раз або напишіть нам у месенджер.");

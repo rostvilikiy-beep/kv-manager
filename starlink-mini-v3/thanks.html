@@ -13,9 +13,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- ================= META PIXEL (Facebook) =================
-     Сюди вставте код пікселя з Events Manager (базовий код + подію Lead), наприклад:
-     <script> ... fbq('init', 'ВАШ_ID_ПІКСЕЛЯ'); fbq('track', 'PageView'); fbq('track', 'Lead'); </script>
+     Впишіть ID пікселя з Events Manager у FB_PIXEL_ID (лише цифри).
+     PageView — при кожному відкритті сторінки; Lead — тільки після справжньої заявки з сайту
+     (не рахується, якщо сторінку відкрили напряму або оновили).
      ========================================================== -->
+<script>
+  const FB_PIXEL_ID = "";   // TODO: ID пікселя, напр. "123456789012345"
+  if (FB_PIXEL_ID) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', FB_PIXEL_ID);
+    fbq('track', 'PageView');
+    let fromForm = false;
+    try { fromForm = sessionStorage.getItem("vomtex_lead") === "1"; sessionStorage.removeItem("vomtex_lead"); } catch (_) {}
+    if (fromForm) fbq('track', 'Lead');
+  }
+</script>
 
 <style>
 :root{--font:"Tektur",system-ui,-apple-system,"Segoe UI",sans-serif;--bg:#070707;--panel:#0f0f0f;--line:#262626;--white:#fff;--muted:#9a9a9a;--yellow:#ffd400;--ease:cubic-bezier(.2,.7,.2,1);--cut:12px}
