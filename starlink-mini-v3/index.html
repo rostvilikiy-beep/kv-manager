@@ -270,7 +270,6 @@ html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
 .field.invalid input{border-color:#ff6b6b}
 .field.invalid .err{display:block}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
 .form-note{font-size:11.5px;color:#6f6f6f;margin-top:12px}
 form .btn{width:100%;margin-top:4px}
 .form-ok{display:none;text-align:center;padding:24px 0}
@@ -673,7 +672,6 @@ dialog[open]{animation:pop .35s var(--ease)}
       </div>
       <div class="form-card" data-a>
         <form novalidate data-form="lead">
-          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <h3>Форма заявки</h3>
           <p>Залиште контакти — менеджер зв’яжеться з вами.</p>
           <div class="row2">
@@ -722,7 +720,6 @@ dialog[open]{animation:pop .35s var(--ease)}
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>
     </button>
     <form novalidate data-form="order">
-          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <h3 id="orderTitle">Купити в 1 клік</h3>
       <p>Залиште ім’я та телефон — менеджер зв’яжеться з вами для оформлення.</p>
       <div class="dlg-price"><span>Starlink Mini · опт від 50 шт</span><b>18 000 грн/шт</b></div>
@@ -744,7 +741,7 @@ dialog[open]{animation:pop .35s var(--ease)}
 const CONFIG = {
   messengerUrl: "",   // TODO: посилання на месенджер, напр. https://t.me/username
   phone: "",          // TODO: номер телефону, напр. +380XXXXXXXXX
-  formEndpoint: "/api/lead"   // заявки йдуть у Telegram (див. api/lead.js і README)
+  formEndpoint: ""    // TODO: адреса, куди надсилати заявки на пошту
 };
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
