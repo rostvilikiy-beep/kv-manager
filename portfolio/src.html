@@ -113,6 +113,17 @@
     .contact strong { display: block; font-weight: 600; overflow-wrap: anywhere; }
     .contact .grow { flex: 1; min-width: 0; }
     .copy { flex: none; min-height: 40px; padding: 0 0.9rem; border-radius: 999px; border: 1px solid var(--line); background: none; cursor: pointer; font-size: 0.85rem; }
+    .copy svg { display: none; width: 18px; height: 18px; }
+    @media (max-width: 760px) {
+      .copy { width: 44px; min-height: 44px; padding: 0; display: grid; place-items: center; }
+      .copy svg { display: block; }
+      .copy-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .contact strong { font-size: 0.95rem; }
+    }
+    .profile { display: flex; align-items: center; gap: 0.9rem; padding: 0.1rem 0.2rem 0.3rem; min-width: 0; }
+    .profile img { flex: none; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent), 0 10px 24px var(--glow); }
+    .profile strong { display: block; font-family: var(--font-display); font-weight: 500; font-size: 1.05rem; line-height: 1.2; }
+    .profile small { color: var(--muted); font-size: 0.9rem; }
     .copy-status { min-height: 1.4em; margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--muted); }
 
     /* Dots + counter */
@@ -186,8 +197,8 @@
       <nav class="nav" aria-label="Разделы" data-i18n-aria="navLabel">
         <button type="button" data-go="1" data-i18n="navServices">Услуги</button>
         <button type="button" data-go="2" data-i18n="navWork">Работы</button>
-        <button type="button" data-go="7" data-i18n="navPrice">Цена</button>
-        <button type="button" data-go="8" data-i18n="navContact">Контакты</button>
+        <button type="button" data-go="6" data-i18n="navPrice">Цена</button>
+        <button type="button" data-go="7" data-i18n="navContact">Контакты</button>
       </nav>
       <div class="tools">
         <div class="seg" role="group" aria-label="Язык" data-i18n-aria="langLabel">
@@ -212,7 +223,7 @@
         <p class="lead reveal" style="--i:2" data-i18n="introLead">Сайты под ключ, баннеры и карточки товаров. От структуры и прототипа до финального дизайна.</p>
         <div class="actions reveal" style="--i:3">
           <button class="btn" type="button" data-go="2" data-i18n="introWork">Смотреть работы</button>
-          <button class="btn btn-ghost" type="button" data-go="8" data-i18n="introContact">Написать мне</button>
+          <button class="btn btn-ghost" type="button" data-go="7" data-i18n="introContact">Написать мне</button>
         </div>
       </div>
     </section>
@@ -256,21 +267,9 @@
       </div>
     </section>
 
-    <section class="slide" tabindex="-1" aria-labelledby="s3-title">
-      <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p2Eyebrow">Сайт для бизнеса</span></span>
-        <h2 class="reveal" style="--i:1" id="s3-title" translate="no">Barbertio</h2>
-        <p class="lead reveal" style="--i:2" data-i18n="p2Lead">Сайт для клиента из Польши. Его можно открыть и посмотреть вживую.</p>
-        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagDev">Сайт под ключ</li></ul>
-        <div class="actions reveal" style="--i:4">
-          <a class="btn" href="https://barbertio.pl" target="_blank" rel="noopener"><span data-i18n="openSite">Открыть сайт</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-        </div>
-      </div>
-    </section>
-
     <section class="slide" tabindex="-1" aria-labelledby="s4-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s4-title" data-i18n="p3Title">Кофейня «Мідь»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p3Lead">3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagMotion">Анимация</li></ul>
@@ -279,7 +278,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s5-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">05</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s5-title" data-i18n="p4Title">Керамика «Обжиг»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p4Lead">3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagInteractive">Интерактив</li></ul>
@@ -306,14 +305,18 @@
         <h2 class="reveal" style="--i:1" id="s7-title" data-i18n-html="contactTitle">Обсудим <span class="accent">ваш проект?</span></h2>
         <p class="lead reveal" style="--i:2" data-i18n="contactLead">Пишите в Telegram или на почту. Отвечаю в течение дня.</p>
         <div class="contact-list reveal" style="--i:3">
+          <div class="profile">
+            <img src="__IMG_AVATAR__" width="112" height="112" alt="Ростислав" data-i18n-alt="name">
+            <span><strong data-i18n="name">Ростислав</strong><small data-i18n="role">Веб-дизайнер</small></span>
+          </div>
           <a class="contact" href="https://t.me/rostyslavvill" target="_blank" rel="noopener">
             <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.5 4.3 18.4 19c-.2 1-.8 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.8 8.8-7.9c.4-.3-.1-.5-.6-.2L6.4 13 1.7 11.5c-1-.3-1-1 .2-1.5l18.3-7c.9-.3 1.6.2 1.3 1.3z"/></svg></span>
             <span class="grow"><small>Telegram</small><strong translate="no">@rostyslavvill</strong></span>
           </a>
           <div class="contact">
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
-            <a class="grow" href="mailto:rostvilikiy@gmail.com" style="text-decoration:none"><small data-i18n="emailLabel">Почта</small><strong translate="no" id="email">rostvilikiy@gmail.com</strong></a>
-            <button class="copy" type="button" id="copy" data-i18n="copy">Скопировать</button>
+            <a class="grow" href="mailto:webdesignerrmark@gmail.com" style="text-decoration:none"><small data-i18n="emailLabel">Почта</small><strong translate="no" id="email">webdesignerrmark<wbr>@gmail.com</strong></a>
+            <button class="copy" type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="copy-text" data-i18n="copy">Скопировать</span></button>
           </div>
         </div>
         <p class="copy-status" role="status" aria-live="polite" id="copy-status"></p>
@@ -340,7 +343,7 @@
     // ---------------- i18n ----------------
     const T = {
       ru: {
-        name: "Ростислав", navLabel: "Разделы", navServices: "Услуги", navWork: "Работы", navPrice: "Цена", navContact: "Контакты",
+        name: "Ростислав", role: "Веб-дизайнер", navLabel: "Разделы", navServices: "Услуги", navWork: "Работы", navPrice: "Цена", navContact: "Контакты",
         langLabel: "Язык", dotsLabel: "Слайды", hint: "Листайте вниз", themeLight: "Светлая тема", themeDark: "Тёмная тема",
         introEyebrow: "Веб-дизайнер · работаю удалённо",
         introTitle: 'Проектирую и рисую сайты, которые <span class="accent">хочется листать</span>',
@@ -352,7 +355,7 @@
         sv3: "Баннеры", sv3d: "Реклама и посты для соцсетей, которые замечают.",
         sv4: "Карточки товаров", sv4d: "Инфографика для маркетплейсов, чтобы товар продавал сам.",
         p1Eyebrow: "Детейлинг-студия", p1Lead: "Тёмный сайт для студии детейлинга. Слайдер «до / после» показывает краску до и после полировки.",
-        p2Eyebrow: "Сайт для бизнеса", p2Lead: "Сайт для клиента из Польши. Его можно открыть и посмотреть вживую.", openSite: "Открыть сайт",
+        openSite: "Открыть сайт",
         p3Eyebrow: "Кофейня · концепт", p3Title: "Кофейня «Мідь»", p3Lead: "3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.",
         p4Eyebrow: "Студия керамики · концепт", p4Title: "Керамика «Обжиг»", p4Lead: "3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.",
         tagDesign: "Дизайн сайта", tagProto: "Прототип", tagAdaptive: "Адаптив", tagDev: "Сайт под ключ", tagMotion: "Анимация", tagInteractive: "Интерактив",
@@ -363,11 +366,11 @@
         contactEyebrow: "Контакты", contactTitle: 'Обсудим <span class="accent">ваш проект?</span>', contactLead: "Пишите в Telegram или на почту. Отвечаю в течение дня.",
         emailLabel: "Почта", copy: "Скопировать", copied: "Почта скопирована.", copyFail: "Не удалось скопировать: выделите адрес вручную.",
         p0Eyebrow: "Опт Starlink · Украина", p0Lead: "Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini в поле на закате", photo2: "Терминал Starlink Mini крупным планом", photo3: "Склад с терминалами Starlink", photoLabel: "Фото", closePhoto: "Закрыть", openPhoto: "Открыть фото",
-        slides: ["Знакомство", "Услуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
+        slides: ["Знакомство", "Услуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
         title: "Ростислав — веб-дизайнер",
       },
       uk: {
-        name: "Ростислав", navLabel: "Розділи", navServices: "Послуги", navWork: "Роботи", navPrice: "Ціна", navContact: "Контакти",
+        name: "Ростислав", role: "Веб-дизайнер", navLabel: "Розділи", navServices: "Послуги", navWork: "Роботи", navPrice: "Ціна", navContact: "Контакти",
         langLabel: "Мова", dotsLabel: "Слайди", hint: "Гортайте вниз", themeLight: "Світла тема", themeDark: "Темна тема",
         introEyebrow: "Веб-дизайнер · працюю віддалено",
         introTitle: 'Проєктую та малюю сайти, які <span class="accent">хочеться гортати</span>',
@@ -379,7 +382,7 @@
         sv3: "Банери", sv3d: "Реклама й пости для соцмереж, які помічають.",
         sv4: "Картки товарів", sv4d: "Інфографіка для маркетплейсів, щоб товар продавав сам.",
         p1Eyebrow: "Детейлінг-студія", p1Lead: "Темний сайт для студії детейлінгу. Слайдер «до / після» показує фарбу до та після полірування.",
-        p2Eyebrow: "Сайт для бізнесу", p2Lead: "Сайт для клієнта з Польщі. Його можна відкрити й подивитися наживо.", openSite: "Відкрити сайт",
+        openSite: "Відкрити сайт",
         p3Eyebrow: "Кав'ярня · концепт", p3Title: "Кав'ярня «Мідь»", p3Lead: "3D-сцена на фоні: під час гортання мідна турка наливає каву в чашку.",
         p4Eyebrow: "Студія кераміки · концепт", p4Title: "Кераміка «Обжиг»", p4Lead: "3D-вази, які можна обертати. Під час вибору моделі одна форма плавно перетікає в іншу.",
         tagDesign: "Дизайн сайту", tagProto: "Прототип", tagAdaptive: "Адаптив", tagDev: "Сайт під ключ", tagMotion: "Анімація", tagInteractive: "Інтерактив",
@@ -390,11 +393,11 @@
         contactEyebrow: "Контакти", contactTitle: 'Обговоримо <span class="accent">ваш проєкт?</span>', contactLead: "Пишіть у Telegram або на пошту. Відповідаю протягом дня.",
         emailLabel: "Пошта", copy: "Скопіювати", copied: "Пошту скопійовано.", copyFail: "Не вдалося скопіювати: виділіть адресу вручну.",
         p0Eyebrow: "Опт Starlink · Україна", p0Lead: "Сайт для оптових продажів Starlink Mini. Шість екранів-слайдів ведуть від першого враження до заявки: зв'язок, умови опту, характеристики, часті питання й контакти.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini у полі на заході сонця", photo2: "Термінал Starlink Mini великим планом", photo3: "Склад із терміналами Starlink", photoLabel: "Фото", closePhoto: "Закрити", openPhoto: "Відкрити фото",
-        slides: ["Знайомство", "Послуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
+        slides: ["Знайомство", "Послуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
         title: "Ростислав — веб-дизайнер",
       },
       en: {
-        name: "Rostyslav", navLabel: "Sections", navServices: "Services", navWork: "Work", navPrice: "Pricing", navContact: "Contact",
+        name: "Rostyslav", role: "Web designer", navLabel: "Sections", navServices: "Services", navWork: "Work", navPrice: "Pricing", navContact: "Contact",
         langLabel: "Language", dotsLabel: "Slides", hint: "Scroll down", themeLight: "Light theme", themeDark: "Dark theme",
         introEyebrow: "Web designer · working remotely",
         introTitle: 'I plan and design websites people <span class="accent">want to scroll</span>',
@@ -406,7 +409,7 @@
         sv3: "Banners", sv3d: "Ads and social posts that get noticed.",
         sv4: "Product cards", sv4d: "Marketplace infographics that help the product sell itself.",
         p1Eyebrow: "Detailing studio", p1Lead: "A dark website for a detailing studio. A before / after slider shows paint before and after correction.",
-        p2Eyebrow: "Business website", p2Lead: "A website for a client in Poland. You can open it and see it live.", openSite: "Open website",
+        openSite: "Open website",
         p3Eyebrow: "Coffee shop · concept", p3Title: "Mid Coffee", p3Lead: "A 3D scene behind the page: as you scroll, a copper cezve pours coffee into a cup.",
         p4Eyebrow: "Ceramics studio · concept", p4Title: "Obzhig Ceramics", p4Lead: "3D vases you can spin. Picking a model morphs one shape smoothly into another.",
         tagDesign: "Web design", tagProto: "Prototype", tagAdaptive: "Responsive", tagDev: "Full website", tagMotion: "Motion", tagInteractive: "Interactive",
@@ -417,11 +420,11 @@
         contactEyebrow: "Contact", contactTitle: 'Let\'s discuss <span class="accent">your project</span>', contactLead: "Message me on Telegram or by email. I reply within a day.",
         emailLabel: "Email", copy: "Copy", copied: "Email copied.", copyFail: "Couldn't copy: please select the address manually.",
         p0Eyebrow: "Starlink wholesale · Ukraine", p0Lead: "A wholesale website for Starlink Mini. Six full-screen slides take a buyer from first impression to inquiry: coverage, wholesale terms, specs, FAQ and contacts.", tagSlides: "Slide-based site", photo1: "Starlink Mini in a field at sunset", photo2: "Starlink Mini terminal close-up", photo3: "Warehouse with Starlink terminals", photoLabel: "Photo", closePhoto: "Close", openPhoto: "Open photo",
-        slides: ["Intro", "Services", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
+        slides: ["Intro", "Services", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
         title: "Rostyslav — web designer",
       },
       pl: {
-        name: "Rostysław", navLabel: "Sekcje", navServices: "Usługi", navWork: "Projekty", navPrice: "Cena", navContact: "Kontakt",
+        name: "Rostysław", role: "Web designer", navLabel: "Sekcje", navServices: "Usługi", navWork: "Projekty", navPrice: "Cena", navContact: "Kontakt",
         langLabel: "Język", dotsLabel: "Slajdy", hint: "Przewiń w dół", themeLight: "Jasny motyw", themeDark: "Ciemny motyw",
         introEyebrow: "Web designer · pracuję zdalnie",
         introTitle: 'Projektuję strony, które <span class="accent">chce się przewijać</span>',
@@ -433,7 +436,7 @@
         sv3: "Banery", sv3d: "Reklamy i posty do social mediów, które przyciągają uwagę.",
         sv4: "Karty produktów", sv4d: "Infografiki na marketplace'y, dzięki którym produkt sprzedaje się sam.",
         p1Eyebrow: "Studio detailingu", p1Lead: "Ciemna strona dla studia detailingu. Suwak „przed / po” pokazuje lakier przed polerowaniem i po nim.",
-        p2Eyebrow: "Strona dla firmy", p2Lead: "Strona dla klienta z Polski. Możesz ją otworzyć i zobaczyć na żywo.", openSite: "Otwórz stronę",
+        openSite: "Otwórz stronę",
         p3Eyebrow: "Kawiarnia · koncept", p3Title: "Kawiarnia „Mid”", p3Lead: "Scena 3D w tle: podczas przewijania miedziany tygielek nalewa kawę do filiżanki.",
         p4Eyebrow: "Pracownia ceramiki · koncept", p4Title: "Ceramika „Obżyg”", p4Lead: "Wazony 3D, które można obracać. Po wybraniu modelu jeden kształt płynnie przechodzi w drugi.",
         tagDesign: "Projekt strony", tagProto: "Prototyp", tagAdaptive: "Responsywność", tagDev: "Strona pod klucz", tagMotion: "Animacja", tagInteractive: "Interaktywność",
@@ -444,7 +447,7 @@
         contactEyebrow: "Kontakt", contactTitle: 'Porozmawiajmy <span class="accent">o Twoim projekcie</span>', contactLead: "Napisz na Telegramie lub e-mailem. Odpowiadam w ciągu dnia.",
         emailLabel: "E-mail", copy: "Kopiuj", copied: "E-mail skopiowany.", copyFail: "Nie udało się skopiować: zaznacz adres ręcznie.",
         p0Eyebrow: "Hurt Starlink · Ukraina", p0Lead: "Strona do hurtowej sprzedaży Starlink Mini. Sześć pełnoekranowych slajdów prowadzi od pierwszego wrażenia do zapytania: łączność, warunki hurtu, parametry, FAQ i kontakt.", tagSlides: "Strona w slajdach", photo1: "Starlink Mini na polu o zachodzie słońca", photo2: "Terminal Starlink Mini z bliska", photo3: "Magazyn z terminalami Starlink", photoLabel: "Zdjęcie", closePhoto: "Zamknij", openPhoto: "Otwórz zdjęcie",
-        slides: ["Poznajmy się", "Usługi", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
+        slides: ["Poznajmy się", "Usługi", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
         title: "Rostysław — web designer",
       },
     };
@@ -539,7 +542,7 @@
     function sync() {
       cur.textContent = String(index + 1).padStart(2, "0");
       dots.forEach((d, i) => d.setAttribute("aria-current", String(i === index)));
-      const group = index >= 2 && index <= 6 ? 2 : index;
+      const group = index >= 2 && index <= 5 ? 2 : index;
       navBtns.forEach((b) => b.setAttribute("aria-current", String(Number(b.dataset.go) === group)));
     }
 
@@ -936,26 +939,10 @@
         g.globalAlpha = 0.85; g.fillText("@rostyslavvill", SCR_W / 2, SCR_H / 2 + 70); g.globalAlpha = 1;
         return c;
       },
-      barbertio: () => {
-        const c = makeCanvas(), g = c.getContext("2d");
-        const grd = g.createLinearGradient(0, 0, 0, SCR_H);
-        grd.addColorStop(0, "#151515"); grd.addColorStop(1, "#262321");
-        g.fillStyle = grd; g.fillRect(0, 0, SCR_W, SCR_H);
-        browser(g, "barbertio.pl");
-        g.fillStyle = "#f2efe9"; g.textAlign = "left"; g.textBaseline = "alphabetic";
-        g.font = "600 120px " + getComputedStyle(root).getPropertyValue("--font-display");
-        g.fillText("barbertio", 110, 420);
-        g.fillStyle = "#b9a27a"; g.fillRect(114, 470, 160, 6);
-        g.fillStyle = "#9b958c"; g.font = "500 30px " + getComputedStyle(root).getPropertyValue("--font-body");
-        g.fillText("barbertio.pl", 114, 540);
-        g.fillStyle = "#f2efe9"; g.beginPath(); g.roundRect(114, 600, 260, 64, 32); g.fill();
-        g.fillStyle = "#151515"; g.font = "600 24px " + getComputedStyle(root).getPropertyValue("--font-body"); g.textAlign = "center"; g.fillText("barbertio.pl ↗", 244, 641);
-        return c;
-      },
     };
     const images = { halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__", star1: "__IMG_STAR1__", star2: "__IMG_STAR2__", star3: "__IMG_STAR3__", star4: "__IMG_STAR4__" };
     const loaded = {};
-    const SLIDE_SCREEN = ["intro", "services", "starlink", "halo", "barbertio", "coffee", "ceramics", "process", "contact"];
+    const SLIDE_SCREEN = ["intro", "services", "starlink", "halo", "coffee", "ceramics", "process", "contact"];
     const STAR = ["star1", "star2", "star3", "star4"];
     let starIdx = 0, starTimer = 0;
     const screenFor = (i) => (SLIDE_SCREEN[i] === "starlink" ? STAR[starIdx] : SLIDE_SCREEN[i]);
@@ -969,7 +956,7 @@
       else return null;
       return (texCache[name] = toTex(c));
     }
-    function invalidateGenerated() { ["intro", "services", "process", "contact", "barbertio"].forEach((n) => { if (texCache[n]) { texCache[n].dispose(); delete texCache[n]; } }); }
+    function invalidateGenerated() { ["intro", "services", "process", "contact"].forEach((n) => { if (texCache[n]) { texCache[n].dispose(); delete texCache[n]; } }); }
 
     let screenName = null, fadeStart = 0, fadeTo = null;
     function showScreen(name, instant) {
@@ -995,8 +982,7 @@
       { lid: 78, ry: 38, rx: 14 },
       { lid: 104, ry: -30, rx: 9 },
       { lid: 106, ry: 24, rx: 8 },
-      { lid: 106, ry: -20, rx: 8 },
-      { lid: 108, ry: 14, rx: 6 },
+      { lid: 108, ry: -16, rx: 6 },
       { lid: 108, ry: -12, rx: 6 },
       { lid: 96, ry: -64, rx: 16 },
       { lid: 112, ry: 0, rx: 4 },
