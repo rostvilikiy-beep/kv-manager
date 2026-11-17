@@ -134,6 +134,25 @@
     .tag.hot > span { background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: 0 8px 26px var(--glow); }
     @keyframes float { from { transform: translateY(-6px) rotate(-2deg); } to { transform: translateY(6px) rotate(2deg); } }
 
+
+    /* Case gallery + lightbox */
+    .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; margin: 0 0 1.3rem; }
+    .shot { padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--surface); cursor: zoom-in; transform: rotate(var(--r, 0deg)); transition: transform 220ms var(--ease-out), border-color 200ms ease, box-shadow 220ms ease; }
+    .shot:nth-child(1) { --r: -2deg; } .shot:nth-child(2) { --r: 1.5deg; } .shot:nth-child(3) { --r: -1deg; }
+    .shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 500ms var(--ease-out); }
+    .shot:active { transform: rotate(0deg) scale(0.97); }
+    @media (hover: hover) and (pointer: fine) {
+      .shot:hover { transform: rotate(0deg) translateY(-4px); border-color: var(--accent); box-shadow: 0 14px 30px var(--glow); }
+      .shot:hover img { transform: scale(1.06); }
+    }
+    .lightbox { padding: 0; border: 0; background: transparent; max-width: min(1100px, 92vw); max-height: 88svh; overflow: visible; opacity: 1; transform: none; transition: opacity 220ms ease, transform 260ms var(--ease-out), overlay 260ms allow-discrete, display 260ms allow-discrete; }
+    @starting-style { .lightbox[open] { opacity: 0; transform: scale(0.96); } }
+    .lightbox::backdrop { background: rgb(0 0 0 / 72%); backdrop-filter: blur(8px); }
+    .lightbox img { display: block; max-width: 100%; max-height: 88svh; border-radius: 18px; box-shadow: 0 30px 80px rgb(0 0 0 / 50%); }
+    .lb-close { position: absolute; top: -18px; right: -18px; width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 0 8px 24px rgb(0 0 0 / 35%); }
+    .lb-close svg { width: 20px; height: 20px; }
+    @media (max-width: 760px) { .lb-close { top: 8px; right: 8px; } .gallery { gap: 0.45rem; } }
+    @media (prefers-reduced-motion: reduce) { .shot, .shot:hover, .shot:active { transform: none; } .shot img, .shot:hover img { transform: none; } .lightbox { transition: opacity 150ms ease; } }
     @media (max-width: 760px) {
       :root { --header-h: 64px; }
       .bar { padding-inline: 16px; }
@@ -167,8 +186,8 @@
       <nav class="nav" aria-label="Разделы" data-i18n-aria="navLabel">
         <button type="button" data-go="1" data-i18n="navServices">Услуги</button>
         <button type="button" data-go="2" data-i18n="navWork">Работы</button>
-        <button type="button" data-go="6" data-i18n="navPrice">Цена</button>
-        <button type="button" data-go="7" data-i18n="navContact">Контакты</button>
+        <button type="button" data-go="7" data-i18n="navPrice">Цена</button>
+        <button type="button" data-go="8" data-i18n="navContact">Контакты</button>
       </nav>
       <div class="tools">
         <div class="seg" role="group" aria-label="Язык" data-i18n-aria="langLabel">
@@ -193,7 +212,7 @@
         <p class="lead reveal" style="--i:2" data-i18n="introLead">Сайты под ключ, баннеры и карточки товаров. От структуры и прототипа до финального дизайна.</p>
         <div class="actions reveal" style="--i:3">
           <button class="btn" type="button" data-go="2" data-i18n="introWork">Смотреть работы</button>
-          <button class="btn btn-ghost" type="button" data-go="7" data-i18n="introContact">Написать мне</button>
+          <button class="btn btn-ghost" type="button" data-go="8" data-i18n="introContact">Написать мне</button>
         </div>
       </div>
     </section>
@@ -211,9 +230,26 @@
       </div>
     </section>
 
+    <section class="slide" tabindex="-1" aria-labelledby="sv-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">01</span>&nbsp;<span data-i18n="p0Eyebrow">Опт Starlink · Украина</span></span>
+        <h2 class="reveal" style="--i:1" id="sv-title" translate="no">VOMTEX · Starlink Mini</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="p0Lead">Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagSlides">Сайт-слайдер</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
+        <div class="gallery reveal" style="--i:4">
+          <button class="shot" type="button" data-photo="0"><img src="__IMG_PHOTO_WIDE__" width="640" height="360" alt="Starlink Mini в поле на закате" data-i18n-alt="photo1"></button>
+          <button class="shot" type="button" data-photo="1"><img src="__IMG_PHOTO_CLOSE__" width="640" height="360" alt="Терминал Starlink Mini крупным планом" data-i18n-alt="photo2"></button>
+          <button class="shot" type="button" data-photo="2"><img src="__IMG_PHOTO_WAREHOUSE__" width="640" height="360" alt="Склад с терминалами Starlink" data-i18n-alt="photo3"></button>
+        </div>
+        <div class="actions reveal" style="--i:5">
+          <a class="btn" href="https://starlinkmini-phi.vercel.app/" target="_blank" rel="noopener"><span data-i18n="openSite">Открыть сайт</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+      </div>
+    </section>
+
     <section class="slide" tabindex="-1" aria-labelledby="s2-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">01</span>&nbsp;<span data-i18n="p1Eyebrow">Детейлинг-студия</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">02</span>&nbsp;<span data-i18n="p1Eyebrow">Детейлинг-студия</span></span>
         <h2 class="reveal" style="--i:1" id="s2-title" translate="no">Halo Detail Studio</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p1Lead">Тёмный сайт для студии детейлинга. Слайдер «до / после» показывает краску до и после полировки.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagProto">Прототип</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
@@ -222,7 +258,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s3-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">02</span>&nbsp;<span data-i18n="p2Eyebrow">Сайт для бизнеса</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p2Eyebrow">Сайт для бизнеса</span></span>
         <h2 class="reveal" style="--i:1" id="s3-title" translate="no">Barbertio</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p2Lead">Сайт для клиента из Польши. Его можно открыть и посмотреть вживую.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagDev">Сайт под ключ</li></ul>
@@ -234,7 +270,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s4-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s4-title" data-i18n="p3Title">Кофейня «Мідь»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p3Lead">3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagMotion">Анимация</li></ul>
@@ -243,7 +279,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s5-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">05</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s5-title" data-i18n="p4Title">Керамика «Обжиг»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p4Lead">3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagInteractive">Интерактив</li></ul>
@@ -285,6 +321,11 @@
     </section>
   </main>
 
+  <dialog class="lightbox" id="lightbox" aria-label="Фото" data-i18n-aria="photoLabel">
+    <img id="lb-img" alt="">
+    <button class="lb-close" type="button" id="lb-close" aria-label="Закрыть" data-i18n-aria="closePhoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </dialog>
+
   <nav class="dots" aria-label="Слайды" data-i18n-aria="dotsLabel"></nav>
   <div class="counter" aria-live="polite"><b id="cur">01</b> / <span id="total">08</span></div>
   <div class="hint" id="hint"><i aria-hidden="true"></i><span data-i18n="hint">Листайте вниз</span></div>
@@ -321,7 +362,8 @@
         st3: "Дизайн", st3d: "Рисую макеты для всех экранов.", st4: "Запуск", st4d: "Передаю макеты или готовый сайт.",
         contactEyebrow: "Контакты", contactTitle: 'Обсудим <span class="accent">ваш проект?</span>', contactLead: "Пишите в Telegram или на почту. Отвечаю в течение дня.",
         emailLabel: "Почта", copy: "Скопировать", copied: "Почта скопирована.", copyFail: "Не удалось скопировать: выделите адрес вручную.",
-        slides: ["Знакомство", "Услуги", "Halo Detail Studio", "Barbertio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
+        p0Eyebrow: "Опт Starlink · Украина", p0Lead: "Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini в поле на закате", photo2: "Терминал Starlink Mini крупным планом", photo3: "Склад с терминалами Starlink", photoLabel: "Фото", closePhoto: "Закрыть", openPhoto: "Открыть фото",
+        slides: ["Знакомство", "Услуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
         title: "Ростислав — веб-дизайнер",
       },
       uk: {
@@ -347,7 +389,8 @@
         st3: "Дизайн", st3d: "Малюю макети для всіх екранів.", st4: "Запуск", st4d: "Передаю макети або готовий сайт.",
         contactEyebrow: "Контакти", contactTitle: 'Обговоримо <span class="accent">ваш проєкт?</span>', contactLead: "Пишіть у Telegram або на пошту. Відповідаю протягом дня.",
         emailLabel: "Пошта", copy: "Скопіювати", copied: "Пошту скопійовано.", copyFail: "Не вдалося скопіювати: виділіть адресу вручну.",
-        slides: ["Знайомство", "Послуги", "Halo Detail Studio", "Barbertio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
+        p0Eyebrow: "Опт Starlink · Україна", p0Lead: "Сайт для оптових продажів Starlink Mini. Шість екранів-слайдів ведуть від першого враження до заявки: зв'язок, умови опту, характеристики, часті питання й контакти.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini у полі на заході сонця", photo2: "Термінал Starlink Mini великим планом", photo3: "Склад із терміналами Starlink", photoLabel: "Фото", closePhoto: "Закрити", openPhoto: "Відкрити фото",
+        slides: ["Знайомство", "Послуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
         title: "Ростислав — веб-дизайнер",
       },
       en: {
@@ -373,7 +416,8 @@
         st3: "Design", st3d: "I design layouts for every screen.", st4: "Launch", st4d: "You get the layouts or a finished site.",
         contactEyebrow: "Contact", contactTitle: 'Let\'s discuss <span class="accent">your project</span>', contactLead: "Message me on Telegram or by email. I reply within a day.",
         emailLabel: "Email", copy: "Copy", copied: "Email copied.", copyFail: "Couldn't copy: please select the address manually.",
-        slides: ["Intro", "Services", "Halo Detail Studio", "Barbertio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
+        p0Eyebrow: "Starlink wholesale · Ukraine", p0Lead: "A wholesale website for Starlink Mini. Six full-screen slides take a buyer from first impression to inquiry: coverage, wholesale terms, specs, FAQ and contacts.", tagSlides: "Slide-based site", photo1: "Starlink Mini in a field at sunset", photo2: "Starlink Mini terminal close-up", photo3: "Warehouse with Starlink terminals", photoLabel: "Photo", closePhoto: "Close", openPhoto: "Open photo",
+        slides: ["Intro", "Services", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
         title: "Rostyslav — web designer",
       },
       pl: {
@@ -399,7 +443,8 @@
         st3: "Design", st3d: "Projektuję makiety na wszystkie ekrany.", st4: "Start", st4d: "Przekazuję makiety lub gotową stronę.",
         contactEyebrow: "Kontakt", contactTitle: 'Porozmawiajmy <span class="accent">o Twoim projekcie</span>', contactLead: "Napisz na Telegramie lub e-mailem. Odpowiadam w ciągu dnia.",
         emailLabel: "E-mail", copy: "Kopiuj", copied: "E-mail skopiowany.", copyFail: "Nie udało się skopiować: zaznacz adres ręcznie.",
-        slides: ["Poznajmy się", "Usługi", "Halo Detail Studio", "Barbertio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
+        p0Eyebrow: "Hurt Starlink · Ukraina", p0Lead: "Strona do hurtowej sprzedaży Starlink Mini. Sześć pełnoekranowych slajdów prowadzi od pierwszego wrażenia do zapytania: łączność, warunki hurtu, parametry, FAQ i kontakt.", tagSlides: "Strona w slajdach", photo1: "Starlink Mini na polu o zachodzie słońca", photo2: "Terminal Starlink Mini z bliska", photo3: "Magazyn z terminalami Starlink", photoLabel: "Zdjęcie", closePhoto: "Zamknij", openPhoto: "Otwórz zdjęcie",
+        slides: ["Poznajmy się", "Usługi", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Barbertio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
         title: "Rostysław — web designer",
       },
     };
@@ -422,6 +467,8 @@
       document.querySelectorAll("[data-i18n]").forEach((el) => { const v = t[el.dataset.i18n]; if (v) el.textContent = v; });
       document.querySelectorAll("[data-i18n-html]").forEach((el) => { const v = t[el.dataset.i18nHtml]; if (v) el.innerHTML = v; });
       document.querySelectorAll("[data-i18n-aria]").forEach((el) => { const v = t[el.dataset.i18nAria]; if (v) el.setAttribute("aria-label", v); });
+      document.querySelectorAll("[data-i18n-alt]").forEach((el) => { const v = t[el.dataset.i18nAlt]; if (v) el.alt = v; });
+      document.querySelectorAll(".shot").forEach((b, i) => b.setAttribute("aria-label", `${t.openPhoto}: ${t["photo" + (i + 1)]}`));
       document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
       dots.forEach((d, i) => d.setAttribute("aria-label", `${i + 1}. ${t.slides[i]}`));
       themeBtn.setAttribute("aria-label", root.dataset.theme === "dark" ? t.themeLight : t.themeDark);
@@ -492,7 +539,7 @@
     function sync() {
       cur.textContent = String(index + 1).padStart(2, "0");
       dots.forEach((d, i) => d.setAttribute("aria-current", String(i === index)));
-      const group = index >= 2 && index <= 5 ? 2 : index;
+      const group = index >= 2 && index <= 6 ? 2 : index;
       navBtns.forEach((b) => b.setAttribute("aria-current", String(Number(b.dataset.go) === group)));
     }
 
@@ -510,7 +557,9 @@
       if (!c || c.scrollHeight <= c.clientHeight + 2) return false;
       return dy > 0 ? c.scrollTop + c.clientHeight < c.scrollHeight - 2 : c.scrollTop > 2;
     }
+    const lightboxOpen = () => document.getElementById("lightbox").open;
     addEventListener("wheel", (e) => {
+      if (lightboxOpen()) { e.preventDefault(); return; }
       if (scrollableInside(e.target, e.deltaY)) return;
       e.preventDefault();
       const now = performance.now();
@@ -524,20 +573,33 @@
     let touchY = null, touchTarget = null;
     addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; touchTarget = e.target; }, { passive: true });
     addEventListener("touchend", (e) => {
-      if (touchY === null) return;
+      if (touchY === null || lightboxOpen()) { touchY = null; return; }
       const dy = touchY - e.changedTouches[0].clientY;
       if (Math.abs(dy) > 50 && !scrollableInside(touchTarget, dy)) go(index + (dy > 0 ? 1 : -1));
       touchY = null;
     }, { passive: true });
 
     addEventListener("keydown", (e) => {
-      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.altKey || e.ctrlKey || e.metaKey || lightboxOpen()) return;
       const k = e.key;
       if (["ArrowDown", "PageDown"].includes(k) || (k === " " && !e.target.closest("button, a"))) { e.preventDefault(); go(index + 1); }
       else if (["ArrowUp", "PageUp"].includes(k)) { e.preventDefault(); go(index - 1); }
       else if (k === "Home") { e.preventDefault(); go(0); }
       else if (k === "End") { e.preventDefault(); go(slides.length - 1); }
     });
+
+    // Lightbox for case photos
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lb-img");
+    let lbOpener = null;
+    document.querySelectorAll(".shot").forEach((btn) => btn.addEventListener("click", () => {
+      const img = btn.querySelector("img");
+      lbImg.src = img.src; lbImg.alt = img.alt; lbOpener = btn;
+      lightbox.showModal();
+    }));
+    document.getElementById("lb-close").addEventListener("click", () => lightbox.close());
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) lightbox.close(); });
+    lightbox.addEventListener("close", () => { if (lbOpener) lbOpener.focus(); });
 
     // Copy email
     const copyStatus = document.getElementById("copy-status");
@@ -891,10 +953,13 @@
         return c;
       },
     };
-    const images = { halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__" };
+    const images = { halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__", star1: "__IMG_STAR1__", star2: "__IMG_STAR2__", star3: "__IMG_STAR3__", star4: "__IMG_STAR4__" };
     const loaded = {};
-    const SLIDE_SCREEN = ["intro", "services", "halo", "barbertio", "coffee", "ceramics", "process", "contact"];
-    const URLS = { halo: "halo-detail-studio", coffee: "mid-coffee", ceramics: "obzhig-ceramics" };
+    const SLIDE_SCREEN = ["intro", "services", "starlink", "halo", "barbertio", "coffee", "ceramics", "process", "contact"];
+    const STAR = ["star1", "star2", "star3", "star4"];
+    let starIdx = 0, starTimer = 0;
+    const screenFor = (i) => (SLIDE_SCREEN[i] === "starlink" ? STAR[starIdx] : SLIDE_SCREEN[i]);
+    const URLS = { halo: "halo-detail-studio", coffee: "mid-coffee", ceramics: "obzhig-ceramics", star1: "starlinkmini-phi.vercel.app", star2: "starlinkmini-phi.vercel.app", star3: "starlinkmini-phi.vercel.app", star4: "starlinkmini-phi.vercel.app" };
     const texCache = {};
     function screenTexture(name) {
       if (texCache[name]) return texCache[name];
@@ -917,21 +982,22 @@
     }
     Object.entries(images).forEach(([k, src]) => {
       const img = new Image();
-      img.onload = () => { loaded[k] = img; if (SLIDE_SCREEN[index] === k) showScreen(k, true); };
+      img.onload = () => { loaded[k] = img; if (screenFor(index) === k) showScreen(k, true); };
       img.src = src;
     });
     showScreen("intro", true);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { invalidateGenerated(); showScreen(SLIDE_SCREEN[index], true); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { invalidateGenerated(); showScreen(screenFor(index), true); });
 
     // ---------------- Poses ----------------
     const deg = Math.PI / 180;
     const POSES = [
       { lid: 32, ry: -78, rx: 10 },
       { lid: 78, ry: 38, rx: 14 },
-      { lid: 106, ry: -22, rx: 8 },
-      { lid: 106, ry: 22, rx: 8 },
-      { lid: 108, ry: -14, rx: 6 },
+      { lid: 104, ry: -30, rx: 9 },
+      { lid: 106, ry: 24, rx: 8 },
+      { lid: 106, ry: -20, rx: 8 },
       { lid: 108, ry: 14, rx: 6 },
+      { lid: 108, ry: -12, rx: 6 },
       { lid: 96, ry: -64, rx: 16 },
       { lid: 112, ry: 0, rx: 4 },
     ];
@@ -941,7 +1007,13 @@
     function pose(i, dur = 1250) {
       const p = POSES[i];
       tween = { from: { ...state }, to: { lid: p.lid * deg, ry: p.ry * deg, rx: p.rx * deg }, t0: performance.now(), dur: reduceMotion ? 1 : dur };
-      if (SLIDE_SCREEN[i] !== screenName) showScreen(SLIDE_SCREEN[i]);
+      clearInterval(starTimer);
+      if (SLIDE_SCREEN[i] === "starlink") {
+        starIdx = 0;
+        showScreen(STAR[0]);
+        // The case slide flips through the client's site like a real browser session.
+        if (!reduceMotion) starTimer = setInterval(() => { starIdx = (starIdx + 1) % STAR.length; showScreen(STAR[starIdx]); }, 3200);
+      } else if (SLIDE_SCREEN[i] !== screenName) showScreen(SLIDE_SCREEN[i]);
     }
 
     // ---------------- Theme for 3D ----------------
@@ -955,7 +1027,7 @@
       accentLight.intensity = dark ? 7 : 4;
       ground.material.opacity = dark ? 0.32 : 0.12;
       invalidateGenerated();
-      showScreen(SLIDE_SCREEN[index], true);
+      showScreen(screenFor(index), true);
     }
     window.__laptop = { pose, setTheme };
     setTheme(root.dataset.theme);
