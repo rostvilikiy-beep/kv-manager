@@ -150,7 +150,10 @@
     .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; margin: 0 0 1.3rem; }
     .shot { padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--surface); cursor: zoom-in; transform: rotate(var(--r, 0deg)); transition: transform 220ms var(--ease-out), border-color 200ms ease, box-shadow 220ms ease; }
     .shot:nth-child(1) { --r: -2deg; } .shot:nth-child(2) { --r: 1.5deg; } .shot:nth-child(3) { --r: -1deg; }
-    .shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 500ms var(--ease-out); }
+    .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform 500ms var(--ease-out); }
+    .shot-phone { display: grid; place-items: center; background: radial-gradient(80% 90% at 50% 30%, color-mix(in srgb, var(--accent) 22%, var(--surface)), var(--surface)); }
+    .phone-frame { height: 88%; aspect-ratio: 520 / 1125; border-radius: 9px; overflow: hidden; border: 2px solid #2a2a2e; box-shadow: 0 8px 18px rgb(0 0 0 / 35%); background: #000; }
+    .phone-frame img { border-radius: 0; }
     .shot:active { transform: rotate(0deg) scale(0.97); }
     @media (hover: hover) and (pointer: fine) {
       .shot:hover { transform: rotate(0deg) translateY(-4px); border-color: var(--accent); box-shadow: 0 14px 30px var(--glow); }
@@ -160,6 +163,7 @@
     @starting-style { .lightbox[open] { opacity: 0; transform: scale(0.96); } }
     .lightbox::backdrop { background: rgb(0 0 0 / 72%); backdrop-filter: blur(8px); }
     .lightbox img { display: block; max-width: 100%; max-height: 88svh; border-radius: 18px; box-shadow: 0 30px 80px rgb(0 0 0 / 50%); }
+    .lightbox.is-tall img { border-radius: 28px; border: 3px solid #2a2a2e; }
     .lb-close { position: absolute; top: -18px; right: -18px; width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 0 8px 24px rgb(0 0 0 / 35%); }
     .lb-close svg { width: 20px; height: 20px; }
     @media (max-width: 760px) { .lb-close { top: 8px; right: 8px; } .gallery { gap: 0.45rem; } }
@@ -248,9 +252,9 @@
         <p class="lead reveal" style="--i:2" data-i18n="p0Lead">Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagSlides">Сайт-слайдер</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
         <div class="gallery reveal" style="--i:4">
-          <button class="shot" type="button" data-photo="0"><img src="__IMG_PHOTO_WIDE__" width="640" height="360" alt="Starlink Mini в поле на закате" data-i18n-alt="photo1"></button>
-          <button class="shot" type="button" data-photo="1"><img src="__IMG_PHOTO_CLOSE__" width="640" height="360" alt="Терминал Starlink Mini крупным планом" data-i18n-alt="photo2"></button>
-          <button class="shot" type="button" data-photo="2"><img src="__IMG_PHOTO_WAREHOUSE__" width="640" height="360" alt="Склад с терминалами Starlink" data-i18n-alt="photo3"></button>
+          <button class="shot" type="button" data-photo="0"><img src="__IMG_SHOT_FAQ__" width="1440" height="900" alt="Раздел частых вопросов" data-i18n-alt="photo1"></button>
+          <button class="shot" type="button" data-photo="1"><img src="__IMG_SHOT_CONTACTS__" width="1440" height="900" alt="Раздел контактов с формой заявки" data-i18n-alt="photo2"></button>
+          <button class="shot shot-phone" type="button" data-photo="2"><span class="phone-frame"><img src="__IMG_SHOT_MOBILE__" width="520" height="1125" alt="Мобильная версия сайта" data-i18n-alt="photo3"></span></button>
         </div>
         <div class="actions reveal" style="--i:5">
           <a class="btn" href="https://starlinkmini-phi.vercel.app/" target="_blank" rel="noopener"><span data-i18n="openSite">Открыть сайт</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
@@ -365,7 +369,7 @@
         st3: "Дизайн", st3d: "Рисую макеты для всех экранов.", st4: "Запуск", st4d: "Передаю макеты или готовый сайт.",
         contactEyebrow: "Контакты", contactTitle: 'Обсудим <span class="accent">ваш проект?</span>', contactLead: "Пишите в Telegram или на почту. Отвечаю в течение дня.",
         emailLabel: "Почта", copy: "Скопировать", copied: "Почта скопирована.", copyFail: "Не удалось скопировать: выделите адрес вручную.",
-        p0Eyebrow: "Опт Starlink · Украина", p0Lead: "Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini в поле на закате", photo2: "Терминал Starlink Mini крупным планом", photo3: "Склад с терминалами Starlink", photoLabel: "Фото", closePhoto: "Закрыть", openPhoto: "Открыть фото",
+        p0Eyebrow: "Опт Starlink · Украина", p0Lead: "Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.", tagSlides: "Сайт-слайдер", photo1: "Раздел частых вопросов", photo2: "Раздел контактов с формой заявки", photo3: "Мобильная версия сайта", photoLabel: "Фото", closePhoto: "Закрыть", openPhoto: "Открыть фото",
         slides: ["Знакомство", "Услуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
         title: "Марк — веб-дизайнер",
       },
@@ -392,7 +396,7 @@
         st3: "Дизайн", st3d: "Малюю макети для всіх екранів.", st4: "Запуск", st4d: "Передаю макети або готовий сайт.",
         contactEyebrow: "Контакти", contactTitle: 'Обговоримо <span class="accent">ваш проєкт?</span>', contactLead: "Пишіть у Telegram або на пошту. Відповідаю протягом дня.",
         emailLabel: "Пошта", copy: "Скопіювати", copied: "Пошту скопійовано.", copyFail: "Не вдалося скопіювати: виділіть адресу вручну.",
-        p0Eyebrow: "Опт Starlink · Україна", p0Lead: "Сайт для оптових продажів Starlink Mini. Шість екранів-слайдів ведуть від першого враження до заявки: зв'язок, умови опту, характеристики, часті питання й контакти.", tagSlides: "Сайт-слайдер", photo1: "Starlink Mini у полі на заході сонця", photo2: "Термінал Starlink Mini великим планом", photo3: "Склад із терміналами Starlink", photoLabel: "Фото", closePhoto: "Закрити", openPhoto: "Відкрити фото",
+        p0Eyebrow: "Опт Starlink · Україна", p0Lead: "Сайт для оптових продажів Starlink Mini. Шість екранів-слайдів ведуть від першого враження до заявки: зв'язок, умови опту, характеристики, часті питання й контакти.", tagSlides: "Сайт-слайдер", photo1: "Розділ частих питань", photo2: "Розділ контактів із формою заявки", photo3: "Мобільна версія сайту", photoLabel: "Фото", closePhoto: "Закрити", openPhoto: "Відкрити фото",
         slides: ["Знайомство", "Послуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
         title: "Марк — веб-дизайнер",
       },
@@ -419,7 +423,7 @@
         st3: "Design", st3d: "I design layouts for every screen.", st4: "Launch", st4d: "You get the layouts or a finished site.",
         contactEyebrow: "Contact", contactTitle: 'Let\'s discuss <span class="accent">your project</span>', contactLead: "Message me on Telegram or by email. I reply within a day.",
         emailLabel: "Email", copy: "Copy", copied: "Email copied.", copyFail: "Couldn't copy: please select the address manually.",
-        p0Eyebrow: "Starlink wholesale · Ukraine", p0Lead: "A wholesale website for Starlink Mini. Six full-screen slides take a buyer from first impression to inquiry: coverage, wholesale terms, specs, FAQ and contacts.", tagSlides: "Slide-based site", photo1: "Starlink Mini in a field at sunset", photo2: "Starlink Mini terminal close-up", photo3: "Warehouse with Starlink terminals", photoLabel: "Photo", closePhoto: "Close", openPhoto: "Open photo",
+        p0Eyebrow: "Starlink wholesale · Ukraine", p0Lead: "A wholesale website for Starlink Mini. Six full-screen slides take a buyer from first impression to inquiry: coverage, wholesale terms, specs, FAQ and contacts.", tagSlides: "Slide-based site", photo1: "FAQ section", photo2: "Contacts section with a request form", photo3: "Mobile version of the site", photoLabel: "Photo", closePhoto: "Close", openPhoto: "Open photo",
         slides: ["Intro", "Services", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
         title: "Mark — web designer",
       },
@@ -446,7 +450,7 @@
         st3: "Design", st3d: "Projektuję makiety na wszystkie ekrany.", st4: "Start", st4d: "Przekazuję makiety lub gotową stronę.",
         contactEyebrow: "Kontakt", contactTitle: 'Porozmawiajmy <span class="accent">o Twoim projekcie</span>', contactLead: "Napisz na Telegramie lub e-mailem. Odpowiadam w ciągu dnia.",
         emailLabel: "E-mail", copy: "Kopiuj", copied: "E-mail skopiowany.", copyFail: "Nie udało się skopiować: zaznacz adres ręcznie.",
-        p0Eyebrow: "Hurt Starlink · Ukraina", p0Lead: "Strona do hurtowej sprzedaży Starlink Mini. Sześć pełnoekranowych slajdów prowadzi od pierwszego wrażenia do zapytania: łączność, warunki hurtu, parametry, FAQ i kontakt.", tagSlides: "Strona w slajdach", photo1: "Starlink Mini na polu o zachodzie słońca", photo2: "Terminal Starlink Mini z bliska", photo3: "Magazyn z terminalami Starlink", photoLabel: "Zdjęcie", closePhoto: "Zamknij", openPhoto: "Otwórz zdjęcie",
+        p0Eyebrow: "Hurt Starlink · Ukraina", p0Lead: "Strona do hurtowej sprzedaży Starlink Mini. Sześć pełnoekranowych slajdów prowadzi od pierwszego wrażenia do zapytania: łączność, warunki hurtu, parametry, FAQ i kontakt.", tagSlides: "Strona w slajdach", photo1: "Sekcja FAQ", photo2: "Sekcja kontaktowa z formularzem", photo3: "Wersja mobilna strony", photoLabel: "Zdjęcie", closePhoto: "Zamknij", openPhoto: "Otwórz zdjęcie",
         slides: ["Poznajmy się", "Usługi", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
         title: "Marek — web designer",
       },
@@ -599,6 +603,7 @@
     document.querySelectorAll(".shot").forEach((btn) => btn.addEventListener("click", () => {
       const img = btn.querySelector("img");
       lbImg.src = img.src; lbImg.alt = img.alt; lbOpener = btn;
+      lightbox.classList.toggle("is-tall", img.naturalHeight > img.naturalWidth);
       lightbox.showModal();
     }));
     document.getElementById("lb-close").addEventListener("click", () => lightbox.close());
