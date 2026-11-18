@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center Car Detailing &amp; Spa · Kraków</title>
+<meta name="description" content="Center Car Detailing &amp; Spa, ul. Rozrywki 1, Kraków. Mycie detailingowe, pranie tapicerki, korekta lakieru, powłoki ceramiczne. Ocena 5.0 w Booksy. Rezerwacja online.">
+<meta property="og:title" content="Center Car Detailing &amp; Spa · Kraków">
+<meta property="og:description" content="Od podstawowego mycia, przez pranie tapicerki, po powłoki ceramiczne. Rezerwacja online w Booksy.">
+<meta property="og:image" content="img/hero.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoWash",
+  "name": "Center Car Detailing & Spa",
+  "image": "img/hero.jpg",
+  "telephone": "+48793960093",
+  "address": { "@type": "PostalAddress", "streetAddress": "ul. Rozrywki 1", "postalCode": "31-419", "addressLocality": "Kraków", "addressCountry": "PL" },
+  "geo": { "@type": "GeoCoordinates", "latitude": 50.0964381, "longitude": 19.98065438 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "09:00", "closes": "18:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "17:00" }
+  ],
+  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": 123 },
+  "sameAs": ["https://www.facebook.com/centercarpl", "https://www.instagram.com/center_car_detailing_spa/"]
+}
+</script>
+<style>
+:root{
+  --bg:#0A0A0B; --bg2:#111113; --card:#16161A; --line:#2A2A30;
+  --text:#F2F0EB; --muted:#A9A59D; --gold:#D9A441; --gold2:#F2C66D; --ink:#111;
+  --display:'Archivo', 'Arial Narrow', sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:var(--gold2)}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+h1,h2,h3{font-family:var(--display);margin:0;font-stretch:125%;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+.k{display:inline-flex;align-items:center;gap:12px;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.k::before{content:"";width:28px;height:1px;background:currentColor}
+.h2{font-size:clamp(34px,5.2vw,72px);line-height:.98}
+.gold{color:var(--gold)}
+section{position:relative;scroll-margin-top:72px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:999px;font-weight:600;font-size:15px;letter-spacing:.02em;text-decoration:none;cursor:pointer;border:0;transition:transform .25s var(--ease),background-color .25s,color .25s,box-shadow .25s}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 10px 30px -10px rgba(217,164,65,.6)}
+.btn-gold:hover{background:var(--gold2);color:var(--ink);transform:translateY(-2px)}
+.btn-line{border:1px solid rgba(242,240,235,.3);color:var(--text);background:transparent}
+.btn-line:hover{border-color:var(--gold);color:var(--gold2)}
+.btn svg{flex:none}
+
+/* progress */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--gold2));z-index:100}
+
+/* header */
+header{position:fixed;inset:0 0 auto;z-index:90;transition:background-color .3s,border-color .3s;border-bottom:1px solid transparent}
+header.solid{background:rgba(10,10,11,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+.logo img{height:44px;width:auto;border-radius:6px}
+.menu{display:flex;align-items:center;gap:30px}
+.menu a.l{color:#CFCBC3;text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;transition:color .2s}
+.menu a.l:hover{color:var(--gold2)}
+.menu .btn{min-height:44px;padding:0 20px;font-size:14px}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;padding:140px 0 72px}
+.hero-bg{position:absolute;inset:-8% 0 0;background:url("img/hero.jpg") center 40%/cover no-repeat;will-change:transform}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.55) 0%,rgba(10,10,11,.25) 35%,rgba(10,10,11,.92) 82%,var(--bg) 100%)}
+.hexes{position:absolute;inset:0;z-index:1;opacity:.32;pointer-events:none;
+  -webkit-mask-image:linear-gradient(105deg,transparent 0%,#000 45%,transparent 70%);mask-image:linear-gradient(105deg,transparent 0%,#000 45%,transparent 70%);
+  -webkit-mask-size:250% 100%;mask-size:250% 100%;animation:sweep 7s linear infinite}
+@keyframes sweep{from{-webkit-mask-position:120% 0;mask-position:120% 0}to{-webkit-mask-position:-120% 0;mask-position:-120% 0}}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero h1{font-size:clamp(46px,9.4vw,148px);line-height:.88;margin:22px 0 26px}
+.hero h1 span{display:block}
+.hero h1 .thin{font-weight:300;font-stretch:100%;color:var(--gold2);font-size:.42em;letter-spacing:.04em;margin-top:.35em}
+.hero-row{display:flex;flex-wrap:wrap;gap:28px 48px;align-items:flex-end;justify-content:space-between}
+.hero p{margin:0;max-width:560px;font-size:18px;color:#D6D2CA}
+.hero .btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+.score{display:flex;align-items:center;gap:18px;padding:18px 22px;border:1px solid rgba(242,240,235,.16);border-radius:18px;background:rgba(10,10,11,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.score b{font:800 46px/1 var(--display);font-stretch:110%}
+.stars{display:flex;gap:3px;color:var(--gold)}
+.score small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.cue{position:absolute;left:50%;bottom:22px;z-index:2;transform:translateX(-50%);width:22px;height:36px;border:1.5px solid rgba(242,240,235,.4);border-radius:12px}
+.cue::after{content:"";position:absolute;left:50%;top:7px;width:3px;height:7px;margin-left:-1.5px;border-radius:2px;background:var(--gold);animation:cue 1.8s var(--ease) infinite}
+@keyframes cue{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
+
+/* ticker */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:var(--bg2)}
+.ticker-track{display:flex;width:max-content;animation:tick 38s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker span{display:flex;align-items:center;gap:28px;padding:20px 14px;font:700 15px/1 var(--display);font-stretch:115%;letter-spacing:.12em;text-transform:uppercase;color:#D8D4CC;white-space:nowrap}
+.ticker span::after{content:"";width:10px;height:11px;background:var(--gold);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* about */
+.about{padding:140px 0 60px}
+.about-quote{font-family:var(--display);font-stretch:110%;font-weight:600;font-size:clamp(26px,3.6vw,50px);line-height:1.15;max-width:1100px;margin:28px 0 0;text-transform:none;letter-spacing:-.01em}
+.about-quote em{font-style:normal;color:var(--gold2)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:72px}
+.facts div{background:var(--bg);padding:30px 26px}
+.facts b{display:block;font:800 clamp(34px,4vw,54px)/1 var(--display);font-stretch:115%;color:var(--text)}
+.facts span{display:block;margin-top:10px;color:var(--muted);font-size:14px}
+
+/* process (sticky story) */
+.process{padding:100px 0 120px}
+.proc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;margin-top:56px}
+.proc-media{position:sticky;top:110px;height:calc(100vh - 160px);max-height:720px;border-radius:24px;overflow:hidden;border:1px solid var(--line)}
+.proc-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity .7s var(--ease),transform 1.2s var(--ease)}
+.proc-media img.on{opacity:1;transform:scale(1)}
+.proc-media .num{position:absolute;left:24px;bottom:20px;z-index:2;font:800 120px/1 var(--display);font-stretch:125%;color:rgba(242,240,235,.92);text-shadow:0 10px 40px rgba(0,0,0,.6)}
+.proc-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.65))}
+.steps{display:flex;flex-direction:column}
+.step{min-height:70vh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:40px 0;opacity:.28;transition:opacity .5s var(--ease)}
+.step.on{opacity:1}
+.step .sn{font:700 13px/1 var(--display);letter-spacing:.3em;color:var(--gold)}
+.step h3{font-size:clamp(28px,3.4vw,46px);line-height:1}
+.step p{margin:0;color:#CFCBC3;font-size:17px;max-width:480px}
+.step ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.step li{font-size:13px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:#DDD9D1}
+.step .mimg{display:none}
+
+/* pricing */
+.pricing{padding:120px 0;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.p-head{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between}
+.sizes{display:inline-flex;padding:5px;border-radius:999px;background:var(--bg);border:1px solid var(--line);gap:4px}
+.sizes button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 14px/1 Inter,sans-serif;padding:0 20px;min-height:44px;border-radius:999px;cursor:pointer;transition:background-color .25s,color .25s}
+.sizes button[aria-pressed="true"]{background:var(--gold);color:var(--ink)}
+.sizes button:hover:not([aria-pressed="true"]){color:var(--text)}
+.size-note{margin:14px 0 0;color:var(--muted);font-size:14px;min-height:22px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:48px}
+.card{position:relative;display:flex;flex-direction:column;gap:18px;padding:30px;border-radius:22px;background:var(--card);border:1px solid var(--line);transition:transform .35s var(--ease),border-color .35s}
+.card:hover{transform:translateY(-4px);border-color:#3A3A42}
+.card.hot{border-color:var(--gold);background:linear-gradient(180deg,rgba(217,164,65,.12),var(--card) 40%)}
+.card .badge{position:absolute;top:-12px;left:30px;background:var(--gold);color:var(--ink);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+.card h3{font-size:22px;line-height:1.1;font-stretch:115%}
+.card .price{display:flex;align-items:baseline;gap:8px}
+.card .price small{color:var(--muted);font-size:14px}
+.card .price b{font:800 46px/1 var(--display);font-stretch:110%;transition:opacity .2s}
+.card .price b.swap{opacity:0}
+.card .time{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.card ul{list-style:none;margin:0;padding:18px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;font-size:14px;color:#D2CEC6;flex:1}
+.card li{display:flex;gap:10px;align-items:flex-start}
+.card li svg{flex:none;margin-top:3px;color:var(--gold)}
+.card .btn{width:100%}
+
+.spec{margin-top:88px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
+.spec h3{font-size:26px;margin-bottom:12px;font-stretch:115%}
+.row{display:flex;justify-content:space-between;gap:20px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line)}
+.row .n{font-weight:600}
+.row .d{display:block;color:var(--muted);font-size:14px;font-weight:400;margin-top:2px}
+.row .p{font:700 20px/1 var(--display);font-stretch:110%;white-space:nowrap;color:var(--gold2)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.chip{display:flex;gap:10px;align-items:baseline;padding:12px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.chip b{color:var(--gold2);font-weight:600;white-space:nowrap}
+.tap{margin-top:40px;padding:28px;border-radius:20px;border:1px solid var(--line);background:var(--card)}
+.tap summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font:700 18px/1.2 var(--display);font-stretch:115%;text-transform:uppercase;min-height:44px}
+.tap summary::-webkit-details-marker{display:none}
+.tap summary svg{transition:transform .3s var(--ease);color:var(--gold)}
+.tap[open] summary svg{transform:rotate(45deg)}
+.tap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;margin-top:14px}
+.tap-grid h4{margin:18px 0 6px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tap-grid div.r{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px;color:#D2CEC6}
+.tap-grid div.r span:last-child{white-space:nowrap;color:var(--text)}
+
+/* before after */
+.ba{padding:130px 0 60px}
+.ba-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:48px}
+.ba-grid figure{margin:0;border-radius:22px;overflow:hidden;position:relative;border:1px solid var(--line);aspect-ratio:1}
+.ba-grid img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.ba-grid figure:hover img{transform:scale(1.04)}
+.ba-grid figcaption{position:absolute;left:16px;bottom:16px;padding:8px 14px;border-radius:999px;background:rgba(10,10,11,.75);backdrop-filter:blur(8px);font-size:13px;font-weight:600;letter-spacing:.06em}
+
+/* gallery */
+.gallery{padding:80px 0 130px}
+.g-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.g-nav{display:flex;gap:10px}
+.g-nav button{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:border-color .2s,color .2s}
+.g-nav button:hover{border-color:var(--gold);color:var(--gold2)}
+.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:44px max(28px,calc((100vw - 1280px)/2 + 28px)) 8px;cursor:grab}
+.strip::-webkit-scrollbar{display:none}
+.strip.drag{cursor:grabbing;scroll-snap-type:none}
+.strip figure{flex:0 0 clamp(260px,30vw,420px);margin:0;scroll-snap-align:start;border-radius:20px;overflow:hidden;aspect-ratio:4/5;border:1px solid var(--line);position:relative}
+.strip figure:nth-child(3n+2){aspect-ratio:1;align-self:center}
+.strip img{width:100%;height:100%;object-fit:cover;pointer-events:none;transition:transform 1s var(--ease)}
+.strip figure:hover img{transform:scale(1.05)}
+
+/* reviews */
+.reviews{padding:120px 0;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.rv-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:72px;align-items:center}
+.big{font:900 clamp(120px,16vw,220px)/.85 var(--display);font-stretch:125%;background:linear-gradient(180deg,#fff,#8d877c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bars{display:flex;flex-direction:column;gap:12px;margin-top:28px;max-width:420px}
+.bar{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--muted)}
+.bar i{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i span{display:block;height:100%;background:var(--gold);transform-origin:0 50%;transform:scaleX(0);transition:transform 1.4s var(--ease)}
+.in .bar i span{transform:scaleX(var(--w))}
+.quotes{display:flex;flex-direction:column;gap:16px}
+.q{padding:28px 30px;border-radius:20px;background:var(--card);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.q:nth-child(2){margin-left:48px}
+.q blockquote{margin:0;font:700 clamp(22px,2.4vw,32px)/1.15 var(--display);font-stretch:110%}
+.q cite{font-style:normal;color:var(--muted);font-size:14px}
+.q cite b{color:var(--text);font-weight:600}
+
+/* amenities */
+.amen{padding:110px 0 40px}
+.am-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-top:40px}
+.am{padding:24px 18px;border-radius:18px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px;font-size:14px;color:#D2CEC6;transition:border-color .3s,transform .3s var(--ease)}
+.am:hover{border-color:var(--gold);transform:translateY(-3px)}
+.am svg{color:var(--gold)}
+
+/* contact */
+.contact{padding:100px 0 120px}
+.c-card{position:relative;overflow:hidden;border-radius:32px;border:1px solid var(--line);background:var(--card)}
+.c-card .hexes{opacity:.22}
+.c-in{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:56px;padding:72px}
+.c-in h2{font-size:clamp(38px,5.6vw,84px);line-height:.92}
+.c-list{display:flex;flex-direction:column;gap:22px;margin-top:34px}
+.c-list div span{display:block;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.c-list a,.c-list address{font-style:normal;font-size:20px;color:var(--text);text-decoration:none}
+.c-list a:hover{color:var(--gold2)}
+.hours{background:rgba(10,10,11,.6);border:1px solid var(--line);border-radius:22px;padding:30px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hours h3{font-size:20px;margin-bottom:10px;font-stretch:115%}
+.hours div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:16px}
+.hours div:last-of-type{border-bottom:0}
+.hours div.today{color:var(--gold2)}
+.hours div span:first-child{font-weight:600}
+.socials{display:flex;gap:10px;margin-top:8px}
+.socials a{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--text)}
+.socials a:hover{border-color:var(--gold);color:var(--gold2)}
+
+footer{border-top:1px solid var(--line)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;padding-top:30px;padding-bottom:30px;color:var(--muted);font-size:14px}
+footer img{height:30px;width:auto}
+
+.mbook{display:none}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}.rv.d5{transition-delay:.4s}
+
+@media (max-width:1024px){
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .am-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .c-in{grid-template-columns:minmax(0,1fr);padding:48px}
+}
+@media (max-width:860px){
+  .menu a.l{display:none}
+  .wrap{padding:0 20px}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .proc-grid{grid-template-columns:minmax(0,1fr);gap:0}
+  .proc-media{display:none}
+  .step{min-height:0;opacity:1;padding:28px 0;border-bottom:1px solid var(--line)}
+  .step .mimg{display:block;border-radius:18px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--line);margin-bottom:6px}
+  .step .mimg img{width:100%;height:100%;object-fit:cover}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .spec{grid-template-columns:minmax(0,1fr);gap:48px}
+  .tap-grid{grid-template-columns:minmax(0,1fr)}
+  .ba-grid{grid-template-columns:minmax(0,1fr)}
+  .rv-grid{grid-template-columns:minmax(0,1fr);gap:40px}
+  .q:nth-child(2){margin-left:0}
+  .am-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .c-in{padding:32px 22px}
+  .about{padding:96px 0 40px}
+  .process,.pricing,.reviews{padding:88px 0}
+  .menu .btn{display:none}
+  .mbook{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:95;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+  footer{padding-bottom:80px}
+  .score b{font-size:38px}
+  .facts b{font-size:30px}
+  .sizes{display:flex;width:100%}
+  .sizes button{flex:1;padding:0 8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  .rv{opacity:1;transform:none}
+  .bar i span{transform:scaleX(var(--w))}
+  .hexes{-webkit-mask-image:none;mask-image:none;opacity:.25}
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<header id="top">
+  <div class="wrap nav">
+    <a class="logo" href="#start" aria-label="Center Car Detailing &amp; Spa, strona główna"><img src="img/logo-wide.jpg" alt="Center Car Detailing Spa" width="197" height="44"></a>
+    <nav class="menu" aria-label="Główne menu">
+      <a class="l" href="#proces">Proces</a>
+      <a class="l" href="#cennik">Cennik</a>
+      <a class="l" href="#galeria">Realizacje</a>
+      <a class="l" href="#opinie">Opinie</a>
+      <a class="l" href="#kontakt">Kontakt</a>
+      <a class="btn btn-gold" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="start">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <svg class="hexes" aria-hidden="true" width="100%" height="100%"><defs><pattern id="hx" width="84" height="145.5" patternUnits="userSpaceOnUse" patternTransform="scale(.9)"><path d="M42 0 84 24.25V72.75L42 97 0 72.75V24.25Z M42 97V145.5 M0 24.25H-1 M84 24.25" fill="none" stroke="#F2C66D" stroke-width="1.4"/></pattern></defs><rect width="100%" height="100%" fill="url(#hx)"/></svg>
+  <div class="wrap">
+    <span class="k rv">Detailing · Kraków</span>
+    <h1 class="rv d1"><span>Center Car</span><span>Detailing</span><span class="thin">&amp; Spa</span></h1>
+    <div class="hero-row">
+      <div class="rv d2">
+        <p>Od podstawowego mycia pojazdu, przez pranie tapicerki, po nakładanie powłok ochronnych. Samochody to nasza pasja.</p>
+        <div class="btns">
+          <a class="btn btn-gold" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj w Booksy
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-line" href="#cennik">Sprawdź cennik</a>
+        </div>
+      </div>
+      <div class="score rv d3">
+        <b>5.0</b>
+        <div>
+          <div class="stars" role="img" aria-label="5 na 5 gwiazdek">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </div>
+          <small>123 opinie w Booksy</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a class="cue" href="#o-nas" aria-label="Przewiń w dół"></a>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Mycie SPA</span><span>Korekta lakieru</span><span>Powłoka ceramiczna</span><span>Pranie tapicerki</span><span>Twardy wosk</span><span>Glinkowanie</span><span>Serwis klimatyzacji</span><span>Ozonowanie</span><span>Door-to-door</span>
+    <span>Mycie SPA</span><span>Korekta lakieru</span><span>Powłoka ceramiczna</span><span>Pranie tapicerki</span><span>Twardy wosk</span><span>Glinkowanie</span><span>Serwis klimatyzacji</span><span>Ozonowanie</span><span>Door-to-door</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="o-nas">
+  <div class="wrap">
+    <span class="k rv">O nas</span>
+    <p class="about-quote rv d1">W naszym spa zadbasz o swój samochód, by cały czas był w <em>nienagannej czystości.</em> Samochody to nasza pasja, więc lepiej nie mogłeś trafić.</p>
+    <div class="facts">
+      <div class="rv"><b data-count="5.0">5.0</b><span>średnia ocen w Booksy</span></div>
+      <div class="rv d1"><b data-count="123">123</b><span>opinie klientów</span></div>
+      <div class="rv d2"><b>do 5 lat</b><span>ochrony lakieru powłoką ceramiczną</span></div>
+      <div class="rv d3"><b>6 dni</b><span>w tygodniu, pon – sob</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="proces">
+  <div class="wrap">
+    <span class="k rv">Pakiet PRO krok po kroku</span>
+    <h2 class="h2 rv d1">Od brudu<br><span class="gold">do lustra</span></h2>
+    <div class="proc-grid">
+      <div class="proc-media" aria-hidden="true">
+        <img src="img/hex.jpg" alt="" class="on" data-i="0">
+        <img src="img/s2.jpg" alt="" data-i="1">
+        <img src="img/s3.jpg" alt="" data-i="2">
+        <img src="img/s1.jpg" alt="" data-i="3">
+        <span class="num">01</span>
+      </div>
+      <div class="steps">
+        <article class="step on" data-i="0">
+          <div class="mimg"><img src="img/hex.jpg" alt="Lakier po myciu detailingowym, odbicie lamp" loading="lazy"></div>
+          <span class="sn">01 / 04</span>
+          <h3>Mycie SPA</h3>
+          <p>Mycie detailingowe z dekontaminacją chemiczną: usuwamy lotną rdzę, smołę i asfalt.</p>
+          <ul><li>Dekontaminacja</li><li>Lotna rdza</li><li>Smoła i asfalt</li></ul>
+        </article>
+        <article class="step" data-i="1">
+          <div class="mimg"><img src="img/s2.jpg" alt="Polerka i pasta do korekty lakieru" loading="lazy"></div>
+          <span class="sn">02 / 04</span>
+          <h3>Glinkowanie i korekta</h3>
+          <p>Glinkowanie pojazdu i jednoetapowa korekta lakieru. Pozbywamy się większości drobnych zarysowań.</p>
+          <ul><li>Glinkowanie</li><li>Korekta one step</li><li>Odtłuszczenie lakieru</li></ul>
+        </article>
+        <article class="step" data-i="2">
+          <div class="mimg"><img src="img/s3.jpg" alt="Powłoka ceramiczna na lakierze" loading="lazy"></div>
+          <span class="sn">03 / 04</span>
+          <h3>Powłoka ceramiczna</h3>
+          <p>Aplikacja powłoki ceramicznej o trwałości do 2 lat, wosk na felgi i niewidzialna wycieraczka.</p>
+          <ul><li>Ceramika do 2 lat</li><li>Wosk na felgi</li><li>Niewidzialna wycieraczka</li><li>Dressing opon</li></ul>
+        </article>
+        <article class="step" data-i="3">
+          <div class="mimg"><img src="img/s1.jpg" alt="Czyszczenie wnętrza szczotką" loading="lazy"></div>
+          <span class="sn">04 / 04</span>
+          <h3>Wnętrze</h3>
+          <p>Odświeżenie wnętrza: odkurzanie, mycie szyb, dressing plastików oraz pranie tapicerki (2 fotele i kanapa).</p>
+          <ul><li>Odkurzanie</li><li>Dressing plastików</li><li>Pranie tapicerki</li></ul>
+          <div><a class="btn btn-gold" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj Pakiet PRO</a></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="cennik">
+  <div class="wrap">
+    <div class="p-head">
+      <div>
+        <span class="k rv">Cennik</span>
+        <h2 class="h2 rv d1">Wybierz<br>pakiet</h2>
+      </div>
+      <div class="rv d2">
+        <div class="sizes" role="group" aria-label="Wielkość samochodu">
+          <button type="button" data-size="s" aria-pressed="false">Auto małe</button>
+          <button type="button" data-size="m" aria-pressed="true">Średnie</button>
+          <button type="button" data-size="l" aria-pressed="false">Duże</button>
+        </div>
+        <p class="size-note" aria-live="polite">Np. BMW 3, Ford Focus, Toyota Corolla, Audi Q5, Volvo XC60</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <article class="card rv">
+        <h3>Mycie zewnątrz</h3>
+        <div class="price"><small>od</small><b data-s="100" data-m="120" data-l="150">120</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-s="30 min" data-m="35 min" data-l="45 min">35 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>3-fazowe mycie zewnątrz</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Suszenie, płynny wosk</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie szyb zewnątrz, dressing opon</li>
+        </ul>
+        <a class="btn btn-line" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+
+      <article class="card rv d1">
+        <h3>Czyszczenie wnętrza · Standard</h3>
+        <div class="price"><small>od</small><b data-s="100" data-m="120" data-l="140">120</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-s="60 min" data-m="80 min" data-l="110 min">80 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Sprzątanie i odkurzanie wnętrza + bagażnik</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie i dressing plastików</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie szyb wewnątrz</li>
+        </ul>
+        <a class="btn btn-line" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+
+      <article class="card hot rv d2">
+        <span class="badge">Popularne</span>
+        <h3>Pakiet Standard</h3>
+        <div class="price"><small>od</small><b data-s="200" data-m="220" data-l="260">220</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>90 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>3-fazowe mycie, suszenie, płynny wosk</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie szyb, dressing opon</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Odkurzanie wnętrza + bagażnik</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Czyszczenie i dressing plastików</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie szyb wewnątrz</li>
+        </ul>
+        <a class="btn btn-gold" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+
+      <article class="card rv">
+        <h3>Pakiet Premium</h3>
+        <div class="price"><small>od</small><b data-s="499" data-m="599" data-l="699">599</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-s="4 h 25 min" data-m="4 h 40 min" data-l="4 h 55 min">4 h 40 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie SPA z dekontaminacją chemiczną</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Usuwanie lotnej rdzy, smoły, asfaltu</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Twardy wosk na lakier i felgi</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Odświeżenie wnętrza</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Niewidzialna wycieraczka, dressing opon</li>
+        </ul>
+        <a class="btn btn-line" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+
+      <article class="card rv d1">
+        <h3>Pakiet Premium +</h3>
+        <div class="price"><small>od</small><b data-s="1 500" data-m="1 700" data-l="1 900">1 700</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-s="9 h" data-m="10 h 30 min" data-l="11 h 30 min">10 h 30 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Wszystko z Pakietu Premium</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Glinkowanie pojazdu</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Jednoetapowa korekta lakieru</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Wosk premium Zymol / Swissvax</li>
+        </ul>
+        <a class="btn btn-line" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+
+      <article class="card rv d2">
+        <h3>Pakiet PRO</h3>
+        <div class="price"><b data-s="2 500" data-m="3 000" data-l="3 500">3 000</b><small>zł</small></div>
+        <div class="time"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-s="16 h" data-m="16 h 30 min" data-l="17 h">16 h 30 min</span></div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mycie SPA, glinkowanie, korekta</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Powłoka ceramiczna do 2 lat</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Wosk na felgi, niewidzialna wycieraczka</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Pranie tapicerki (2 fotele + kanapa)</li>
+        </ul>
+        <a class="btn btn-line" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj</a>
+      </article>
+    </div>
+
+    <div class="spec">
+      <div class="rv">
+        <h3>Lakier i ochrona</h3>
+        <div class="row"><span class="n">Polerowanie / korekta lakieru (wieloetapowa)<span class="d">3 etapy: cutting, polish, finish. Pomiar grubości lakieru, zaprawki pod numer lakieru.</span></span><span class="p">od 1 500 zł</span></div>
+        <div class="row"><span class="n">Odświeżenie lakieru „one step” + twardy wosk<span class="d">Jednoetapowa korekta, usuwa większość drobnych zarysowań.</span></span><span class="p">od 800 zł</span></div>
+        <div class="row"><span class="n">Powłoka ceramiczna<span class="d">Ochrona i połysk lakieru od 1 roku do nawet 5 lat.</span></span><span class="p">600 zł</span></div>
+        <div class="row"><span class="n">Demontaż folii samochodowych<span class="d">Z szyb lub nadwozia, z usunięciem kleju.</span></span><span class="p">od 350 zł</span></div>
+      </div>
+      <div class="rv d1">
+        <h3>Wnętrze i serwis</h3>
+        <div class="row"><span class="n">Czyszczenie wnętrza · Pakiet PRO<span class="d">Detailingowe sprzątanie, pranie dywaników, konserwacja gum, quick detailer.</span></span><span class="p">699 zł</span></div>
+        <div class="row"><span class="n">Serwis klimatyzacji<span class="d">Czynnik R-134a / czynnik 1234yf</span></span><span class="p">od 250 / 350 zł</span></div>
+        <div class="row"><span class="n">Dezynfekcja</span><span class="p">100 zł</span></div>
+        <div class="row"><span class="n">Usługa door-to-door<span class="d">Odbieramy i odwozimy auto. Koszt ustalany indywidualnie.</span></span><span class="p">od 100 zł</span></div>
+      </div>
+    </div>
+
+    <details class="tap rv">
+      <summary>Pranie tapicerki · cennik elementów <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+      <div class="tap-grid">
+        <div>
+          <h4>Tapicerka materiałowa</h4>
+          <div class="r"><span>Fotel</span><span>do 80 zł</span></div>
+          <div class="r"><span>Kanapa</span><span>od 130 zł</span></div>
+          <div class="r"><span>Podłoga</span><span>od 100 zł</span></div>
+          <div class="r"><span>Bagażnik</span><span>od 100 zł</span></div>
+          <div class="r"><span>Boczki drzwi</span><span>od 50 zł</span></div>
+          <div class="r"><span>Pasy</span><span>od 30 zł</span></div>
+          <div class="r"><span>Fotelik samochodowy</span><span>od 70 zł</span></div>
+          <div class="r"><span>Dywaniki welurowe kpl</span><span>od 50 zł</span></div>
+          <div class="r"><span>Podsufitka</span><span>od 100 zł</span></div>
+          <div class="r"><span>Komplet Pro</span><span>od 700 zł</span></div>
+        </div>
+        <div>
+          <h4>Tapicerka skórzana · czyszczenie i impregnacja</h4>
+          <div class="r"><span>Fotel</span><span>od 90 zł</span></div>
+          <div class="r"><span>Kanapa</span><span>od 140 zł</span></div>
+          <div class="r"><span>Podłoga</span><span>od 100 zł</span></div>
+          <div class="r"><span>Bagażnik</span><span>od 50 zł</span></div>
+          <div class="r"><span>Boczki drzwi</span><span>od 50 zł</span></div>
+          <div class="r"><span>Pasy</span><span>od 30 zł</span></div>
+          <div class="r"><span>Fotelik samochodowy</span><span>70 zł</span></div>
+          <div class="r"><span>Dywaniki welurowe kpl</span><span>od 50 zł</span></div>
+          <div class="r"><span>Podsufitka</span><span>od 100 zł</span></div>
+          <div class="r"><span>Komplet Pro</span><span>od 800 zł</span></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="rv" style="margin-top:56px">
+      <h3 style="font-size:22px;font-stretch:115%">Usługi dodatkowe</h3>
+      <div class="chips">
+        <span class="chip">Usuwanie naklejek i kleju <b>od 20 zł</b></span>
+        <span class="chip">Doczyszczanie z sierści zwierząt <b>od 30 zł</b></span>
+        <span class="chip">Dressing tworzyw sztucznych <b>od 50 zł</b></span>
+        <span class="chip">Niewidzialna wycieraczka <b>60 zł</b></span>
+        <span class="chip">Quick Detailer / Quick Wax <b>od 80 zł</b></span>
+        <span class="chip">Ozonowanie <b>80 zł</b></span>
+        <span class="chip">Wosk twardy na felgi (4 szt.) <b>od 120 zł</b></span>
+        <span class="chip">Dekontaminacja lakieru <b>140 zł</b></span>
+        <span class="chip">Glinkowanie lakieru <b>150 zł</b></span>
+        <span class="chip">Wosk twardy <b>od 150 zł</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="ba" id="efekty">
+  <div class="wrap">
+    <span class="k rv">Efekty</span>
+    <h2 class="h2 rv d1">Przed i po<br><span class="gold">praniu tapicerki</span></h2>
+    <div class="ba-grid">
+      <figure class="rv"><img src="img/ba1.jpg" alt="Fotel samochodowy przed i po praniu tapicerki" loading="lazy"><figcaption>Fotele</figcaption></figure>
+      <figure class="rv d1"><img src="img/ba2.jpg" alt="Boczek drzwi przed i po czyszczeniu" loading="lazy"><figcaption>Boczki drzwi</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="galeria">
+  <div class="wrap g-head">
+    <div>
+      <span class="k rv">Realizacje</span>
+      <h2 class="h2 rv d1">Z naszego<br>boksu</h2>
+    </div>
+    <div class="g-nav rv d2">
+      <button type="button" data-dir="-1" aria-label="Poprzednie zdjęcia"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" data-dir="1" aria-label="Następne zdjęcia"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="strip" tabindex="0" aria-label="Galeria realizacji, przewijana w poziomie">
+    <figure><img src="img/c1.jpg" alt="Biały Lexus RX po myciu" loading="lazy"></figure>
+    <figure><img src="img/c2.jpg" alt="Zielone Audi przed boksem" loading="lazy"></figure>
+    <figure><img src="img/c3.jpg" alt="Porsche Cayenne Coupe" loading="lazy"></figure>
+    <figure><img src="img/c4.jpg" alt="Białe Porsche Panamera" loading="lazy"></figure>
+    <figure><img src="img/c5.jpg" alt="BMW X6 po detailingu" loading="lazy"></figure>
+    <figure><img src="img/c6.jpg" alt="Peugeot 2008 z odbiciem heksagonalnych lamp" loading="lazy"></figure>
+    <figure><img src="img/c7.jpg" alt="BMW Z4 z czerwonym wnętrzem" loading="lazy"></figure>
+    <figure><img src="img/c8.jpg" alt="Kierownica Volkswagena po czyszczeniu" loading="lazy"></figure>
+    <figure><img src="img/c9.jpg" alt="Felga i nadkole po myciu" loading="lazy"></figure>
+    <figure><img src="img/c10.jpg" alt="Range Rover Velar" loading="lazy"></figure>
+    <figure><img src="img/c11.jpg" alt="Konsola środkowa po czyszczeniu" loading="lazy"></figure>
+    <figure><img src="img/c12.jpg" alt="Kratka nawiewu po czyszczeniu" loading="lazy"></figure>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews" id="opinie">
+  <div class="wrap rv-grid">
+    <div class="rv" id="score">
+      <span class="k">Opinie w Booksy</span>
+      <div class="big" style="margin-top:20px">5.0</div>
+      <p style="margin:12px 0 0;color:var(--muted)">Na podstawie 123 opinii zweryfikowanych klientów.</p>
+      <div class="bars">
+        <div class="bar"><span>5</span><i><span style="--w:.976"></span></i><span>120</span></div>
+        <div class="bar"><span>4</span><i><span style="--w:.012"></span></i><span>1</span></div>
+        <div class="bar"><span>3</span><i><span style="--w:.012"></span></i><span>1</span></div>
+        <div class="bar"><span>2</span><i><span style="--w:.012"></span></i><span>1</span></div>
+        <div class="bar"><span>1</span><i><span style="--w:0"></span></i><span>0</span></div>
+      </div>
+    </div>
+    <div class="quotes">
+      <figure class="q rv" style="margin:0"><blockquote>„100% zadowolenie”</blockquote><cite><b>Tomasz</b> · Pakiet Standard</cite></figure>
+      <figure class="q rv d1" style="margin-top:0;margin-bottom:0"><blockquote>„Polecam”</blockquote><cite><b>Katarzyna</b> · Czyszczenie wnętrza</cite></figure>
+      <figure class="q rv d2" style="margin:0"><blockquote>„Wszystko ok”</blockquote><cite><b>Artur</b> · Czyszczenie wnętrza</cite></figure>
+      <a class="rv d3" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener" style="font-weight:600;margin-top:8px">Zobacz wszystkie opinie w Booksy →</a>
+    </div>
+  </div>
+</section>
+
+<!-- AMENITIES -->
+<section class="amen" aria-label="Udogodnienia">
+  <div class="wrap">
+    <span class="k rv">Udogodnienia</span>
+    <div class="am-grid">
+      <div class="am rv"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>Parking</div>
+      <div class="am rv d1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Płatność kartą</div>
+      <div class="am rv d2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/><path d="M1.5 9a15 15 0 0 1 21 0"/></svg>Wi-Fi</div>
+      <div class="am rv d3"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4" r="2"/><path d="M12 7v6h5l2 6M12 10H8"/><path d="M9.5 13.5a5 5 0 1 0 6 6"/></svg>Dostępne dla niepełnosprawnych</div>
+      <div class="am rv d4"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>Przyjazne dla dzieci</div>
+      <div class="am rv d5"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="10" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="19" cy="10" r="2"/><path d="M12 12c-3 0-5 3.5-5 6 0 1.7 1.3 3 3 3 1 0 1.4-.5 2-.5s1 .5 2 .5c1.7 0 3-1.3 3-3 0-2.5-2-6-5-6z"/></svg>Zwierzęta dozwolone</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="kontakt">
+  <div class="wrap">
+    <div class="c-card rv">
+      <svg class="hexes" aria-hidden="true" width="100%" height="100%"><rect width="100%" height="100%" fill="url(#hx)"/></svg>
+      <div class="c-in">
+        <div>
+          <span class="k">Kontakt</span>
+          <h2 style="margin-top:20px">Twoje auto<br><span class="gold">zasługuje na spa</span></h2>
+          <div class="c-list">
+            <div><span>Adres</span><address>ul. Rozrywki 1, 31-419 Kraków</address></div>
+            <div><span>Telefon</span><a href="tel:+48793960093">793 960 093</a></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:34px">
+            <a class="btn btn-gold" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj w Booksy</a>
+            <a class="btn btn-line" href="https://www.google.com/maps/search/?api=1&amp;query=50.0964381%2C19.98065438" target="_blank" rel="noopener">Wyznacz trasę</a>
+          </div>
+        </div>
+        <div class="hours">
+          <h3>Godziny otwarcia</h3>
+          <div data-d="1"><span>Poniedziałek</span><span>9:00 – 18:00</span></div>
+          <div data-d="2"><span>Wtorek</span><span>9:00 – 18:00</span></div>
+          <div data-d="3"><span>Środa</span><span>9:00 – 18:00</span></div>
+          <div data-d="4"><span>Czwartek</span><span>9:00 – 18:00</span></div>
+          <div data-d="5"><span>Piątek</span><span>9:00 – 18:00</span></div>
+          <div data-d="6"><span>Sobota</span><span>9:00 – 17:00</span></div>
+          <div data-d="0"><span>Niedziela</span><span>nieczynne</span></div>
+          <div class="socials">
+            <a href="https://www.instagram.com/center_car_detailing_spa/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+            <a href="https://www.facebook.com/centercarpl" target="_blank" rel="noopener" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2z"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="img/logo-wide.jpg" alt="Center Car Detailing Spa" width="134" height="30">
+    <span>© 2026 Center Car Detailing &amp; Spa · Kraków</span>
+    <a href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Rezerwacje przez Booksy</a>
+  </div>
+</footer>
+
+<a class="btn btn-gold mbook" href="https://booksy.com/pl-pl/142263_center-car-detailing-spa_motoryzacja_8820_krakow" target="_blank" rel="noopener">Zarezerwuj w Booksy</a>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // reveal on scroll
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+
+  // header + progress + hero parallax
+  var header = document.getElementById('top');
+  var bar = document.querySelector('.progress');
+  var heroBg = document.querySelector('.hero-bg');
+  var ticking = false;
+  function onScroll() {
+    var y = window.scrollY, h = document.documentElement.scrollHeight - innerHeight;
+    header.classList.toggle('solid', y > 40);
+    bar.style.transform = 'scaleX(' + (h > 0 ? y / h : 0) + ')';
+    if (!reduce && y < innerHeight * 1.2) heroBg.style.transform = 'translate3d(0,' + (y * 0.28) + 'px,0) scale(1.04)';
+    ticking = false;
+  }
+  addEventListener('scroll', function () { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
+  onScroll();
+
+  // process: sticky image follows active step
+  var imgs = document.querySelectorAll('.proc-media img');
+  var num = document.querySelector('.proc-media .num');
+  var steps = document.querySelectorAll('.step');
+  var so = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var i = e.target.getAttribute('data-i');
+      steps.forEach(function (s) { s.classList.toggle('on', s === e.target); });
+      imgs.forEach(function (im) { im.classList.toggle('on', im.getAttribute('data-i') === i); });
+      num.textContent = '0' + (+i + 1);
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  steps.forEach(function (s) { so.observe(s); });
+
+  // pricing size toggle
+  var notes = { s: 'Np. Audi A1, BMW 1, Fiat 500, Skoda Citigo, Ford Fiesta', m: 'Np. BMW 3, Ford Focus, Toyota Corolla, Audi Q5, Volvo XC60', l: 'Np. Mercedes GLS, BMW X7, Volvo XC90, Ford Edge' };
+  var btns = document.querySelectorAll('.sizes button');
+  var note = document.querySelector('.size-note');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var sz = b.getAttribute('data-size');
+      btns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      note.textContent = notes[sz];
+      document.querySelectorAll('.cards [data-' + sz + ']').forEach(function (el) {
+        if (el.tagName === 'B' && !reduce) {
+          el.classList.add('swap');
+          setTimeout(function () { el.textContent = el.getAttribute('data-' + sz); el.classList.remove('swap'); }, 180);
+        } else { el.textContent = el.getAttribute('data-' + sz); }
+      });
+    });
+  });
+
+  // gallery: buttons + drag
+  var strip = document.querySelector('.strip');
+  document.querySelectorAll('.g-nav button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      strip.scrollBy({ left: (+b.getAttribute('data-dir')) * strip.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+  var down = false, sx = 0, sl = 0, moved = false;
+  strip.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = strip.scrollLeft; });
+  addEventListener('pointermove', function (e) { if (!down) return; var dx = e.clientX - sx; if (Math.abs(dx) > 4) { moved = true; strip.classList.add('drag'); } strip.scrollLeft = sl - dx; });
+  addEventListener('pointerup', function () { down = false; strip.classList.remove('drag'); });
+
+  // today's hours
+  var d = new Date().getDay();
+  var row = document.querySelector('.hours [data-d="' + d + '"]');
+  if (row) row.classList.add('today');
+})();
+</script>
+</body>
+</html>
