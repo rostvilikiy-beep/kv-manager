@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balbierz Barber Shop · Poznań, Jeżyce</title>
+<meta name="description" content="Balbierz Barber Shop, Jana Henryka Dąbrowskiego 40, Poznań (Jeżyce). Strzyżenie głowy, broda, golenie brzytwą, fryzury dziecięce. Ocena 5.0 w Booksy. Rezerwacja online.">
+<meta property="og:title" content="Balbierz Barber Shop · Poznań">
+<meta property="og:description" content="Strzyżenie głowy, broda, golenie brzytwą i fryzury dziecięce na Jeżycach. Rezerwacja online w Booksy.">
+<meta property="og:image" content="img/hero.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#10221B">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BarberShop",
+  "name": "Balbierz Barber Shop",
+  "image": "img/hero.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Jana Henryka Dąbrowskiego 40",
+    "postalCode": "60-843",
+    "addressLocality": "Poznań",
+    "addressCountry": "PL"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 52.4119211, "longitude": 16.9064041 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "12:00", "closes": "19:20" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "10:30", "closes": "19:20" }
+  ],
+  "sameAs": ["https://www.facebook.com/balbierz.shop"]
+}
+</script>
+<style>
+  :root{
+    --green:#10221B; --green2:#0B1913; --cream:#F3EDE2; --ink:#14261F;
+    --gold:#E9C77B; --gold2:#F6DFA6; --red:#B3261E; --red-text:#A3271F;
+    --muted-d:#CFC7B6; --muted-l:#4A5A52; --muted-l2:#5B6B63;
+    --serif:'DM Serif Display', Georgia, serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--green);color:var(--cream);font:16px/1.6 Inter, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  a{color:var(--gold)} a:hover{color:var(--gold2)}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+  section{scroll-margin-top:84px}
+  .kicker{font-size:13px;letter-spacing:.28em;text-transform:uppercase;font-weight:600;color:var(--gold)}
+  .light .kicker{color:var(--red-text);font-weight:700}
+  .h2{font-size:clamp(40px,6vw,64px);line-height:1}
+  .light{background:var(--cream);color:var(--ink)}
+  .light h2,.light h3{color:var(--green)}
+  .pad{padding:104px 0}
+  .pole{display:inline-block;height:10px;border-radius:5px;background:repeating-linear-gradient(135deg,#C8372D 0 8px,#F3EDE2 8px 14px,#2B4C8C 14px 22px,#F3EDE2 22px 28px)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:15px 30px;border-radius:999px;font-weight:600;font-size:16px;text-decoration:none;transition:transform .15s ease,background-color .15s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-red{background:var(--red);color:#fff} .btn-red:hover{background:#C93027;color:#fff}
+  .btn-ghost{border:1px solid rgba(243,237,226,.4);color:var(--cream)} .btn-ghost:hover{border-color:var(--gold);color:var(--gold2)}
+  .btn-dark{background:var(--green);color:var(--cream)} .btn-dark:hover{color:#fff}
+
+  /* header */
+  header{position:sticky;top:0;z-index:50;background:rgba(16,34,27,.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(233,199,123,.18)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 24px;max-width:1240px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+  .brand img{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid var(--gold)}
+  .brand b{display:block;font:24px/1.1 var(--serif);font-weight:400;letter-spacing:.02em}
+  .brand small{display:block;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#C9BFA9}
+  .menu{display:flex;align-items:center;gap:28px}
+  .menu a.l{color:#D9D2C3;text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+  .menu a.l:hover{color:#fff}
+  .menu .btn{padding:12px 22px;font-size:14px;min-height:44px}
+
+  /* hero */
+  .hero{display:flex;flex-wrap:wrap;gap:56px;align-items:center;padding:72px 24px 96px;max-width:1240px;margin:0 auto}
+  .hero-txt{flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:28px}
+  .hero-k{display:flex;align-items:center;gap:14px}
+  .hero h1{font-size:clamp(56px,9vw,92px);line-height:.95;letter-spacing:-.01em;color:#F8F3EA}
+  .hero h1 em{color:var(--gold)}
+  .hero p{margin:0;font-size:19px;color:var(--muted-d);max-width:520px}
+  .btns{display:flex;gap:14px;flex-wrap:wrap}
+  .rating{display:flex;align-items:center;gap:18px;padding-top:8px}
+  .rating .big{font:48px/1 var(--serif);color:#F8F3EA}
+  .stars{display:flex;gap:3px}
+  .hero-pic{flex:1 1 420px;min-width:0;position:relative}
+  .hero-pic .ring{position:absolute;top:-18px;right:-18px;width:140px;height:140px;border-radius:50%;border:1px solid rgba(233,199,123,.5)}
+  .hero-pic .arch{position:relative;border-radius:280px 280px 16px 16px;overflow:hidden;border:1px solid rgba(233,199,123,.35);height:600px}
+  .hero-pic .arch img{width:100%;height:100%;object-fit:cover}
+  .hero-pic .tag{position:absolute;left:-24px;bottom:40px;background:var(--cream);color:var(--green);padding:16px 20px;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+  .hero-pic .tag span{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-l2);font-weight:600}
+  .hero-pic .tag b{display:block;font:26px/1.2 var(--serif);font-weight:400}
+
+  /* amenities */
+  .strip{background:var(--green2);border-top:1px solid rgba(233,199,123,.15);border-bottom:1px solid rgba(233,199,123,.15)}
+  .strip .wrap{display:flex;flex-wrap:wrap;gap:16px 48px;justify-content:center;padding-top:22px;padding-bottom:22px}
+  .strip span{display:flex;align-items:center;gap:10px;font-size:15px;color:#DCD4C4}
+
+  /* cennik */
+  .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:56px}
+  .head > div{display:flex;flex-direction:column;gap:14px}
+  .svc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 56px}
+  .cat-h{display:flex;align-items:baseline;gap:14px;padding-bottom:14px;border-bottom:2px solid var(--green);margin-bottom:6px}
+  .cat-h h3{font-size:32px}
+  .cat-h span{font-size:13px;color:var(--muted-l2)}
+  .svc{display:flex;gap:20px;align-items:flex-start;padding:18px 14px;margin:0 -14px;border-radius:12px;text-decoration:none;color:var(--ink);border-bottom:1px dashed rgba(16,34,27,.2);transition:background-color .15s}
+  .svc:hover{background:#fff;color:var(--ink)}
+  .svc .i{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .svc .n{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;letter-spacing:.02em}
+  .svc .pop{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--red-text);padding:3px 8px;border-radius:999px}
+  .svc .d{font-size:14px;line-height:1.5;color:var(--muted-l)}
+  .svc .t{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted-l2)}
+  .svc .p{font:28px/1 var(--serif);white-space:nowrap;color:var(--green)}
+
+  /* barber */
+  .barber{display:flex;flex-wrap:wrap;gap:64px;align-items:center}
+  .barber-pics{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:16px}
+  .barber-pics div{border-radius:16px;overflow:hidden}
+  .barber-pics img{width:100%;height:100%;object-fit:cover}
+  .barber-txt{flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:28px}
+  .barber-txt h2{color:#F8F3EA}
+  .barber-txt p{margin:0;font-size:18px;line-height:1.65;color:var(--muted-d);max-width:520px}
+  .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-top:8px}
+  .stats div{border-top:1px solid rgba(233,199,123,.4);padding-top:18px}
+  .stats b{display:block;font:44px/1 var(--serif);font-weight:400;color:var(--gold)}
+  .stats span{display:block;margin-top:6px;font-size:13px;color:var(--muted-d);letter-spacing:.06em}
+
+  /* galeria */
+  .gal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:240px;gap:14px}
+  .gal div{border-radius:14px;overflow:hidden}
+  .gal img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+  .gal div:hover img{transform:scale(1.05)}
+  .c2{grid-column:span 2} .r2{grid-row:span 2}
+
+  /* opinie */
+  .rev{display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start}
+  .rev-l{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:24px}
+  .rev-l p{margin:0;font-size:17px;color:var(--muted-l)}
+  .bars{display:flex;flex-direction:column;gap:10px;max-width:420px}
+  .bar{display:flex;align-items:center;gap:12px;font-size:14px}
+  .bar b{width:14px}
+  .bar i{flex:1;height:8px;border-radius:4px;background:rgba(16,34,27,.12);overflow:hidden}
+  .bar i span{display:block;height:100%;background:var(--green)}
+  .bar em{font-style:normal;width:34px;text-align:right;color:var(--muted-l)}
+  .rev-l a{color:var(--red-text);font-weight:600;text-underline-offset:4px}
+  .quote{flex:1 1 520px;min-width:0;margin:0;background:var(--green);color:var(--cream);border-radius:24px;padding:56px;display:flex;flex-direction:column;gap:28px;position:relative;overflow:hidden}
+  .quote .qm{position:absolute;top:-40px;right:24px;font:260px/1 var(--serif);color:rgba(233,199,123,.14)}
+  .quote blockquote{margin:0;font:clamp(28px,3.4vw,40px)/1.2 var(--serif);color:#F8F3EA;position:relative}
+  .quote figcaption{font-size:15px;color:var(--muted-d)}
+  .quote figcaption b{display:block;color:var(--cream);font-weight:600}
+
+  /* kontakt */
+  .contact{display:flex;flex-wrap:wrap;gap:48px}
+  .contact-l{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:28px}
+  .contact-l h2{color:#F8F3EA}
+  .addr span{display:block;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#9FA99F;margin-bottom:6px}
+  .addr address{font-style:normal;font-size:20px;line-height:1.5}
+  .fb{width:52px;padding:0}
+  .hours{flex:1 1 460px;min-width:0;background:var(--cream);color:var(--ink);border-radius:24px;padding:44px}
+  .hours h3{font-size:34px;color:var(--green);margin-bottom:16px}
+  .hours div{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid rgba(16,34,27,.14);font-size:17px}
+  .hours div b{font-weight:600}
+  .hours div span{color:#33443C;text-align:right}
+  .hours p{margin:14px 0 0;font-size:14px;color:var(--muted-l)}
+
+  footer{background:var(--green2);border-top:1px solid rgba(233,199,123,.15)}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;padding-top:36px;padding-bottom:36px}
+  footer .f{display:flex;align-items:center;gap:12px;font-size:14px;color:#B8B09F}
+  footer img{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#fff}
+  footer a{font-size:14px;font-weight:600}
+
+  /* mobile booking bar */
+  .mbook{display:none}
+
+  @media (max-width:900px){
+    .menu a.l{display:none}
+    .pad{padding:72px 0}
+    .hero{padding:40px 20px 72px;gap:40px}
+    .hero-pic .arch{height:440px}
+    .hero-pic .tag{left:12px;bottom:20px}
+    .hero-pic .ring{display:none}
+    .svc-grid{grid-template-columns:minmax(0,1fr)}
+    .gal{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:180px}
+    .gal .c2{grid-column:span 2} .gal .r2{grid-row:span 1}
+    .quote{padding:36px 28px}
+    .hours{padding:28px 22px}
+    .wrap{padding:0 20px}
+    .menu .btn{display:none}
+    .mbook{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+    footer{padding-bottom:76px}
+  }
+  @media (max-width:480px){
+    .stats b{font-size:34px}
+    .brand small{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav" aria-label="Główne menu">
+    <a class="brand" href="#start">
+      <img src="img/logo.jpg" alt="Logo Balbierz Barber Shop">
+      <span><b>Balbierz</b><small>Barber Shop · Poznań</small></span>
+    </a>
+    <div class="menu">
+      <a class="l" href="#cennik">Cennik</a>
+      <a class="l" href="#barber">Barber</a>
+      <a class="l" href="#galeria">Galeria</a>
+      <a class="l" href="#opinie">Opinie</a>
+      <a class="l" href="#kontakt">Kontakt</a>
+      <a class="btn btn-red" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Umów wizytę</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+<section id="start">
+  <div class="hero">
+    <div class="hero-txt">
+      <div class="hero-k"><span class="pole" style="width:44px" aria-hidden="true"></span><span class="kicker">Since 1992 · Poznań, Jeżyce</span></div>
+      <h1>Balbierz<br><em>Barber Shop</em></h1>
+      <p>Strzyżenie głowy, broda, golenie brzytwą z gorącym ręcznikiem i fryzury dziecięce. Jana Henryka Dąbrowskiego 40, Poznań.</p>
+      <div class="btns">
+        <a class="btn btn-red" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Zarezerwuj w Booksy</a>
+        <a class="btn btn-ghost" href="#cennik">Zobacz cennik</a>
+      </div>
+      <div class="rating">
+        <span class="big">5.0</span>
+        <span>
+          <span class="stars" role="img" aria-label="5 na 5 gwiazdek">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+          </span>
+          <span style="font-size:14px;color:var(--muted-d)">604 opinie na Booksy</span>
+        </span>
+      </div>
+    </div>
+    <div class="hero-pic">
+      <div class="ring" aria-hidden="true"></div>
+      <div class="arch"><img src="img/hero.jpg" alt="Barber z nożyczkami w Balbierz Barber Shop"></div>
+      <div class="tag"><span>Wtorek – piątek</span><b>10:30 – 19:20</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="strip" aria-label="Udogodnienia">
+  <div class="wrap">
+    <span><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>Parking</span>
+    <span><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>Przyjazne dla dzieci</span>
+    <span><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="10" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><circle cx="19" cy="10" r="2"/><path d="M12 12c-3 0-5 3.5-5 6 0 1.7 1.3 3 3 3 1 0 1.4-.5 2-.5s1 .5 2 .5c1.7 0 3-1.3 3-3 0-2.5-2-6-5-6z"/></svg>Zwierzęta dozwolone</span>
+    <span><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Rezerwacja online 24/7</span>
+  </div>
+</section>
+
+<section id="cennik" class="light pad">
+  <div class="wrap">
+    <div class="head">
+      <div><span class="kicker">Cennik</span><h2 class="h2">Usługi i ceny</h2></div>
+      <a class="btn btn-dark" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Wybierz termin w Booksy</a>
+    </div>
+    <div class="svc-grid">
+      <div>
+        <div class="cat-h"><h3>Głowa</h3><span>5 usług</span></div>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">GŁOWA KLASYK <span class="pop">Popularne</span></span><span class="d">Strzyżenie klasyczne głowy</span><span class="t">20 min</span></span><span class="p">90 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">SKIN FADE</span><span class="d">Cieniowanie od skóry głowy</span><span class="t">20 min</span></span><span class="p">90 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">MASZYNKA EXPRESS</span><span class="d">Strzyżenie głowy maszynką</span><span class="t">15 min</span></span><span class="p">60 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">FRYZURA DZIECIĘCA (do 10 lat) <span class="pop">Popularne</span></span><span class="t">20 min</span></span><span class="p">50 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">FRYZURA CHŁOPIĘCA (powyżej 10 do 13 lat)</span><span class="t">20 min</span></span><span class="p">60 zł</span></a>
+      </div>
+      <div>
+        <div class="cat-h"><h3>Broda + Głowa</h3><span>3 usługi</span></div>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">PAKIET KLASYK <span class="pop">Popularne</span></span><span class="d">Strzyżenie głowy i strzyżenie brody nożyczkami i maszynką</span><span class="t">30 min</span></span><span class="p">110 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">PAKIET LUX</span><span class="d">Strzyżenie głowy, strzyżenie brody,<br>podgolenie brody brzytwą lub maszynką,<br>gorący ręcznik, woda po goleniu.</span><span class="t">35 min</span></span><span class="p">130 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">BRODA i GŁOWA EXPRESS</span><span class="d">Strzyżenie maszynką głowy i brody</span><span class="t">25 min</span></span><span class="p">90 zł</span></a>
+      </div>
+      <div>
+        <div class="cat-h"><h3>Broda</h3><span>2 usługi</span></div>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">BRODA KLASYK</span><span class="d">Strzyżenie brody i konturowanie brody maszynką</span><span class="t">20 min</span></span><span class="p">70 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">BRODA EXCLUSIVE</span><span class="d">Golenie brody brzytwą.<br>Gorący ręcznik, woda po goleniu.</span><span class="t">30 min</span></span><span class="p">90 zł</span></a>
+      </div>
+      <div>
+        <div class="cat-h"><h3>Inne usługi</h3><span>3 usługi</span></div>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">Modelowanie, stylizowanie</span><span class="t">10 min</span></span><span class="p">30 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">Odsiwianie</span><span class="t">15 min</span></span><span class="p">70 zł</span></a>
+        <a class="svc" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener"><span class="i"><span class="n">Farbowanie brody</span><span class="t">15 min</span></span><span class="p">70 zł</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="barber" class="pad">
+  <div class="wrap barber">
+    <div class="barber-pics">
+      <div style="height:420px"><img src="img/marcin.jpg" alt="Marcin Frankowski, barber" style="object-position:center 30%"></div>
+      <div style="height:240px"><img src="img/wnetrze.jpg" alt="Wnętrze salonu: zielone ściany, złote lustra, fotel barberski"></div>
+    </div>
+    <div class="barber-txt">
+      <span class="kicker">Twój barber</span>
+      <h2 class="h2">Marcin<br>Frankowski</h2>
+      <p>Balbierz Barber Shop na Jeżycach, przy Dąbrowskiego 40. Wszystkie wizyty prowadzi Marcin.</p>
+      <div class="stats">
+        <div><b>1992</b><span>od tego roku</span></div>
+        <div><b>604</b><span>opinie w Booksy</span></div>
+        <div><b>5.0</b><span>średnia ocen</span></div>
+      </div>
+      <div><a class="btn btn-red" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Umów się do Marcina</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="galeria" class="pad" style="background:var(--green2)">
+  <div class="wrap">
+    <div class="head">
+      <div><span class="kicker">Galeria</span><h2 class="h2" style="color:#F8F3EA">Nasze prace</h2></div>
+      <a href="https://www.facebook.com/balbierz.shop" target="_blank" rel="noopener" style="font-weight:600;text-underline-offset:4px">Więcej na Facebooku</a>
+    </div>
+    <div class="gal">
+      <div class="c2 r2"><img src="img/g1.jpg" alt="Trymowanie brody maszynką"></div>
+      <div class="r2"><img src="img/g2.jpg" alt="Fade i broda, widok z boku"></div>
+      <div><img src="img/g3.jpg" alt="Modelowanie włosów suszarką"></div>
+      <div><img src="img/g6.jpg" alt="Konturowanie brody"></div>
+      <div class="r2"><img src="img/g4.jpg" alt="Fryzura dziecięca z wzorem"></div>
+      <div class="c2"><img src="img/g5.jpg" alt="Skin fade, profil"></div>
+      <div class="r2"><img src="img/g8.jpg" alt="Fryzura chłopięca"></div>
+      <div><img src="img/g7.jpg" alt="Golenie brody"></div>
+      <div><img src="img/g9.jpg" alt="Woda po goleniu"></div>
+    </div>
+  </div>
+</section>
+
+<section id="opinie" class="light pad">
+  <div class="wrap rev">
+    <div class="rev-l">
+      <span class="kicker">Opinie</span>
+      <h2 class="h2">5.0 na 5</h2>
+      <p>Na podstawie 604 zweryfikowanych opinii w Booksy.</p>
+      <div class="bars">
+        <div class="bar"><b>5</b><i><span style="width:98%"></span></i><em>594</em></div>
+        <div class="bar"><b>4</b><i><span style="width:1.5%"></span></i><em>4</em></div>
+        <div class="bar"><b>3</b><i><span style="width:1%"></span></i><em>2</em></div>
+        <div class="bar"><b>2</b><i><span style="width:1%"></span></i><em>3</em></div>
+        <div class="bar"><b>1</b><i><span style="width:.6%"></span></i><em>1</em></div>
+      </div>
+      <a href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Przeczytaj wszystkie opinie w Booksy</a>
+    </div>
+    <figure class="quote">
+      <span class="qm" aria-hidden="true">”</span>
+      <span class="stars" role="img" aria-label="5 na 5 gwiazdek">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#E9C77B"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+      </span>
+      <blockquote>Profesjonalne podejście do klienta! Fryzura Klasa Światowia. Polecam!!!</blockquote>
+      <figcaption><b>Adam · potwierdzony klient</b>PAKIET KLASYK · listopad 2026</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="kontakt" class="pad">
+  <div class="wrap contact">
+    <div class="contact-l">
+      <span class="kicker">Kontakt</span>
+      <h2 class="h2">Zapraszamy<br>na Jeżyce</h2>
+      <div class="addr"><span>Adres</span><address>Jana Henryka Dąbrowskiego 40<br>60-843 Poznań, Jeżyce</address></div>
+      <div class="btns">
+        <a class="btn btn-red" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Umów wizytę</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Jana+Henryka+D%C4%85browskiego+40+60-843+Pozna%C5%84" target="_blank" rel="noopener">Wyznacz trasę</a>
+        <a class="btn btn-ghost fb" href="https://www.facebook.com/balbierz.shop" target="_blank" rel="noopener" aria-label="Balbierz Barber Shop na Facebooku"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2z"/></svg></a>
+      </div>
+    </div>
+    <div class="hours">
+      <h3>Godziny otwarcia</h3>
+      <div><b>Poniedziałek</b><span>12:00 – 19:20</span></div>
+      <div><b>Wtorek</b><span>10:30 – 19:20</span></div>
+      <div><b>Środa</b><span>10:30 – 19:20</span></div>
+      <div><b>Czwartek</b><span>10:30 – 19:20</span></div>
+      <div><b>Piątek</b><span>10:30 – 19:20</span></div>
+      <div><b>Sobota</b><span>wybrane terminy</span></div>
+      <div><b>Niedziela</b><span>nieczynne</span></div>
+      <p>Aktualne wolne terminy, także w soboty, widać w Booksy.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f"><img src="img/logo.jpg" alt="">© 2026 Balbierz Barber Shop · Poznań</div>
+    <span class="pole" style="width:120px;height:8px" aria-hidden="true"></span>
+    <a href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Rezerwacje przez Booksy</a>
+  </div>
+</footer>
+
+<a class="btn btn-red mbook" href="https://booksy.com/pl-pl/38259_balbierz-barber-shop_barber-shop_15608_poznan" target="_blank" rel="noopener">Umów wizytę w Booksy</a>
+
+</body>
+</html>
