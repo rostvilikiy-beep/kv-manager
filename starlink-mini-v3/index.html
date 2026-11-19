@@ -109,6 +109,7 @@ button{font-family:inherit}
 .btn:active{transform:scale(.97)}
 .btn svg{width:18px;height:18px;transition:transform .35s var(--ease)}
 .btn:hover svg{transform:translateX(5px)}
+.btn--down:hover svg{transform:translateY(4px)}
 .btn--accent{background:var(--yellow);color:#000;clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,var(--cut) 100%,0 calc(100% - var(--cut)))}
 .btn--accent::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.7) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease);z-index:-1}
 .btn--accent:hover::before{transform:translateX(120%)}
@@ -499,9 +500,8 @@ dialog[open]{animation:pop .35s var(--ease)}
     <h1 data-a>Starlink<span>Mini</span></h1>
     <p class="lead" data-a>Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
     <div class="actions" data-a>
-      <!-- TODO: посилання на месенджер -->
-      <a class="btn btn--line" href="https://t.me/vomtexua" data-messenger target="_blank" rel="noopener"><span><span class="hide-m">Написати в </span>месенджер</span>
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+      <a class="btn btn--line btn--down" href="#s-contact" data-go="5"><span>Зв’язатися<span class="hide-m"> з нами</span></span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 2v11M4 9l4 4 4-4"/></svg></a>
       <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
     </div>
@@ -637,8 +637,8 @@ dialog[open]{animation:pop .35s var(--ease)}
         <span class="tag" data-a><b>05</b> FAQ</span>
         <h2 data-a>Часті питання</h2>
         <p data-a>Не знайшли відповідь? Напишіть нам — відповімо на питання щодо партії, доставки та документів.</p>
-        <a class="btn btn--line" href="https://t.me/vomtexua" data-messenger target="_blank" rel="noopener" data-a>Написати в месенджер
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+        <a class="btn btn--line btn--down" href="#s-contact" data-go="5" data-a>Зв’язатися з нами
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 2v11M4 9l4 4 4-4"/></svg></a>
       </div>
       <div class="faq-list" data-a>
         <details class="faq-item" open>
@@ -734,8 +734,8 @@ dialog[open]{animation:pop .35s var(--ease)}
 
 <!-- Липкі кнопки на мобільному -->
 <div class="sticky-cta" id="stickyCta">
-  <a class="btn btn--line" href="https://t.me/vomtexua" data-messenger target="_blank" rel="noopener" aria-label="Написати в месенджер">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>
+  <a class="btn btn--line" href="#s-contact" data-go="5" aria-label="Зв’язатися з нами">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
   </a>
   <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік</button>
 </div>
