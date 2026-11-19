@@ -67,7 +67,9 @@ p{color:#cfcfcf;font-size:16px;line-height:1.55;max-width:420px;margin:0 auto}
 .btn svg{width:18px;height:18px;transition:transform .3s var(--ease)}
 .btn:hover svg{transform:translateX(-4px)}
 :focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
-footer{position:relative;z-index:2;padding:16px 32px;font-size:11px;color:#6a6a6a}
+footer{position:relative;z-index:2;padding:16px 32px;font-size:11px;line-height:1.7;color:#6a6a6a}
+footer a{color:#9a9a9a;text-underline-offset:3px}
+footer a:hover{color:var(--yellow)}
 @media (max-width:520px){header,footer{padding-left:20px;padding-right:20px}.card{padding:36px 22px}.btn{width:100%}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.tick path{stroke-dashoffset:0}}
 </style>
@@ -92,7 +94,7 @@ footer{position:relative;z-index:2;padding:16px 32px;font-size:11px;color:#6a6a6
   </div>
 </main>
 
-<footer>© <span id="y">2026</span> VOMTEX. Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</footer>
+<footer>ФОП Лавров Михайло Валерійович · РНОКПП 3532006918 · <a href="privacy.html">Політика конфіденційності</a> · <a href="terms.html">Умови використання</a><br>© <span id="y">2026</span> VOMTEX. Starlink є торговою маркою Space Exploration Technologies Corp. Сайт не є офіційним сайтом Starlink.</footer>
 <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
 </body>
 </html>
