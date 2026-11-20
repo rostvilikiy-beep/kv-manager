@@ -13,7 +13,7 @@
 
 **Теги (до 10):** Starlink, Starlink Mini, landing page, web design, UI/UX, B2B, wholesale, satellite internet, Ukraine, dark UI
 
-**Инструменты:** [NEED: в чём делал: Figma, Photoshop и т.д.]
+**Инструменты:** Figma
 
 **Описание проекта** (поле в настройках, до ~300 знаков, тоже на трёх языках):
 
@@ -93,11 +93,11 @@ UK: «Купити в 1 клік» відкриває вікно з ціною �
 
 ### Текст 7 · в конце (по желанию)
 
-EN: Design: [NEED: имя/ник как на Behance]. Client: VOMTEX. 2026.
+EN: Design: Mark. Client: VOMTEX. 2026.
 
-RU: Дизайн: [NEED]. Клиент: VOMTEX. 2026.
+RU: Дизайн: Марк. Клиент: VOMTEX. 2026.
 
-UK: Дизайн: [NEED]. Клієнт: VOMTEX. 2026.
+UK: Дизайн: Марк. Клієнт: VOMTEX. 2026.
 
 ---
 
