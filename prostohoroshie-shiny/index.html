@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Просто Хорошие Шины · Пермь</title>
+<meta name="description" content="Самый крупный шинный центр в Перми. 5 000 комплектов шин и дисков в наличии. Продажа, выкуп и обмен шин и дисков, шиномонтаж. Ул. Дзержинского, 61.">
+<meta property="og:title" content="Просто Хорошие Шины · Пермь">
+<meta property="og:description" content="5 000 комплектов шин и дисков в наличии. Выкуп, обмен, шиномонтаж. Ул. Дзержинского, 61.">
+<meta property="og:image" content="img/tires.jpg">
+<link rel="icon" href="img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#04213b; --navy2:#062a49; --ink:#03182b; --card:#0a3050; --line:rgba(255,255,255,.1);
+    --green:#23e17d; --green2:#7af0b0; --text:#eef4f8; --muted:#9fb3c4;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--ink); color:var(--text); font:16px/1.6 Inter, system-ui, sans-serif; }
+  img { max-width:100%; display:block; }
+  a { color:inherit; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 20px; }
+  h1, h2, h3, .brand b { font-family:Montserrat, Arial, sans-serif; font-weight:800; text-transform:uppercase; margin:0; letter-spacing:.01em; }
+  h2 { font-size:clamp(28px,4.2vw,44px); line-height:1.08; margin-bottom:14px; }
+  h3 { font-size:18px; line-height:1.25; }
+  .kicker { display:inline-block; color:var(--green); font-size:13px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; margin-bottom:12px; }
+  .lead { color:var(--muted); font-size:18px; max-width:640px; margin:0; }
+  section { padding:92px 0; }
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:16px 28px; background:var(--green); color:var(--navy); font-weight:700; text-decoration:none; border-radius:40px; transition:.2s; font-size:16px; border:0; cursor:pointer; }
+  .btn:hover { background:var(--green2); transform:translateY(-2px); }
+  .btn.ghost { background:transparent; color:var(--text); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35); }
+  .btn.ghost:hover { box-shadow:inset 0 0 0 1.5px var(--green); color:var(--green2); }
+  .btn svg { width:18px; height:18px; flex:none; }
+
+  /* фото-слот: если файла нет, видна подпись */
+  .ph { position:relative; background:linear-gradient(135deg,#0b3a5e,#06223a); overflow:hidden; }
+  .ph::before { content:attr(data-label); position:absolute; inset:0; display:grid; place-items:center; padding:20px; text-align:center; color:#6f8ea6; font-size:13px; letter-spacing:.06em; border:1.5px dashed #24506f; }
+  .ph img { position:relative; width:100%; height:100%; object-fit:cover; }
+
+  /* шапка */
+  header { position:fixed; inset:0 0 auto; z-index:30; transition:.3s; }
+  header.solid { background:rgba(3,24,43,.96); box-shadow:0 1px 0 var(--line); backdrop-filter:blur(8px); }
+  .nav { display:flex; align-items:center; justify-content:space-between; height:76px; gap:16px; }
+  .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .brand img { width:42px; height:42px; border-radius:10px; }
+  .brand b { font-size:16px; line-height:1.05; }
+  .brand b span { display:block; color:var(--green); }
+  .menu { display:flex; gap:26px; align-items:center; }
+  .menu a { text-decoration:none; font-size:15px; color:var(--muted); font-weight:500; }
+  .menu a:hover { color:var(--text); }
+  .menu .tel { color:var(--text); font-weight:700; white-space:nowrap; }
+  .menu .btn { padding:11px 20px; font-size:14px; color:var(--navy); }
+  @media (max-width:980px) { .menu a:not(.btn):not(.tel) { display:none; } }
+  @media (max-width:560px) { .menu .tel { display:none; } .brand b { font-size:14px; } }
+
+  /* первый экран */
+  .hero { min-height:100vh; display:flex; align-items:center; padding:130px 0 70px; position:relative; overflow:hidden;
+    background:radial-gradient(120% 90% at 85% 10%, rgba(35,225,125,.22), transparent 55%), linear-gradient(160deg,var(--navy2),var(--ink) 70%); }
+  .hero-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:50px; align-items:center; }
+  .hero h1 { font-size:clamp(36px,4.8vw,62px); line-height:1; margin:6px 0 22px; }
+  .hero h1 em { font-style:normal; color:var(--green); }
+  .hero .big { display:flex; align-items:baseline; gap:14px; margin:0 0 18px; }
+  .hero .big b { font:900 clamp(44px,6vw,70px)/1 Montserrat, sans-serif; color:var(--green); }
+  .hero .big span { color:var(--text); font-weight:600; font-size:18px; line-height:1.3; }
+  .hero p { color:#c7d6e2; font-size:18px; max-width:540px; margin:0 0 30px; }
+  .btns { display:flex; gap:12px; flex-wrap:wrap; }
+  .badges { display:flex; gap:10px; flex-wrap:wrap; margin-top:34px; }
+  .badge { display:inline-flex; gap:8px; align-items:center; padding:9px 15px; background:rgba(255,255,255,.06); border:1px solid var(--line); border-radius:40px; font-size:14px; color:#d6e2ea; }
+  .badge b { color:var(--green); }
+  .hero-pic { aspect-ratio:4/4.3; border-radius:28px; box-shadow:0 30px 80px rgba(0,0,0,.45); transform:rotate(1.5deg); }
+  .hero-pic::after { content:""; position:absolute; inset:auto 0 0 0; height:40%; background:linear-gradient(transparent,rgba(3,24,43,.6)); }
+  .hero-tag { position:absolute; left:-18px; bottom:34px; z-index:2; background:var(--green); color:var(--navy); padding:14px 20px; border-radius:16px; font-weight:700; line-height:1.25; box-shadow:0 12px 30px rgba(0,0,0,.35); transform:rotate(-1.5deg); }
+  .hero-tag small { display:block; font-weight:500; font-size:13px; }
+  .hero-side { position:relative; }
+  @media (max-width:900px) { .hero-grid { grid-template-columns:1fr; } .hero-side { max-width:520px; } .hero-tag { left:12px; } }
+
+  /* что купить */
+  .buy { background:var(--ink); }
+  .cards4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:40px; }
+  .c { background:var(--navy); border:1px solid var(--line); border-radius:20px; padding:26px; transition:.25s; }
+  .c:hover { border-color:rgba(35,225,125,.5); transform:translateY(-4px); }
+  .c .ic { width:52px; height:52px; border-radius:14px; background:rgba(35,225,125,.12); display:grid; place-items:center; margin-bottom:18px; }
+  .c .ic svg { width:28px; height:28px; stroke:var(--green); fill:none; stroke-width:1.8; }
+  .c p { color:var(--muted); margin:8px 0 0; font-size:15px; }
+  .promo { margin-top:22px; display:flex; gap:14px; align-items:center; padding:18px 24px; border-radius:18px; background:linear-gradient(90deg,rgba(35,225,125,.18),rgba(35,225,125,.04)); border:1px solid rgba(35,225,125,.35); font-weight:600; }
+  .promo span { font-size:24px; }
+  @media (max-width:900px) { .cards4 { grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px) { .cards4 { grid-template-columns:1fr; } }
+
+  /* каталог */
+  .catalog { background:linear-gradient(180deg,var(--navy),var(--ink)); }
+  .cat-head { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; }
+  .goods { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:36px; }
+  .g { background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:8px; }
+  .g .size { display:inline-block; align-self:flex-start; font:700 13px Inter; color:var(--navy); background:var(--green); padding:4px 10px; border-radius:20px; }
+  .g .name { font-weight:600; line-height:1.35; flex:1; }
+  .g .price { font:800 24px Montserrat, sans-serif; }
+  .note { color:var(--muted); font-size:14px; margin-top:16px; }
+  @media (max-width:900px) { .goods { grid-template-columns:1fr 1fr; } }
+
+  /* услуги */
+  .services-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
+  .svc-list { border-top:1px solid var(--line); }
+  .svc { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:20px 0; border-bottom:1px solid var(--line); }
+  .svc .n { font-weight:600; font-size:17px; }
+  .svc .p { font:800 20px Montserrat, sans-serif; color:var(--green); white-space:nowrap; }
+  .svc .p.free { font-size:15px; background:rgba(35,225,125,.14); padding:6px 14px; border-radius:20px; }
+  .svc .p.mute { color:var(--muted); font:500 14px Inter; }
+  @media (max-width:900px) { .services-grid { grid-template-columns:1fr; gap:36px; } }
+
+  /* выкуп */
+  .buyback { background:var(--green); color:var(--navy); position:relative; overflow:hidden; }
+  .buyback::after { content:""; position:absolute; right:-80px; top:-80px; width:420px; height:420px; border-radius:50%; border:70px solid rgba(4,33,59,.08); }
+  .bb { display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center; position:relative; z-index:1; }
+  .buyback .kicker { color:var(--navy); opacity:.7; }
+  .buyback p { font-size:19px; margin:0 0 26px; max-width:620px; }
+  .buyback .btn { background:var(--navy); color:#fff; }
+  .buyback .btn:hover { background:#0b3a63; }
+  .buyback .btn.ghost { background:transparent; color:var(--navy); box-shadow:inset 0 0 0 1.5px var(--navy); }
+  .bb-list { display:grid; gap:12px; }
+  .bb-list div { background:rgba(4,33,59,.08); border-radius:16px; padding:18px 22px; font-weight:700; font-size:18px; display:flex; gap:14px; align-items:center; }
+  .bb-list div span { font-size:24px; }
+  .fast { margin-top:18px; font-size:14px; font-weight:600; opacity:.75; }
+  @media (max-width:900px) { .bb { grid-template-columns:1fr; } }
+
+  /* фото */
+  .photos { display:grid; grid-template-columns:1.2fr 1fr; grid-template-rows:250px 250px; gap:12px; margin-top:40px; }
+  .photos .ph { border-radius:20px; }
+  .photos .ph:first-child { grid-row:span 2; }
+  .photos .ph img { transition:.5s; }
+  .photos .ph:hover img { transform:scale(1.04); }
+  @media (max-width:800px) { .photos { grid-template-columns:1fr 1fr; grid-template-rows:auto; } .photos .ph { aspect-ratio:4/3; } .photos .ph:first-child { grid-column:span 2; grid-row:auto; } }
+
+  /* команда */
+  .team { background:var(--navy); }
+  .team-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:56px; align-items:center; }
+  .team .ph { aspect-ratio:1065/757; border-radius:24px; }
+  .quote { font-size:20px; line-height:1.55; color:#dbe6ee; margin:0 0 22px; }
+  .award { display:inline-flex; gap:14px; align-items:center; background:rgba(255,255,255,.06); border:1px solid var(--line); padding:14px 18px; border-radius:16px; text-decoration:none; }
+  .award b { color:var(--green); display:block; font-size:18px; }
+  .award small { color:var(--muted); }
+  .award .cup { font-size:30px; }
+  @media (max-width:900px) { .team-grid { grid-template-columns:1fr; gap:34px; } }
+
+  /* советы */
+  .tips { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:40px; }
+  .tip { background:var(--navy); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; }
+  .tip .cover { aspect-ratio:1599/939; background:#06223a; }
+  .tip .cover img { width:100%; height:100%; object-fit:cover; }
+  .tip .cover.sq img { object-position:center 30%; }
+  .tip .body { padding:22px 24px 24px; }
+  .tip p { color:var(--muted); margin:8px 0 0; }
+  .tip details { margin-top:14px; }
+  .tip summary { cursor:pointer; color:var(--green); font-weight:600; list-style:none; }
+  .tip summary::-webkit-details-marker { display:none; }
+  .tip summary::after { content:" →"; }
+  .tip details[open] summary::after { content:" ↑"; }
+  .tip ol { color:#c9d7e2; padding-left:20px; margin:12px 0 0; }
+  .tip ol li { margin-bottom:8px; }
+  .tip ol b { color:var(--text); }
+  @media (max-width:800px) { .tips { grid-template-columns:1fr; } }
+
+  /* контакты */
+  .contacts { background:linear-gradient(180deg,var(--ink),var(--navy)); }
+  .ct { display:grid; grid-template-columns:.9fr 1.1fr; gap:30px; margin-top:36px; }
+  .ct-info { display:grid; gap:12px; align-content:start; }
+  .row { background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:18px; padding:20px 22px; }
+  .row small { display:block; color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:4px; }
+  .row b, .row a { font-size:19px; font-weight:700; text-decoration:none; }
+  .row a:hover { color:var(--green); }
+  .links { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  .links a { font-size:14px; font-weight:600; padding:10px 16px; border-radius:30px; background:rgba(255,255,255,.07); text-decoration:none; }
+  .links a:hover { background:var(--green); color:var(--navy); }
+  .map { border-radius:22px; overflow:hidden; min-height:420px; border:1px solid var(--line); }
+  .map iframe { width:100%; height:100%; min-height:420px; border:0; filter:saturate(.8); }
+  @media (max-width:900px) { .ct { grid-template-columns:1fr; } }
+
+  footer { padding:30px 0 100px; color:#6f879b; font-size:14px; border-top:1px solid var(--line); background:var(--navy); }
+  footer .wrap { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+
+  /* нижняя панель на телефоне */
+  .callbar { position:fixed; left:12px; right:12px; bottom:12px; z-index:40; display:none; gap:8px; }
+  .callbar a { flex:1; justify-content:center; padding:15px; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .callbar a.ghost { background:var(--navy); }
+  @media (max-width:700px) { .callbar { display:flex; } section { padding:70px 0; } }
+
+  .reveal { opacity:0; transform:translateY(24px); transition:.7s ease; }
+  .reveal.in { opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce) { .reveal { opacity:1; transform:none; } html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></symbol>
+  <symbol id="i-vk" viewBox="0 0 24 24"><path fill="currentColor" d="M12.8 18C6.3 18 2.6 13.5 2.4 6h3.3c.1 5.5 2.5 7.8 4.4 8.3V6h3.1v4.7c1.9-.2 3.9-2.3 4.5-4.7h3.1a9.2 9.2 0 0 1-4.2 6 9.6 9.6 0 0 1 5 6h-3.4a6 6 0 0 0-5-4.3V18h-.4Z"/></symbol>
+</svg>
+
+<header id="top">
+  <div class="wrap nav">
+    <a class="brand" href="#top"><img src="img/logo.jpg" alt="Логотип"><b>Просто хорошие<span>шины</span></b></a>
+    <nav class="menu">
+      <a href="#buy">Купить</a>
+      <a href="#services">Услуги</a>
+      <a href="#buyback">Выкуп</a>
+      <a href="#tips">Советы</a>
+      <a href="#contacts">Контакты</a>
+      <a class="tel" href="tel:+73422554636">+7 (342) 255-46-36</a>
+      <a class="btn" href="https://vk.me/prostohoroshini" target="_blank" rel="noopener">Написать</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker">Пермь · ул. Дзержинского, 61</span>
+      <h1>Самый крупный <em>шинный центр</em> в&nbsp;Перми</h1>
+      <div class="big"><b>5 000</b><span>комплектов шин<br>и дисков в наличии</span></div>
+      <p>Шины, диски и комплекты в сборе. Выкупаем и меняем ваши шины и диски, делаем шиномонтаж и отправляем транспортной компанией по всей России.</p>
+      <div class="btns">
+        <a class="btn" href="tel:+73422554636"><svg><use href="#i-phone"/></svg>+7 (342) 255-46-36</a>
+        <a class="btn ghost" href="https://vk.me/prostohoroshini" target="_blank" rel="noopener"><svg><use href="#i-vk"/></svg>Спросить в ВК</a>
+      </div>
+      <div class="badges">
+        <span class="badge">🏆 <b>Премия 2ГИС</b> 2026</span>
+        <span class="badge">★ <b>5,0</b> · 9 отзывов ВКонтакте</span>
+        <span class="badge">Ежедневно <b>9:00–20:00</b></span>
+      </div>
+    </div>
+    <div class="hero-side reveal">
+      <div class="ph hero-pic" data-label="ФОТО: стеллаж с шинами (img/tires.jpg)"><img src="img/tires.jpg" alt="Шины на складе" onerror="this.remove()"></div>
+      <div class="hero-tag">Скидки на диски<small>при покупке комплекта резины</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="buy" id="buy">
+  <div class="wrap">
+    <span class="kicker">Что можно купить</span>
+    <h2>Всё для колёс в одном месте</h2>
+    <div class="cards4">
+      <div class="c reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg></div>
+        <h3>Шины</h3><p>Летние и зимние, от R14 до R21.</p>
+      </div>
+      <div class="c reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 9.5V3.5M14.4 13.2l5.2 3M9.6 13.2l-5.2 3"/><circle cx="12" cy="12" r="2.5"/></svg></div>
+        <h3>Диски</h3><p>Литые диски разных марок на стеллажах.</p>
+      </div>
+      <div class="c reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M7 8h10M7 12h10M7 16h10"/></svg></div>
+        <h3>Одиночные шины</h3><p>Когда нужна одна шина, а не весь комплект.</p>
+      </div>
+      <div class="c reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="5.5"/><circle cx="16" cy="12" r="5.5"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg></div>
+        <h3>Комплекты шины + диски</h3><p>Колёса в сборе, готовые к установке.</p>
+      </div>
+    </div>
+    <div class="promo reveal"><span>💥</span>Скидки на покупку дисков при покупке комплекта резины</div>
+  </div>
+</section>
+
+<section class="catalog">
+  <div class="wrap">
+    <div class="cat-head">
+      <div>
+        <span class="kicker">В наличии сейчас</span>
+        <h2>Несколько позиций из каталога</h2>
+      </div>
+      <a class="btn ghost" href="https://www.avito.ru/brands/prostohoroshieshini" target="_blank" rel="noopener">Весь каталог на Авито</a>
+    </div>
+    <div class="goods">
+      <div class="g reveal"><span class="size">205/55 R16</span><div class="name">Continental PremiumContact 6</div><div class="price">18 000 ₽</div></div>
+      <div class="g reveal"><span class="size">205/55 R16</span><div class="name">Bridgestone Turanza T001</div><div class="price">13 000 ₽</div></div>
+      <div class="g reveal"><span class="size">205/60 R16</span><div class="name">Nokian Nordman 7</div><div class="price">16 000 ₽</div></div>
+      <div class="g reveal"><span class="size">215/65 R16</span><div class="name">Pirelli Scorpion Verde All Season</div><div class="price">18 000 ₽</div></div>
+      <div class="g reveal"><span class="size">215/65 R16</span><div class="name">Continental CrossContact LX</div><div class="price">24 000 ₽</div></div>
+      <div class="g reveal"><span class="size">225/65 R17</span><div class="name">Giti GitiComfort SUV 520</div><div class="price">15 000 ₽</div></div>
+      <div class="g reveal"><span class="size">275/50 R21</span><div class="name">Michelin X-Ice North 4 SUV</div><div class="price">85 000 ₽</div></div>
+      <div class="g reveal"><span class="size">5.5Jx14 4x98</span><div class="name">Диски литые Lada Granta</div><div class="price">14 000 ₽</div></div>
+    </div>
+    <p class="note">Цены из магазина группы ВКонтакте. Наличие уточняйте по телефону или в сообщениях.</p>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap services-grid">
+    <div>
+      <span class="kicker">Услуги</span>
+      <h2>Шиномонтаж и ремонт на месте</h2>
+      <p class="lead">Купили колёса у нас? Здесь же их и поставят. Если нужно в другой город, отправим транспортной компанией.</p>
+      <div class="btns" style="margin-top:28px">
+        <a class="btn" href="tel:+73422554636"><svg><use href="#i-phone"/></svg>Записаться</a>
+      </div>
+    </div>
+    <div class="svc-list reveal">
+      <div class="svc"><span class="n">🛞 Шиномонтаж</span><span class="p">1 390 ₽</span></div>
+      <div class="svc"><span class="n">🔧 Правка дисков</span><span class="p">930 ₽</span></div>
+      <div class="svc"><span class="n">Дошиповка</span><span class="p">22 ₽</span></div>
+      <div class="svc"><span class="n">🔧 Ремонт шин и дисков</span><span class="p mute">по запросу</span></div>
+      <div class="svc"><span class="n">Выкуп шин и дисков</span><span class="p free">бесплатная оценка</span></div>
+      <div class="svc"><span class="n">Обмен шин, дисков, комплектов</span><span class="p mute">по запросу</span></div>
+      <div class="svc"><span class="n">🚛 Доставка ТК по всей России</span><span class="p mute">по запросу</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="buyback" id="buyback">
+  <div class="wrap bb">
+    <div>
+      <span class="kicker">Выкуп и обмен</span>
+      <h2>Продайте старые колёса нам</h2>
+      <p>Срочный выкуп, продажа и обмен пригодных для эксплуатации шин, колёс и дисков. Пришлите фото и размер — дадим предварительную оценку.</p>
+      <div class="btns">
+        <a class="btn" href="https://vk.com/app6013442_-217804638?form_id=2" target="_blank" rel="noopener">Получить оценку</a>
+        <a class="btn ghost" href="tel:+73422554636">Позвонить</a>
+      </div>
+      <div class="fast">В ВК отвечаем в среднем за 1 минуту</div>
+    </div>
+    <div class="bb-list reveal">
+      <div><span>🛞</span>Шины</div>
+      <div><span>⚙️</span>Диски</div>
+      <div><span>🚗</span>Комплекты в сборе</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="kicker">Как у нас</span>
+    <h2>Склад и машины клиентов</h2>
+    <div class="photos">
+      <div class="ph reveal" data-label="ФОТО: диски на стеллаже (img/discs.jpg)"><img src="img/discs.jpg" alt="Диски на стеллаже" onerror="this.remove()"></div>
+      <div class="ph reveal" data-label="ФОТО: Mercedes на мойке (img/mercedes.jpg)"><img src="img/mercedes.jpg" alt="Mercedes в боксе" onerror="this.remove()"></div>
+      <div class="ph reveal" data-label="ФОТО: Range Rover у офиса (img/rangerover.jpg)"><img src="img/rangerover.jpg" alt="Range Rover у офиса" onerror="this.remove()"></div>
+    </div>
+  </div>
+</section>
+
+<section class="team">
+  <div class="wrap team-grid">
+    <div class="ph reveal" data-label="ФОТО: команда с Премией 2ГИС (img/team.jpg)"><img src="img/team.jpg" alt="Команда «Просто Хорошие Шины»" onerror="this.remove()"></div>
+    <div>
+      <span class="kicker">О нас</span>
+      <h2>Мы получили Премию 2ГИС</h2>
+      <p class="quote">Это значит, что наш бизнес вошёл в число лучших по мнению пользователей — и для нас это большая гордость. Спасибо всем, кто делится отзывами, выбирает нас и возвращается.</p>
+      <a class="award" href="https://2gis.ru/perm/geo/70000001064775413/56.158673,58.007470" target="_blank" rel="noopener">
+        <span class="cup">🏆</span><span><b>Премия 2ГИС 2026</b><small>Найти нас в 2ГИС →</small></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="wrap">
+    <span class="kicker">Советы</span>
+    <h2>Полезное из нашей группы</h2>
+    <div class="tips">
+      <article class="tip reveal">
+        <div class="cover"><img src="img/tip-spring.jpg" alt="Переходить на лето нужно правильно" loading="lazy"></div>
+        <div class="body">
+          <h3>Пермская весна: почему не стоит спешить со сменой резины</h3>
+          <p>Летняя резина при температуре ниже +5…+7 °C дубеет и теряет сцепление.</p>
+          <details><summary>Когда менять</summary>
+            <ol>
+              <li><b>Дождитесь устойчивой погоды:</b> температура должна быть выше нуля и днём, и ночью.</li>
+              <li><b>Смотрите на средний показатель:</b> когда среднесуточная температура закрепится на +7 °C, летняя резина начнёт работать эффективно.</li>
+              <li><b>Не доверяйте первому теплу:</b> в нашем регионе вплоть до конца апреля, а иногда и в мае, возможны внезапные снегопады.</li>
+            </ol>
+          </details>
+        </div>
+      </article>
+      <article class="tip reveal">
+        <div class="cover"><img src="img/tip-storage.jpg" alt="Правильное хранение зимы" loading="lazy"></div>
+        <div class="body">
+          <h3>Зимние шины нужно хранить правильно</h3>
+          <p>Четыре условия, чтобы шины прослужили не один сезон.</p>
+          <details><summary>Какие условия</summary>
+            <ol>
+              <li><b>15–35 °C и влажность около 65%.</b> Избегайте резких перепадов температур и близости к источникам тепла.</li>
+              <li><b>Защита от солнца и химии.</b> Место вдали от окон, на улице накрывайте брезентом. Не допускайте попадания масел и топлива.</li>
+              <li><b>Правильное размещение.</b> Шины без дисков храните вертикально, с дисками — горизонтально. Перекладывайте хотя бы раз в месяц.</li>
+              <li><b>Без упаковки.</b> Полиэтилен создаёт конденсат. На улице используйте тканевые мешки, в помещении можно без упаковки.</li>
+            </ol>
+          </details>
+        </div>
+      </article>
+      <article class="tip reveal">
+        <div class="cover sq"><img src="img/tip-runflat.jpg" alt="Подойдут ли тебе шины RunFlat" loading="lazy"></div>
+        <div class="body">
+          <h3>Подойдут ли вам шины RunFlat?</h3>
+          <p>Шины с усиленными боковинами держат авто даже при полной потере давления. Но есть нюансы.</p>
+          <details><summary>Плюсы и минусы</summary>
+            <ol>
+              <li>Жёстко и шумно: если приоритет — комфорт, они не для вас.</li>
+              <li>Для монтажа нужно специальное оборудование, оно есть не везде.</li>
+              <li>После езды на спущенной шине её уже не отремонтировать.</li>
+              <li>Сильнее рыскание по колее, выше цена и нагрузка на ходовую.</li>
+              <li>Зато при проколе на большой скорости авто не дёрнет в сторону.</li>
+            </ol>
+          </details>
+        </div>
+      </article>
+      <article class="tip reveal">
+        <div class="cover"><img src="img/tip-akb.jpg" alt="АКБ под замену" loading="lazy"></div>
+        <div class="body">
+          <h3>Три признака, что аккумулятор пора менять</h3>
+          <p>Зима истощает ресурс аккумулятора, а летом его ждёт жара.</p>
+          <details><summary>Признаки износа</summary>
+            <ol>
+              <li><b>Проблемы с запуском:</b> медленное вращение стартера, несколько попыток запуска или полный отказ.</li>
+              <li><b>Снижение напряжения:</b> тусклый свет фар, сбои электроники.</li>
+              <li><b>Внешние признаки:</b> вздутие корпуса, белый налёт на клеммах, течь электролита.</li>
+            </ol>
+          </details>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="contacts" id="contacts">
+  <div class="wrap">
+    <span class="kicker">Как нас найти</span>
+    <h2>Приезжайте или позвоните</h2>
+    <p class="lead">Готовы ответить на все вопросы.</p>
+    <div class="ct">
+      <div class="ct-info">
+        <div class="row"><small>Адрес</small><b>Пермь, ул. Дзержинского, 61</b></div>
+        <div class="row"><small>Телефон</small><a href="tel:+73422554636">+7 (342) 255-46-36</a></div>
+        <div class="row"><small>Режим работы</small><b>Ежедневно, 9:00–20:00</b></div>
+        <div class="links">
+          <a href="https://vk.com/prostohoroshini" target="_blank" rel="noopener">ВКонтакте</a>
+          <a href="https://vk.me/prostohoroshini" target="_blank" rel="noopener">Написать в ВК</a>
+          <a href="https://www.avito.ru/brands/prostohoroshieshini" target="_blank" rel="noopener">Авито</a>
+          <a href="https://2gis.ru/perm/geo/70000001064775413/56.158673,58.007470" target="_blank" rel="noopener">2ГИС</a>
+        </div>
+      </div>
+      <div class="map">
+        <iframe title="Карта" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=56.150%2C58.0045%2C56.167%2C58.0105&amp;layer=mapnik&amp;marker=58.007470%2C56.158673"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© Просто Хорошие Шины, Пермь</span>
+    <span>Пробная версия сайта</span>
+  </div>
+</footer>
+
+<div class="callbar">
+  <a class="btn" href="tel:+73422554636"><svg><use href="#i-phone"/></svg>Позвонить</a>
+  <a class="btn ghost" href="https://vk.me/prostohoroshini" target="_blank" rel="noopener"><svg><use href="#i-vk"/></svg>Написать</a>
+</div>
+
+<script>
+  const h = document.querySelector('header');
+  const onScroll = () => h.classList.toggle('solid', scrollY > 40);
+  addEventListener('scroll', onScroll); onScroll();
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
