@@ -132,7 +132,21 @@ h1 span{display:block;color:var(--yellow)}
 h2{font-size:clamp(32px,4.2vw,60px);line-height:.98;margin:14px 0 20px}
 h2 em{font-style:normal;color:var(--yellow)}
 .lead{max-width:480px;color:#e0e0e0;font-size:clamp(15px,1.15vw,17px)}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.actions{display:flex;flex-wrap:wrap;align-items:stretch;gap:12px;margin-top:28px}
+/* Ціна — в одному ряду з кнопками, щоб її було видно одразу */
+.actions .price-strip{margin-top:0;max-width:none;flex-wrap:nowrap}
+.actions .price-strip > div{padding:7px 16px;display:flex;flex-direction:column;justify-content:center}
+.actions .price-strip b{font-size:22px;line-height:1.1}
+/* Невисокі екрани (ноутбуки, iPad горизонтально): заголовок і відступи підлаштовуються під висоту */
+@media (min-width:901px){
+  #s-home h1{font-size:clamp(46px,min(7.6vw,13.5vh),118px);margin:clamp(8px,1.8vh,18px) 0 clamp(10px,2.2vh,22px)}
+  #s-home .actions{margin-top:clamp(14px,3vh,28px)}
+  #s-home .slide-inner{padding-bottom:12px}
+}
+@media (min-width:901px) and (max-height:760px){
+  #s-home .lead{font-size:14.5px;line-height:1.5}
+  #s-home .tag{font-size:11px}
+}
 
 /* Режим «слайди» (десктоп) */
 .is-slides body,.is-slides{overflow:hidden;height:100%}
@@ -152,7 +166,7 @@ html:not(.is-slides) .slide--panel{background:rgba(7,7,7,.9)}
 .price-strip small{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .price-strip b{font-size:26px;font-weight:900;color:var(--white);line-height:1.15}
 .price-strip b i{font-style:normal;font-size:13px;color:var(--yellow);margin-left:6px}
-.price-strip .badge{display:flex;align-items:center;white-space:nowrap;background:var(--yellow);color:#000;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.price-strip .badge{padding:0 16px;display:flex;align-items:center;white-space:nowrap;background:var(--yellow);color:#000;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
 
 /* Слайд 2: зв'язок */
 #s-link{align-items:flex-start;padding-top:calc(var(--head) + 56px)}
@@ -346,7 +360,7 @@ dialog[open]{animation:pop .35s var(--ease)}
   #s-home .actions .btn{width:auto;--h:52px;padding:0 10px;font-size:12px;letter-spacing:.06em}
   #s-home .actions .btn svg{display:none}
   .hide-m{display:none}
-  #s-home .price-strip{margin-top:10px;max-width:none}
+  #s-home .price-strip{margin-top:0;max-width:none;grid-column:1/-1}
   #s-home .price-strip > div{padding:9px 14px}
   #s-home .price-strip b{font-size:19px}
   #s-home .price-strip .badge{flex:1;justify-content:center;font-size:11px}
@@ -500,14 +514,14 @@ dialog[open]{animation:pop .35s var(--ease)}
     <h1 data-a>Starlink<span>Mini</span></h1>
     <p class="lead" data-a>Starlink Mini — компактна супутникова система зв’язку з інтегрованим Wi-Fi. Легко транспортується в рюкзаку та може живитися від EcoFlow або автомобільної мережі 12&nbsp;В. Ідеальне рішення для роботи у віддалених локаціях, автомобільних подорожей і мобільних робочих команд.</p>
     <div class="actions" data-a>
+      <div class="price-strip">
+        <div><small>Ціна, опт</small><b>16 999<i>грн/шт</i></b></div>
+        <div class="badge">Опт від 10 шт</div>
+      </div>
       <a class="btn btn--line btn--down" href="#s-contact" data-go="5"><span>Зв’язатися<span class="hide-m"> з нами</span></span>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 2v11M4 9l4 4 4-4"/></svg></a>
       <button class="btn btn--accent" type="button" data-open-order>Купити в 1 клік
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
-    </div>
-    <div class="price-strip" data-a>
-      <div><small>Ціна, опт</small><b>16 999<i>грн/шт</i></b></div>
-      <div class="badge">Опт від 10 шт</div>
     </div>
   </div></div>
 </section>
