@@ -120,6 +120,18 @@
       .copy-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
       .contact strong { font-size: 0.95rem; }
     }
+    .review { position: relative; margin: 1.5rem 0 0; padding: 1.5rem 1.5rem 1.2rem; border: 1px solid var(--line); border-radius: 22px; background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(12px); }
+    .review::before { content: "\201C"; position: absolute; top: -0.3em; left: 0.3em; font: 600 5.5rem/1 var(--font-display); color: var(--accent); text-shadow: 0 8px 30px var(--glow); }
+    .review blockquote { margin: 0; }
+    .review .pull { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.1rem, 1.9vw, 1.45rem); line-height: 1.25; letter-spacing: -0.01em; margin: 0.5rem 0 0.8rem; text-wrap: balance; }
+    .review .text { color: var(--muted); font-size: 0.95rem; line-height: 1.6; margin: 0 0 1.1rem; }
+    .author { display: flex; align-items: center; gap: 0.75rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+    .author .mono { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font: 600 0.85rem/1 var(--font-display); }
+    .author strong { display: block; font-weight: 600; }
+    .author small { color: var(--muted); font-size: 0.85rem; }
+    .rv-note { margin: 0.7rem 0 0; font-size: 0.8rem; color: var(--muted); font-style: italic; }
+    .rv-note:empty { display: none; }
+    @media (max-width: 760px) { .review { padding: 1.2rem 1rem 1rem; } .review::before { font-size: 4.2rem; } .review .text { font-size: 0.9rem; } }
     .profile { display: flex; align-items: center; gap: 0.9rem; padding: 0.1rem 0.2rem 0.3rem; min-width: 0; }
     .profile img { flex: none; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent), 0 10px 24px var(--glow); }
     .profile strong { display: block; font-family: var(--font-display); font-weight: 500; font-size: 1.05rem; line-height: 1.2; }
@@ -201,8 +213,8 @@
       <nav class="nav" aria-label="Разделы" data-i18n-aria="navLabel">
         <button type="button" data-go="1" data-i18n="navServices">Услуги</button>
         <button type="button" data-go="2" data-i18n="navWork">Работы</button>
-        <button type="button" data-go="6" data-i18n="navPrice">Цена</button>
-        <button type="button" data-go="7" data-i18n="navContact">Контакты</button>
+        <button type="button" data-go="8" data-i18n="navPrice">Цена</button>
+        <button type="button" data-go="9" data-i18n="navContact">Контакты</button>
       </nav>
       <div class="tools">
         <div class="seg" role="group" aria-label="Язык" data-i18n-aria="langLabel">
@@ -227,7 +239,7 @@
         <p class="lead reveal" style="--i:2" data-i18n="introLead">Сайты под ключ, баннеры и карточки товаров. От структуры и прототипа до финального дизайна.</p>
         <div class="actions reveal" style="--i:3">
           <button class="btn" type="button" data-go="2" data-i18n="introWork">Смотреть работы</button>
-          <button class="btn btn-ghost" type="button" data-go="7" data-i18n="introContact">Написать мне</button>
+          <button class="btn btn-ghost" type="button" data-go="9" data-i18n="introContact">Написать мне</button>
         </div>
       </div>
     </section>
@@ -245,9 +257,44 @@
       </div>
     </section>
 
+    <section class="slide" tabindex="-1" aria-labelledby="bs-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">01</span>&nbsp;<span data-i18n="bsEyebrow">Салон красоты · Белосток</span></span>
+        <h2 class="reveal" style="--i:1" id="bs-title" translate="no">Blond Secret</h2>
+        <p class="lead reveal" style="--i:2" data-i18n="bsLead">Сайт для салона блонда и окрашивания. Галерея работ, подбор оттенка блонда, услуги с ценами, отзывы клиентов и запись на визит.</p>
+        <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagDev">Сайт под ключ</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
+        <div class="gallery reveal" style="--i:4">
+          <button class="shot" type="button"><img src="__IMG_BS_GALERIA__" width="1440" height="900" alt="Галерея работ салона" data-i18n-alt="photo4"></button>
+          <button class="shot" type="button"><img src="__IMG_BS_OPINIE__" width="1440" height="900" alt="Раздел отзывов" data-i18n-alt="photo5"></button>
+          <button class="shot shot-phone" type="button"><span class="phone-frame"><img src="__IMG_BS_MOBILE__" width="520" height="1125" alt="Мобильная версия сайта" data-i18n-alt="photo6"></span></button>
+        </div>
+        <div class="actions reveal" style="--i:5">
+          <a class="btn" href="https://blondsecret.pl/" target="_blank" rel="noopener"><span data-i18n="openSite">Открыть сайт</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" tabindex="-1" aria-labelledby="rv-title">
+      <div class="content">
+        <span class="eyebrow reveal" style="--i:0" translate="no">Blond Secret</span>
+        <h2 class="reveal" style="--i:1" id="rv-title" data-i18n="rvTitle">Что говорит клиентка</h2>
+        <figure class="review reveal" style="--i:2">
+          <blockquote>
+            <p class="pull" data-i18n="rvPull">Вы тот, кому можно довериться без сожаления.</p>
+            <p class="text" data-i18n="rvText">Выражаю огромную благодарность за сотворение сайта для моей фирмы. Мне было очень комфортно работать с Вами. То, что Вы учли все мои пожелания, создали сайт, почувствовав мою задумку относительно цветов, сделали всё очень быстро и чутко реагировали на все мои просьбы, пробудило во мне доверие к Вам. С Вами приятно сотрудничать, и за такую работу хочется отблагодарить оплатой. В мире, где нас окружает обман, Вы тот, кому можно довериться без сожаления. Обязательно буду рекомендовать Вашу работу тем, кто нуждается в создании собственного сайта.</p>
+          </blockquote>
+          <figcaption class="author">
+            <span class="mono" aria-hidden="true">TK</span>
+            <span><strong translate="no">Tetiana Kovalchuk</strong><small data-i18n="rvRole">Владелица Blond Secret, Белосток</small></span>
+          </figcaption>
+          <p class="rv-note" data-i18n="rvNote"></p>
+        </figure>
+      </div>
+    </section>
+
     <section class="slide" tabindex="-1" aria-labelledby="sv-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">01</span>&nbsp;<span data-i18n="p0Eyebrow">Опт Starlink · Украина</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">02</span>&nbsp;<span data-i18n="p0Eyebrow">Опт Starlink · Украина</span></span>
         <h2 class="reveal" style="--i:1" id="sv-title" translate="no">VOMTEX · Starlink Mini</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p0Lead">Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagSlides">Сайт-слайдер</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
@@ -264,7 +311,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s2-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">02</span>&nbsp;<span data-i18n="p1Eyebrow">Детейлинг-студия</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p1Eyebrow">Детейлинг-студия</span></span>
         <h2 class="reveal" style="--i:1" id="s2-title" translate="no">Halo Detail Studio</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p1Lead">Тёмный сайт для студии детейлинга. Слайдер «до / после» показывает краску до и после полировки.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li data-i18n="tagProto">Прототип</li><li data-i18n="tagAdaptive">Адаптив</li></ul>
@@ -273,7 +320,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s4-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">03</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p3Eyebrow">Кофейня · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s4-title" data-i18n="p3Title">Кофейня «Мідь»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p3Lead">3D-сцена на фоне: при прокрутке медная турка наливает кофе в чашку.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagMotion">Анимация</li></ul>
@@ -282,7 +329,7 @@
 
     <section class="slide" tabindex="-1" aria-labelledby="s5-title">
       <div class="content">
-        <span class="eyebrow reveal" style="--i:0"><span class="num-big">04</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
+        <span class="eyebrow reveal" style="--i:0"><span class="num-big">05</span>&nbsp;<span data-i18n="p4Eyebrow">Студия керамики · концепт</span></span>
         <h2 class="reveal" style="--i:1" id="s5-title" data-i18n="p4Title">Керамика «Обжиг»</h2>
         <p class="lead reveal" style="--i:2" data-i18n="p4Lead">3D-вазы, которые можно вращать. При выборе модели одна форма плавно перетекает в другую.</p>
         <ul class="chips reveal" style="--i:3"><li data-i18n="tagDesign">Дизайн сайта</li><li>3D</li><li data-i18n="tagInteractive">Интерактив</li></ul>
@@ -370,7 +417,8 @@
         contactEyebrow: "Контакты", contactTitle: 'Обсудим <span class="accent">ваш проект?</span>', contactLead: "Пишите в Telegram или на почту. Отвечаю в течение дня.",
         emailLabel: "Почта", copy: "Скопировать", copied: "Почта скопирована.", copyFail: "Не удалось скопировать: выделите адрес вручную.",
         p0Eyebrow: "Опт Starlink · Украина", p0Lead: "Сайт для оптовых продаж Starlink Mini. Шесть экранов-слайдов ведут от первого впечатления к заявке: связь, условия опта, характеристики, частые вопросы и контакты.", tagSlides: "Сайт-слайдер", photo1: "Раздел частых вопросов", photo2: "Раздел контактов с формой заявки", photo3: "Мобильная версия сайта", photoLabel: "Фото", closePhoto: "Закрыть", openPhoto: "Открыть фото",
-        slides: ["Знакомство", "Услуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
+        bsEyebrow: "Салон красоты · Белосток", bsLead: "Сайт для салона блонда и окрашивания. Галерея работ, подбор оттенка блонда, услуги с ценами, отзывы клиентов и запись на визит.", photo4: "Галерея работ салона", photo5: "Раздел отзывов", photo6: "Мобильная версия сайта", rvTitle: "Что говорит клиентка", rvPull: "Вы тот, кому можно довериться без сожаления.", rvText: "Выражаю огромную благодарность за сотворение сайта для моей фирмы. Мне было очень комфортно работать с Вами. То, что Вы учли все мои пожелания, создали сайт, почувствовав мою задумку относительно цветов, сделали всё очень быстро и чутко реагировали на все мои просьбы, пробудило во мне доверие к Вам. С Вами приятно сотрудничать, и за такую работу хочется отблагодарить оплатой. В мире, где нас окружает обман, Вы тот, кому можно довериться без сожаления. Обязательно буду рекомендовать Вашу работу тем, кто нуждается в создании собственного сайта.", rvRole: "Владелица Blond Secret, Белосток", rvNote: "",
+        slides: ["Знакомство", "Услуги", "Blond Secret", "Отзыв клиентки", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кофейня «Мідь»", "Керамика «Обжиг»", "Цена и этапы", "Контакты"],
         title: "Марк — веб-дизайнер",
       },
       uk: {
@@ -397,7 +445,8 @@
         contactEyebrow: "Контакти", contactTitle: 'Обговоримо <span class="accent">ваш проєкт?</span>', contactLead: "Пишіть у Telegram або на пошту. Відповідаю протягом дня.",
         emailLabel: "Пошта", copy: "Скопіювати", copied: "Пошту скопійовано.", copyFail: "Не вдалося скопіювати: виділіть адресу вручну.",
         p0Eyebrow: "Опт Starlink · Україна", p0Lead: "Сайт для оптових продажів Starlink Mini. Шість екранів-слайдів ведуть від першого враження до заявки: зв'язок, умови опту, характеристики, часті питання й контакти.", tagSlides: "Сайт-слайдер", photo1: "Розділ частих питань", photo2: "Розділ контактів із формою заявки", photo3: "Мобільна версія сайту", photoLabel: "Фото", closePhoto: "Закрити", openPhoto: "Відкрити фото",
-        slides: ["Знайомство", "Послуги", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
+        bsEyebrow: "Салон краси · Білосток", bsLead: "Сайт для салону блонду та фарбування. Галерея робіт, вибір відтінку блонду, послуги з цінами, відгуки клієнтів і запис на візит.", photo4: "Галерея робіт салону", photo5: "Розділ відгуків", photo6: "Мобільна версія сайту", rvTitle: "Що каже клієнтка", rvPull: "Ви та людина, якій можна довіритися без жалю.", rvText: "Висловлюю величезну вдячність за створення сайту для моєї фірми. Мені було дуже комфортно працювати з Вами. Те, що Ви врахували всі мої побажання, створили сайт, відчувши мій задум щодо кольорів, зробили все дуже швидко й чуйно реагували на всі мої прохання, пробудило в мені довіру до Вас. З Вами приємно співпрацювати, і за таку роботу хочеться віддячити оплатою. У світі, де нас оточує обман, Ви та людина, якій можна довіритися без жалю. Обов'язково рекомендуватиму Вашу роботу тим, хто потребує створення власного сайту.", rvRole: "Власниця Blond Secret, Білосток", rvNote: "Переклад з російської",
+        slides: ["Знайомство", "Послуги", "Blond Secret", "Відгук клієнтки", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Кав'ярня «Мідь»", "Кераміка «Обжиг»", "Ціна та етапи", "Контакти"],
         title: "Марк — веб-дизайнер",
       },
       en: {
@@ -424,7 +473,8 @@
         contactEyebrow: "Contact", contactTitle: 'Let\'s discuss <span class="accent">your project</span>', contactLead: "Message me on Telegram or by email. I reply within a day.",
         emailLabel: "Email", copy: "Copy", copied: "Email copied.", copyFail: "Couldn't copy: please select the address manually.",
         p0Eyebrow: "Starlink wholesale · Ukraine", p0Lead: "A wholesale website for Starlink Mini. Six full-screen slides take a buyer from first impression to inquiry: coverage, wholesale terms, specs, FAQ and contacts.", tagSlides: "Slide-based site", photo1: "FAQ section", photo2: "Contacts section with a request form", photo3: "Mobile version of the site", photoLabel: "Photo", closePhoto: "Close", openPhoto: "Open photo",
-        slides: ["Intro", "Services", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
+        bsEyebrow: "Hair salon · Białystok", bsLead: "A website for a blonde and color salon: a work gallery, a blonde shade guide, services with prices, client reviews and booking.", photo4: "Salon work gallery", photo5: "Reviews section", photo6: "Mobile version of the site", rvTitle: "What the client says", rvPull: "You're someone I can trust without regret.", rvText: "I'm hugely grateful for the website you created for my business. Working with you was very comfortable. You took all my wishes into account, sensed my idea for the colors, did everything very quickly and responded thoughtfully to every request, and that earned my trust. You're a pleasure to work with, and work like this deserves to be paid for. In a world full of deception, you're someone I can trust without regret. I will definitely recommend your work to anyone who needs a website of their own.", rvRole: "Owner of Blond Secret, Białystok", rvNote: "Translated from Russian",
+        slides: ["Intro", "Services", "Blond Secret", "Client review", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Mid Coffee", "Obzhig Ceramics", "Pricing & process", "Contact"],
         title: "Mark — web designer",
       },
       pl: {
@@ -451,7 +501,8 @@
         contactEyebrow: "Kontakt", contactTitle: 'Porozmawiajmy <span class="accent">o Twoim projekcie</span>', contactLead: "Napisz na Telegramie lub e-mailem. Odpowiadam w ciągu dnia.",
         emailLabel: "E-mail", copy: "Kopiuj", copied: "E-mail skopiowany.", copyFail: "Nie udało się skopiować: zaznacz adres ręcznie.",
         p0Eyebrow: "Hurt Starlink · Ukraina", p0Lead: "Strona do hurtowej sprzedaży Starlink Mini. Sześć pełnoekranowych slajdów prowadzi od pierwszego wrażenia do zapytania: łączność, warunki hurtu, parametry, FAQ i kontakt.", tagSlides: "Strona w slajdach", photo1: "Sekcja FAQ", photo2: "Sekcja kontaktowa z formularzem", photo3: "Wersja mobilna strony", photoLabel: "Zdjęcie", closePhoto: "Zamknij", openPhoto: "Otwórz zdjęcie",
-        slides: ["Poznajmy się", "Usługi", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
+        bsEyebrow: "Salon fryzjerski · Białystok", bsLead: "Strona salonu specjalizującego się w blondzie i koloryzacji: galeria prac, wybór odcienia blondu, usługi z cenami, opinie klientek i zapis na wizytę.", photo4: "Galeria prac salonu", photo5: "Sekcja opinii", photo6: "Wersja mobilna strony", rvTitle: "Co mówi klientka", rvPull: "Jest Pan kimś, komu można zaufać bez żalu.", rvText: "Wyrażam ogromną wdzięczność za stworzenie strony dla mojej firmy. Praca z Panem była dla mnie bardzo komfortowa. To, że uwzględnił Pan wszystkie moje życzenia, wyczuł mój pomysł na kolory, zrobił wszystko bardzo szybko i z wyczuciem reagował na każdą prośbę, wzbudziło moje zaufanie. Współpraca z Panem to przyjemność, a za taką pracę chce się odwdzięczyć zapłatą. W świecie pełnym oszustw jest Pan kimś, komu można zaufać bez żalu. Na pewno będę polecać Pana pracę wszystkim, którzy potrzebują własnej strony.", rvRole: "Właścicielka Blond Secret, Białystok", rvNote: "Przetłumaczone z rosyjskiego",
+        slides: ["Poznajmy się", "Usługi", "Blond Secret", "Opinia klientki", "VOMTEX · Starlink Mini", "Halo Detail Studio", "Kawiarnia „Mid”", "Ceramika „Obżyg”", "Cena i etapy", "Kontakt"],
         title: "Marek — web designer",
       },
     };
@@ -476,7 +527,8 @@
       document.querySelectorAll("[data-i18n-html]").forEach((el) => { const v = t[el.dataset.i18nHtml]; if (v) el.innerHTML = v; });
       document.querySelectorAll("[data-i18n-aria]").forEach((el) => { const v = t[el.dataset.i18nAria]; if (v) el.setAttribute("aria-label", v); });
       document.querySelectorAll("[data-i18n-alt]").forEach((el) => { const v = t[el.dataset.i18nAlt]; if (v) el.alt = v; });
-      document.querySelectorAll(".shot").forEach((b, i) => b.setAttribute("aria-label", `${t.openPhoto}: ${t["photo" + (i + 1)]}`));
+      document.querySelectorAll(".shot").forEach((b) => b.setAttribute("aria-label", `${t.openPhoto}: ${b.querySelector("img").alt}`));
+      document.querySelectorAll('[data-i18n="rvNote"]').forEach((el) => (el.textContent = t.rvNote || ""));
       document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
       dots.forEach((d, i) => d.setAttribute("aria-label", `${i + 1}. ${t.slides[i]}`));
       themeBtn.setAttribute("aria-label", root.dataset.theme === "dark" ? t.themeLight : t.themeDark);
@@ -547,7 +599,7 @@
     function sync() {
       cur.textContent = String(index + 1).padStart(2, "0");
       dots.forEach((d, i) => d.setAttribute("aria-current", String(i === index)));
-      const group = index >= 2 && index <= 5 ? 2 : index;
+      const group = index >= 2 && index <= 7 ? 2 : index;
       navBtns.forEach((b) => b.setAttribute("aria-current", String(Number(b.dataset.go) === group)));
     }
 
@@ -960,13 +1012,14 @@
         return c;
       },
     };
-    const images = { halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__", star1: "__IMG_STAR1__", star2: "__IMG_STAR2__", star3: "__IMG_STAR3__", star4: "__IMG_STAR4__" };
+    const images = { bs1: "__IMG_BS_HERO__", bs2: "__IMG_BS_BLOND__", bs3: "__IMG_BS_GALERIA__", bs4: "__IMG_BS_CENNIK__", bsrev: "__IMG_BS_OPINIE__", halo: "__IMG_HALO__", coffee: "__IMG_COFFEE__", ceramics: "__IMG_CERAMICS__", star1: "__IMG_STAR1__", star2: "__IMG_STAR2__", star3: "__IMG_STAR3__", star4: "__IMG_STAR4__" };
     const loaded = {};
-    const SLIDE_SCREEN = ["intro", "services", "starlink", "halo", "coffee", "ceramics", "process", "contact"];
-    const STAR = ["star1", "star2", "star3", "star4"];
-    let starIdx = 0, starTimer = 0;
-    const screenFor = (i) => (SLIDE_SCREEN[i] === "starlink" ? STAR[starIdx] : SLIDE_SCREEN[i]);
-    const URLS = { halo: "halo-detail-studio", coffee: "mid-coffee", ceramics: "obzhig-ceramics", star1: "starlinkmini-phi.vercel.app", star2: "starlinkmini-phi.vercel.app", star3: "starlinkmini-phi.vercel.app", star4: "starlinkmini-phi.vercel.app" };
+    const SLIDE_SCREEN = ["intro", "services", "blond", "bsrev", "starlink", "halo", "coffee", "ceramics", "process", "contact"];
+    // Case slides flip through several screens of the client's site.
+    const SHOWS = { starlink: ["star1", "star2", "star3", "star4"], blond: ["bs1", "bs2", "bs3", "bs4"] };
+    let showIdx = 0, showTimer = 0;
+    const screenFor = (i) => (SHOWS[SLIDE_SCREEN[i]] ? SHOWS[SLIDE_SCREEN[i]][showIdx] : SLIDE_SCREEN[i]);
+    const URLS = { bs1: "blondsecret.pl", bs2: "blondsecret.pl", bs3: "blondsecret.pl", bs4: "blondsecret.pl", bsrev: "blondsecret.pl", halo: "halo-detail-studio", coffee: "mid-coffee", ceramics: "obzhig-ceramics", star1: "starlinkmini-phi.vercel.app", star2: "starlinkmini-phi.vercel.app", star3: "starlinkmini-phi.vercel.app", star4: "starlinkmini-phi.vercel.app" };
     const texCache = {};
     function screenTexture(name) {
       if (texCache[name]) return texCache[name];
@@ -1000,9 +1053,11 @@
     const POSES = [
       { lid: 32, ry: -78, rx: 10 },
       { lid: 78, ry: 38, rx: 14 },
-      { lid: 104, ry: -30, rx: 9 },
-      { lid: 106, ry: 24, rx: 8 },
-      { lid: 108, ry: -16, rx: 6 },
+      { lid: 104, ry: -28, rx: 9 },
+      { lid: 100, ry: -56, rx: 12 },
+      { lid: 106, ry: 26, rx: 8 },
+      { lid: 106, ry: -20, rx: 8 },
+      { lid: 108, ry: 14, rx: 6 },
       { lid: 108, ry: -12, rx: 6 },
       { lid: 96, ry: -64, rx: 16 },
       { lid: 112, ry: 0, rx: 4 },
@@ -1013,12 +1068,12 @@
     function pose(i, dur = 1250) {
       const p = POSES[i];
       tween = { from: { ...state }, to: { lid: p.lid * deg, ry: p.ry * deg, rx: p.rx * deg }, t0: performance.now(), dur: reduceMotion ? 1 : dur };
-      clearInterval(starTimer);
-      if (SLIDE_SCREEN[i] === "starlink") {
-        starIdx = 0;
-        showScreen(STAR[0]);
-        // The case slide flips through the client's site like a real browser session.
-        if (!reduceMotion) starTimer = setInterval(() => { starIdx = (starIdx + 1) % STAR.length; showScreen(STAR[starIdx]); }, 3200);
+      clearInterval(showTimer);
+      const show = SHOWS[SLIDE_SCREEN[i]];
+      if (show) {
+        showIdx = 0;
+        showScreen(show[0]);
+        if (!reduceMotion) showTimer = setInterval(() => { showIdx = (showIdx + 1) % show.length; showScreen(show[showIdx]); }, 3200);
       } else if (SLIDE_SCREEN[i] !== screenName) showScreen(SLIDE_SCREEN[i]);
     }
 
