@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Google tag (код від клієнта) -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-P2TKN9TW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
 <title>Дякуємо за заявку — VOMTEX</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="img/favicon.png">
@@ -11,6 +18,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script>
+  // Чи прийшов відвідувач саме після заявки з форми (а не відкрив сторінку напряму / оновив її).
+  // Прапорець ставить форма на головній; читаємо його один раз — для Google Ads і пікселя FB.
+  window.VOMTEX_FROM_FORM = false;
+  try { window.VOMTEX_FROM_FORM = sessionStorage.getItem("vomtex_lead") === "1"; sessionStorage.removeItem("vomtex_lead"); } catch (_) {}
+</script>
+
+<!-- Event snippet for Отправка формы для потенциальных клиентов conversion page (Google Ads, код від клієнта).
+     Конверсія надсилається лише після справжньої заявки. -->
+<script>
+  if (window.VOMTEX_FROM_FORM) {
+    gtag('event', 'conversion', {'send_to': 'AW-18592084410/ZvUqCLT6k78dELrjsqFF'});
+  }
+</script>
 
 <!-- ================= META PIXEL (Facebook) =================
      Впишіть ID пікселя з Events Manager у FB_PIXEL_ID (лише цифри).
@@ -27,9 +49,7 @@
     document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', FB_PIXEL_ID);
     fbq('track', 'PageView');
-    let fromForm = false;
-    try { fromForm = sessionStorage.getItem("vomtex_lead") === "1"; sessionStorage.removeItem("vomtex_lead"); } catch (_) {}
-    if (fromForm) fbq('track', 'Lead');
+    if (window.VOMTEX_FROM_FORM) fbq('track', 'Lead');
   }
 </script>
 
